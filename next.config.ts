@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   images: {
     unoptimized: true
-  },
-  experimental: {
-    esmExternals: 'loose'
   }
 };
 
