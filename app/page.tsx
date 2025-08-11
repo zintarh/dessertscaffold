@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Zap, Target, Users, BookOpen, TrendingUp, ArrowRight, Play, GraduationCap, Rocket, Brain, Clock, Award, Sun, Moon, CheckCircle, BarChart3, Lightbulb, Search, FileText, Beaker } from 'lucide-react';
+import { Zap, Target, Users, BookOpen, TrendingUp, ArrowRight, Play, GraduationCap, Brain, Clock, Award, Sun, Moon, CheckCircle, BarChart3, Lightbulb, Search, FileText, Beaker } from 'lucide-react';
 import { useTheme } from './contexts/ThemeContext';
 
 export default function Home() {

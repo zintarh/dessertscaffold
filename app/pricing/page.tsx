@@ -22,7 +22,7 @@ interface PricingPlan {
   excludedFeatures?: string[];
   buttonText: string;
   buttonVariant: 'primary' | 'secondary' | 'premium';
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   gradient: string;
   badge?: string;
 }
@@ -112,7 +112,7 @@ export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false);
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
 
-  const getButtonStyles = (variant: string, popular?: boolean) => {
+  const getButtonStyles = (variant: string, _popular?: boolean) => {
     const baseStyles = "w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg";
     
     switch (variant) {

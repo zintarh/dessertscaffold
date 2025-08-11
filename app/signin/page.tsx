@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { GraduationCap, Sun, Moon, Mail, Lock, Eye, EyeOff, ArrowRight, Building, Users, Target, Clock, Shield, CheckCircle } from '../components/Icons';
+import { GraduationCap, Sun, Moon, Mail, Lock, Eye, EyeOff, ArrowRight, Users, Target, CheckCircle } from '../components/Icons';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function SigninPage() {
@@ -422,7 +422,7 @@ export default function SigninPage() {
                   <span className={`text-sm ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                   }`}>
-                    Don't have an account?{' '}
+                    Don&apos;t have an account?{' '}
                   </span>
                   <Link 
                     href="/signup"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Zap, Target, Users, BookOpen, TrendingUp, ArrowRight, Play, Star, Rocket, Brain, Clock, Award } from 'lucide-react';
+import { GraduationCap, Zap, Users, BookOpen, TrendingUp, ArrowRight, Play, Star, Rocket, Brain, Clock, Award } from 'lucide-react';
 
 export default function Home() {
   const [isEvaluating, setIsEvaluating] = useState(false);

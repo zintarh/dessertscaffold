@@ -8,9 +8,8 @@ import ThemeToggle from '../components/ThemeToggle';
 import Image from 'next/image';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
-  Search, Filter, GraduationCap, MapPin, Clock, Users, MessageCircle, Heart,
-  Award, Zap, TrendingUp, Calendar, ChevronDown, X, Plus, Eye,
-  ThumbsUp, Share2, Bookmark
+  Search, GraduationCap, MapPin, Clock, Users, MessageCircle, Heart,
+  Award, Zap, TrendingUp, Plus, Bookmark
 } from 'lucide-react';
 
 interface Mentor {
@@ -86,7 +85,7 @@ export default function CommunityPage() {
   const { isDarkMode } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters] = useState(false);
   const [likedMentors, setLikedMentors] = useState<string[]>([]);
   const [bookmarkedMentors, setBookmarkedMentors] = useState<string[]>([]);
 
