@@ -127,9 +127,9 @@ export default function CommunityPage() {
       
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse ${isDarkMode ? 'bg-blue-600/20' : 'bg-blue-600/10'}`} style={{ left: '10%', top: '10%' }} />
-        <div className={`absolute top-1/3 right-1/4 w-64 h-64 rounded-full blur-2xl animate-bounce ${isDarkMode ? 'bg-emerald-500/15' : 'bg-emerald-500/8'}`} />
-        <div className={`absolute bottom-1/4 left-1/3 w-48 h-48 rounded-full blur-xl animate-pulse ${isDarkMode ? 'bg-amber-500/15' : 'bg-amber-500/8'}`} />
+        <div className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse ${isDarkMode ? 'bg-blue-600/10' : 'bg-blue-600/5'}`} style={{ left: '10%', top: '10%' }} />
+        <div className={`absolute top-1/3 right-1/4 w-64 h-64 rounded-full blur-2xl animate-bounce ${isDarkMode ? 'bg-emerald-500/8' : 'bg-emerald-500/4'}`} />
+        <div className={`absolute bottom-1/4 left-1/3 w-48 h-48 rounded-full blur-xl animate-pulse ${isDarkMode ? 'bg-amber-500/8' : 'bg-amber-500/4'}`} />
       </div>
 
       {/* Top Search Bar */}
@@ -137,9 +137,11 @@ export default function CommunityPage() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-              <GraduationCap className="w-6 h-5 text-white" />
+              <GraduationCap className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">Community</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+              Dissertation Scaffold
+            </span>
           </Link>
 
           <div className="flex-1 max-w-2xl mx-8">
@@ -181,7 +183,7 @@ export default function CommunityPage() {
                           <motion.button key={option} onClick={() => {
                             setSelectedFilters(prev => prev.includes(option) ? prev.filter(f => f !== option) : [...prev, option]);
                           }} className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
-                            selectedFilters.includes(option) ? 'bg-gradient-to-r from-blue-600 to-emerald-500 text-white' : 
+                            selectedFilters.includes(option) ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white' : 
                             isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                             whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                             {option}
@@ -198,8 +200,17 @@ export default function CommunityPage() {
       </motion.div>
 
       {/* Main Layout */}
-      <div className="relative z-10 flex max-w-7xl mx-auto px-6 py-8 gap-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
         
+        {/* Page Title */}
+       
+        <motion.div className="mb-6 gap-8" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <h1 className="text-3xl font-black mb-2 bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">Discover Mentors</h1>
+          <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{filteredMentors.length} researchers ready to guide your journey</p>
+        </motion.div>
+        
+        <div className="flex gap-8 items-start">
+          
         {/* Sidebar */}
         <motion.div className="w-80 space-y-6 hidden lg:block" initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.8 }}>
           <div className={`rounded-3xl p-6 shadow-2xl border backdrop-blur-sm ${isDarkMode ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200'}`}>
@@ -207,39 +218,39 @@ export default function CommunityPage() {
             <div className="space-y-4">
               <motion.div className="flex items-center justify-between" whileHover={{ x: 5 }}>
                 <div className="flex items-center space-x-3">
-                  <Users className="w-5 h-5 text-blue-500" />
+                  <Users className="w-5 h-5 text-gray-500" />
                   <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Active Mentors</span>
                 </div>
-                <span className="font-bold text-blue-500">2,847</span>
+                <span className="font-bold text-gray-600">2,847</span>
               </motion.div>
               <motion.div className="flex items-center justify-between" whileHover={{ x: 5 }}>
                 <div className="flex items-center space-x-3">
-                  <MessageCircle className="w-5 h-5 text-emerald-500" />
+                  <MessageCircle className="w-5 h-5 text-gray-500" />
                   <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Sessions Today</span>
                 </div>
-                <span className="font-bold text-emerald-500">156</span>
+                <span className="font-bold text-gray-600">156</span>
               </motion.div>
               <motion.div className="flex items-center justify-between" whileHover={{ x: 5 }}>
                 <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-5 h-5 text-amber-500" />
+                  <TrendingUp className="w-5 h-5 text-gray-500" />
                   <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Success Rate</span>
                 </div>
-                <span className="font-bold text-amber-500">98.4%</span>
+                <span className="font-bold text-gray-600">98.4%</span>
               </motion.div>
             </div>
           </div>
 
           <div className={`rounded-3xl p-6 shadow-2xl border backdrop-blur-sm ${isDarkMode ? 'bg-gray-800/90 border-gray-700' : 'bg-white/90 border-gray-200'}`}>
             <h3 className={`font-bold mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              <TrendingUp className="w-5 h-5 text-emerald-500" />
+              <TrendingUp className="w-5 h-5 text-slate-500" />
               <span>Trending</span>
             </h3>
             <div className="space-y-3">
               {[
-                { topic: "AI Research", trend: "+15%", color: "text-blue-500" },
-                { topic: "Grant Writing", trend: "+8%", color: "text-emerald-500" },
-                { topic: "PhD Tips", trend: "+22%", color: "text-amber-500" },
-                { topic: "Methodology", trend: "+5%", color: "text-purple-500" }
+                { topic: "AI Research", trend: "+15%", color: "text-gray-600" },
+                { topic: "Grant Writing", trend: "+8%", color: "text-gray-600" },
+                { topic: "PhD Tips", trend: "+22%", color: "text-gray-600" },
+                { topic: "Methodology", trend: "+5%", color: "text-gray-600" }
               ].map((item, i) => (
                 <motion.div key={i} className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}
                   whileHover={{ x: 5 }} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 + i * 0.1 }}>
@@ -255,10 +266,6 @@ export default function CommunityPage() {
 
         {/* Main Feed */}
         <div className="flex-1">
-          <motion.div className="mb-6" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <h1 className="text-3xl font-black mb-2 bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">Discover Mentors</h1>
-            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{filteredMentors.length} researchers ready to guide your journey</p>
-          </motion.div>
 
           <motion.div className="space-y-4" layout>
             <AnimatePresence>
@@ -285,19 +292,19 @@ export default function CommunityPage() {
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
                           <h3 className={`font-black text-xl tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{mentor.name}</h3>
-                          <motion.div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-amber-500 px-2 py-1 rounded-full" whileHover={{ scale: 1.05 }}>
+                           <motion.div className="flex items-center space-x-1 bg-gradient-to-r from-gray-400 to-gray-500 px-2 py-1 rounded-full" whileHover={{ scale: 1.05 }}>
                             <GraduationCap className="w-3 h-3 text-white fill-current" />
                             <span className="font-bold text-xs text-white">{mentor.rating}</span>
                           </motion.div>
                         </div>
                         <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{mentor.title}</p>
-                        <p className="text-blue-500 text-sm font-semibold">{mentor.institution}</p>
+                         <p className="text-gray-600 text-sm font-semibold">{mentor.institution}</p>
                         <div className="flex items-center space-x-3 mt-3">
-                          <motion.div className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            mentor.availability === 'Available'
-                              ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
-                              : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
-                          }`} whileHover={{ scale: 1.05 }}>
+                           <motion.div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                             mentor.availability === 'Available'
+                               ? 'bg-gradient-to-r from-green-500 to-green-600 text-white'
+                               : 'bg-gradient-to-r from-orange-400 to-orange-500 text-white'
+                           }`} whileHover={{ scale: 1.05 }}>
                             {mentor.availability}
                           </motion.div>
                           <div className="flex items-center space-x-1">
@@ -318,7 +325,7 @@ export default function CommunityPage() {
 
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
-                        <div className="font-bold text-xl text-blue-500">${mentor.hourlyRate}</div>
+                         <div className="font-bold text-xl text-gray-700">${mentor.hourlyRate}</div>
                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>per hour</div>
                       </div>
                       
@@ -343,8 +350,8 @@ export default function CommunityPage() {
 
                   <div className="flex flex-wrap gap-2 mt-4">
                     {mentor.expertise.slice(0, 3).map((skill) => (
-                      <span key={skill} className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        isDarkMode ? 'bg-blue-500/20 text-blue-300' : 'bg-blue-100 text-blue-700'}`}>
+                       <span key={skill} className={`px-3 py-1 rounded-full text-xs font-medium ${
+                         isDarkMode ? 'bg-gray-500/15 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
                         {skill}
                       </span>
                     ))}
@@ -356,7 +363,7 @@ export default function CommunityPage() {
                   </div>
 
                   <motion.div className="mt-4  transition-all duration-300">
-                    <motion.button onClick={() => handleMentorClick(mentor.id) }                     className="w-full bg-gradient-to-r from-blue-600 to-emerald-500 text-white font-semibold py-2 rounded-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2"
+                     <motion.button onClick={() => handleMentorClick(mentor.id) }                     className="w-full bg-gradient-to-r from-blue-600/90 to-emerald-500/90 text-white font-semibold py-2 rounded-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Zap className="w-4 h-4" />
                       <span>Quick Connect</span>
@@ -367,14 +374,15 @@ export default function CommunityPage() {
             </AnimatePresence>
           </motion.div>
         </div>
+        </div>
       </div>
 
       {/* Floating Action Button */}
       <motion.div className="fixed bottom-8 right-8 z-50" initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }}
         transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}>
-        <motion.button className="w-16 h-16 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full shadow-2xl flex items-center justify-center text-white"
+        <motion.button className="w-16 h-16 bg-gradient-to-r from-blue-600/90 to-emerald-500/90 rounded-full shadow-2xl flex items-center justify-center text-white"
           whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }}
-          animate={{ boxShadow: ["0 0 20px rgba(59, 130, 246, 0.5)", "0 0 40px rgba(16, 185, 129, 0.5)", "0 0 20px rgba(59, 130, 246, 0.5)"] }}
+          animate={{ boxShadow: ["0 0 20px rgba(59, 130, 246, 0.4)", "0 0 30px rgba(16, 185, 129, 0.4)", "0 0 20px rgba(59, 130, 246, 0.4)"] }}
           transition={{ duration: 2, repeat: Infinity }}>
           <Plus className="w-8 h-8" />
         </motion.button>
