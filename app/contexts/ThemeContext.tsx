@@ -14,10 +14,23 @@ const ThemeContext = createContext<ThemeContextType>({
   toggleTheme: () => {}
 });
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+function getInitialTheme(): boolean {
+  if (typeof window === 'undefined') return true; // SSR default
+  
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    return savedTheme === 'dark';
+  }
+  
+  // Default to system preference
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
 
-  // Load theme from localStorage on mount
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [isDarkMode, setIsDarkMode] = useState(() => getInitialTheme());
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Hydrate theme on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -27,14 +40,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(prefersDark);
     }
+    setIsHydrated(true);
   }, []);
 
   // Save theme to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    // Update document class for global styling
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode]);
+    if (isHydrated) {
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+      // Update document class for global styling
+      document.documentElement.classList.toggle('dark', isDarkMode);
+    }
+  }, [isDarkMode, isHydrated]);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);

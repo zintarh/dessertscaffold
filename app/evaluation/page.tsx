@@ -135,29 +135,20 @@ export default function EvaluationPage() {
       <nav className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3 group">
-            <motion.div
-              className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg"
-              whileHover={{ scale: 1.05, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <GraduationCap className="w-7 h-7 text-white" />
-            </motion.div>
-            <div className="flex flex-col">
-              <span
-                className={`text-xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                Dissertation Scaffold
-              </span>
-              <span
-                className={`text-sm font-medium ${
-                  isDarkMode ? "text-blue-300" : "text-blue-600"
-                }`}
-              >
-                Expert Research Platform
-              </span>
-            </div>
+            
+            <div className="flex items-center space-x-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+                    Dissertation Scaffold
+                  </span>
+                  <p className="text-gray-400 text-sm">
+                    Expert Research Guidance
+                  </p>
+                </div>
+              </div>
           </Link>
 
           <div className="flex items-center space-x-4">
