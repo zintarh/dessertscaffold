@@ -2,15 +2,33 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Zap, Target, Users, BookOpen, TrendingUp, ArrowRight, Play, GraduationCap, Brain, Clock, Award, Sun, Moon, CheckCircle, BarChart3, Lightbulb, Search, FileText, Beaker } from 'lucide-react';
-import { useTheme } from './contexts/ThemeContext';
+import {
+  Zap,
+  Target,
+  Users,
+  BookOpen,
+  TrendingUp,
+  ArrowRight,
+  Play,
+  GraduationCap,
+  Brain,
+  Clock,
+  Award,
+  CheckCircle,
+  BarChart3,
+  Lightbulb,
+  Search,
+  FileText,
+  Beaker,
+} from "lucide-react";
+import { useTheme } from "./contexts/ThemeContext";
+import Navbar from "./components/Navbar";
 
 export default function Home() {
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, isHydrated } = useTheme();
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [researchTopic, setResearchTopic] = useState("");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -26,8 +44,7 @@ export default function Home() {
     setIsEvaluating(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsEvaluating(false);
-    // Redirect to evaluation page
-    window.location.href = '/evaluation';
+    window.location.href = "/evaluation";
   };
 
   const features = [
@@ -75,6 +92,17 @@ export default function Home() {
     { number: "95%", label: "Success Rate" },
     { number: "24/7", label: "Expert Support" },
   ];
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -132,103 +160,7 @@ export default function Home() {
       </div>
 
       {/* Navigation */}
-      <motion.nav
-        className="relative z-50 px-6 py-6"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div
-            className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-              Dissertation Scaffold
-            </span>
-          </motion.div>
-
-          <div className="hidden md:flex items-center space-x-8">
-            <motion.a
-              href="/community"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Community
-            </motion.a>
-            <motion.a
-              href="/pricing"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Pricing
-            </motion.a>
-            <motion.a
-              href="/evaluation"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Evaluation
-            </motion.a>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <motion.button
-              onClick={toggleTheme}
-              className={`p-3 rounded-xl transition-all duration-300 ${
-                isDarkMode
-                  ? "bg-white/10 hover:bg-white/20 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </motion.button>
-
-            <motion.a
-              href="/signin"
-              className="bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get Started
-            </motion.a>
-          </div>
-        </div>
-      </motion.nav>
+      <Navbar />
 
       <motion.section
         className="relative z-10 px-6 py-20 text-center"
@@ -237,82 +169,179 @@ export default function Home() {
         transition={{ duration: 1 }}
       >
         <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-8"
-          >
-            <motion.div
-              className={`inline-flex items-center space-x-2 backdrop-blur-sm rounded-full px-6 py-3 mb-8 ${
-                isDarkMode
-                  ? "bg-white/10 border border-white/20"
-                  : "bg-white/70 border border-gray-200 shadow-lg"
-              }`}
-              animate={{
-                boxShadow: [
-                  "0 0 20px rgba(59, 130, 246, 0.3)",
-                  "0 0 40px rgba(16, 185, 129, 0.3)",
-                  "0 0 20px rgba(59, 130, 246, 0.3)",
-                ],
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              <Zap className="w-5 h-5 text-amber-500" />
-              <span
-                className={`text-sm font-medium ${
-                  isDarkMode ? "text-gray-200" : "text-gray-700"
-                }`}
-              >
-                Expert Research Assistant
-              </span>
-            </motion.div>
-          </motion.div>
-
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-8 leading-tight"
+            className="text-5xl md:text-6xl font-bold mb-8 leading-tight"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <span className="bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-500 bg-clip-text text-transparent">
-              Transform Your
+              Transform Your Research
             </span>
             <br />
             <span className={isDarkMode ? "text-white" : "text-gray-900"}>
-              Research Journey
+              Chaos Into Structured Success
             </span>
           </motion.h1>
 
-          <motion.p
-            className={`text-xl md:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            Navigate your academic journey with confidence. Get expert
-            research evaluation, structured progress tracking, and connect with
-            a community of scholars.
-          </motion.p>
-
-          {/* Enhanced Research Topic Evaluation Section */}
+        
           <motion.div
-            className="max-w-5xl mx-auto mb-12"
+            className="max-w-6xl mx-auto mb-12"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
           >
+
+            <div
+              className={`backdrop-blur-sm rounded-3xl p-12 relative overflow-hidden mb-8 ${
+                isDarkMode
+                  ? "bg-white/10 border border-white/20"
+                  : "bg-white/95 border border-gray-200 shadow-2xl"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
+                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full blur-3xl"></div>
+              </div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 opacity-5">
+                <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-orange-500 rounded-full blur-2xl"></div>
+              </div>
+
+              <div className="relative z-10 max-w-4xl mx-auto">
+                <div className="text-center mb-8">
+
+                  <p
+                    className={`text-lg ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    } max-w-2xl mx-auto`}
+                  >
+                    Get instant expert evaluation of your research topic across 6 key academic metrics
+                  </p>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-6 mb-8">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      placeholder="Enter your research topic here..."
+                      value={researchTopic}
+                      onChange={(e) => setResearchTopic(e.target.value)}
+                      className={`w-full rounded-2xl px-8 py-6 text-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all duration-300 ${
+                        isDarkMode
+                          ? "bg-white/10 border border-white/20 text-white placeholder-gray-400"
+                          : "bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    />
+                    {researchTopic && (
+                      <motion.div
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 30,
+                        }}
+                      >
+                        <CheckCircle className="w-7 h-7 text-emerald-500" />
+                      </motion.div>
+                    )}
+                  </div>
+                  <motion.button
+                    onClick={handleEvaluate}
+                    disabled={isEvaluating || !researchTopic.trim()}
+                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-10 py-6 rounded-2xl font-bold text-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 text-white min-w-[220px]"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {isEvaluating ? (
+                      <>
+                        <motion.div
+                          className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        />
+                        <span>Analyzing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-6 h-6" />
+                        <span>Evaluate Now</span>
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+
+                {/* Sample Topics */}
+                <div className="text-center">
+                  <p
+                    className={`text-sm mb-4 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    Try these sample topics:
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {[
+                      "AI Ethics in Healthcare",
+                      "Sustainable Urban Planning",
+                      "Quantum Computing Applications",
+                    ].map((sample, index) => (
+                      <motion.button
+                        key={index}
+                        onClick={() => setResearchTopic(sample)}
+                        className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                          isDarkMode
+                            ? "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
+                            : "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 border border-gray-200 hover:border-gray-300"
+                        }`}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {sample}
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* Evaluation Metrics Preview */}
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8 ">
               {[
-                { icon: Target, label: "Relevance", color: "text-blue-500" },
-                { icon: Lightbulb, label: "Novelty", color: "text-amber-500" },
-                { icon: BarChart3, label: "Feasibility", color: "text-emerald-500" },
-                { icon: Search, label: "Scope", color: "text-purple-500" },
-                { icon: FileText, label: "Clarity", color: "text-orange-500" },
-                { icon: Beaker, label: "Impact", color: "text-red-500" }
+                { icon: Target, label: "Novelty", color: "text-blue-500" },
+                {
+                  icon: Lightbulb,
+                  label: "Research Gap",
+                  color: "text-amber-500",
+                },
+                {
+                  icon: BarChart3,
+                  label: "Methodological Complexity",
+                  color: "text-emerald-500",
+                },
+                {
+                  icon: Search,
+                  label: "Research Trend",
+                  color: "text-purple-500",
+                },
+                {
+                  icon: FileText,
+                  label: "Researchability",
+                  color: "text-orange-500",
+                },
+                {
+                  icon: Beaker,
+                  label: "Literature Availability",
+                  color: "text-red-500",
+                },
+                {
+                  icon: Beaker,
+                  label: "Grant Potential",
+                  color: "text-red-500",
+                },
               ].map((metric, index) => {
                 const IconComponent = metric.icon;
                 return (
@@ -328,7 +357,9 @@ export default function Home() {
                     transition={{ delay: 0.9 + index * 0.1 }}
                     whileHover={{ y: -5, scale: 1.05 }}
                   >
-                    <IconComponent className={`w-6 h-6 mx-auto mb-2 ${metric.color}`} />
+                    <IconComponent
+                      className={`w-6 h-6 mx-auto mb-2 ${metric.color}`}
+                    />
                     <span
                       className={`text-sm font-medium ${
                         isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -339,132 +370,6 @@ export default function Home() {
                   </motion.div>
                 );
               })}
-            </div>
-
-            {/* Main Evaluation Input */}
-            <div
-              className={`backdrop-blur-sm rounded-2xl p-8 relative overflow-hidden ${
-                isDarkMode
-                  ? "bg-white/10 border border-white/20"
-                  : "bg-white/80 border border-gray-200 shadow-xl"
-              }`}
-            >
-              {/* Decorative Elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
-                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full blur-2xl"></div>
-              </div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 opacity-10">
-                <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-orange-500 rounded-full blur-xl"></div>
-              </div>
-
-              <div className="relative z-10">
-                <div className="text-center mb-6">
-                  <motion.div
-                    className="inline-flex items-center space-x-2 mb-4"
-                    animate={{
-                      y: [0, -5, 0],
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <Brain className="w-8 h-8 text-blue-500" />
-                    <span
-                      className={`text-xl font-bold ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      Research Evaluator
-                    </span>
-                  </motion.div>
-                  <p
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Get instant analysis across 6 key academic metrics
-                  </p>
-                </div>
-
-                <div className="flex flex-col lg:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder="e.g., 'Machine Learning Applications in Climate Change Prediction'"
-                      value={researchTopic}
-                      onChange={(e) => setResearchTopic(e.target.value)}
-                      className={`w-full rounded-xl px-6 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 ${
-                        isDarkMode
-                          ? "bg-white/10 border border-white/20 text-white placeholder-gray-400"
-                          : "bg-white border border-gray-300 text-gray-900 placeholder-gray-500"
-                      }`}
-                    />
-                    {researchTopic && (
-                      <motion.div
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      >
-                        <CheckCircle className="w-6 h-6 text-emerald-500" />
-                      </motion.div>
-                    )}
-                  </div>
-                  <motion.button
-                    onClick={handleEvaluate}
-                    disabled={isEvaluating || !researchTopic.trim()}
-                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-8 py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-white min-w-[200px]"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {isEvaluating ? (
-                      <>
-                        <motion.div
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                        <span>Analyzing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-5 h-5" />
-                        <span>Evaluate Now</span>
-                      </>
-                    )}
-                  </motion.button>
-                </div>
-
-                {/* Sample Topics */}
-                <div className="mt-6">
-                  <p
-                    className={`text-sm mb-3 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Try these sample topics:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "AI Ethics in Healthcare",
-                      "Sustainable Urban Planning",
-                      "Quantum Computing Applications"
-                    ].map((sample, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={() => setResearchTopic(sample)}
-                        className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
-                          isDarkMode
-                            ? "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 border border-gray-200"
-                        }`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {sample}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </div>
           </motion.div>
 

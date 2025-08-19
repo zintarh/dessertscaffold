@@ -1,0 +1,92 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { GraduationCap, Sun, Moon } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext";
+
+export default function Navbar() {
+  const { isDarkMode, toggleTheme } = useTheme();
+
+  return (
+    <motion.nav
+      className="relative z-50 px-6 py-6"
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <motion.div
+          className="flex items-center space-x-3"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+              <GraduationCap className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+              Dissertation Scaffold
+            </span>
+          </Link>
+        </motion.div>
+
+        <div className="hidden md:flex items-center space-x-8">
+          <NavLink href="/community" label="Community" delay={0.1} />
+          <NavLink href="/pricing" label="Pricing" delay={0.2} />
+          <NavLink href="/result" label="Result" delay={0.3} />
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <motion.button
+            onClick={toggleTheme}
+            className={`p-3 rounded-xl transition-all duration-300 ${
+              isDarkMode
+                ? "bg-white/10 hover:bg-white/20 text-white"
+                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+            }`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </motion.button>
+
+          <motion.a
+            href="/signup"
+            className="bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Sign Up
+          </motion.a>
+        </div>
+      </div>
+    </motion.nav>
+  );
+}
+
+function NavLink({ href, label, delay }: { href: string; label: string; delay: number }) {
+  const { isDarkMode } = useTheme();
+  return (
+    <motion.a
+      href={href}
+      className={`font-medium transition-colors duration-300 ${
+        isDarkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"
+      }`}
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay, duration: 0.5 }}
+      whileHover={{ y: -2 }}
+    >
+      {label}
+    </motion.a>
+  );
+}

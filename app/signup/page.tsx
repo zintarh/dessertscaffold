@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import { 
   GraduationCap, 
@@ -23,77 +26,162 @@ import {
 } from '../components/Icons';
 
 import { useTheme } from '../contexts/ThemeContext';
+import Navbar from "../components/Navbar";
+import {
+  signupStepAtom,
+  signupFormDataAtom,
+  isStepValidAtom,
+  canProceedAtom,
+  canGoBackAtom,
+  nextStepAtom,
+  prevStepAtom,
+  updateFormDataAtom,
+  resetSignupAtom,
+  goToStepAtom,
+  type SignupFormData
+} from '../../lib/stores/signupStore';
 
 export default function SignupPage() {
-  const { isDarkMode, toggleTheme } = useTheme();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    institutionName: '',
-    userType: '',
-    researchArea: '',
-    academicLevel: '',
-    agreeToTerms: false
-  });
+  const { isDarkMode, toggleTheme, isHydrated } = useTheme();
+  
+  // Jotai atoms for persistent state
+  const [currentStep, setCurrentStep] = useAtom(signupStepAtom);
+  const [formData, setFormData] = useAtom(signupFormDataAtom);
+  const canProceed = useAtomValue(canProceedAtom);
+  const canGoBack = useAtomValue(canGoBackAtom);
+  const setNextStep = useSetAtom(nextStepAtom);
+  const setPrevStep = useSetAtom(prevStepAtom);
+  const updateFormData = useSetAtom(updateFormDataAtom);
+  const resetSignup = useSetAtom(resetSignupAtom);
+  const goToStep = useSetAtom(goToStepAtom);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Cleanup effect - reset signup state when component unmounts
+  useEffect(() => {
+    return () => {
+      // Only reset if user hasn't completed registration
+      if (currentStep < 4) {
+        // Don't reset here - let user continue where they left off
+        // resetSignup();
+      }
+    };
+  }, [currentStep]);
 
 
   const handleNext = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
+    if (canProceed) {
+      setNextStep();
     }
   };
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    if (canGoBack) {
+      setPrevStep();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (currentStep < 4) {
       handleNext();
       return;
     }
-    
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      setError('Passwords do not match');
       return;
     }
     if (!formData.userType) {
-      alert('Please select your user type!');
+      setError('Please select your user type');
       return;
     }
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName || undefined,
+          lastName: formData.lastName || undefined,
+          userType: formData.userType || undefined,
+          institutionName: formData.institutionName || undefined,
+          researchArea: formData.researchArea || undefined,
+          academicLevel: formData.academicLevel || undefined,
+        }),
+      });
+
+      console.log('Response status:', res.status);
+      console.log('Response headers:', res.headers);
+      
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error('Registration failed:', {
+          status: res.status,
+          statusText: res.statusText,
+          data
+        });
+        throw new Error(data.error || 'Registration failed');
+      }
+      const data = await res.json();
+      
+      // If registration requires verification, show success message
+      if (data.requiresVerification) {
+        // Reset signup state after successful registration
+        resetSignup();
+        // Redirect to a success page or show success message
+        router.replace('/signup-success');
+        return;
+      }
+
+      // For users that don't require verification, sign them in directly
+      const signInRes = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+      if (signInRes?.error) {
+        throw new Error('Sign-in failed');
+      }
+      // Reset signup state after successful registration
+      resetSignup();
+      router.replace('/writing');
+    } catch (err: any) {
+      console.error('Signup error caught:', err);
+      console.error('Error details:', {
+        message: err?.message,
+        stack: err?.stack,
+        name: err?.name
+      });
+      
+      const errorMessage = err?.message || 'Something went wrong';
+      // Make error messages more user-friendly
+      if (errorMessage.includes('Email already in use')) {
+        setError('This email is already registered. Try signing in instead or use a different email.');
+      } else if (errorMessage.includes('Registration failed')) {
+        setError('Unable to create your account. Please check your information and try again.');
+      } else if (errorMessage.includes('Sign-in failed')) {
+        setError('Account created but sign-in failed. Please try signing in manually.');
+      } else {
+        setError(errorMessage);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    updateFormData({ [field]: value });
   };
 
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1:
-        return formData.userType;
-      case 2:
-        return formData.userType === 'institution' ? formData.institutionName.trim() : (formData.firstName.trim() && formData.lastName.trim());
-      case 3:
-        return formData.email.trim() && formData.institutionName.trim();
-      case 4:
-        return formData.password && formData.confirmPassword && formData.agreeToTerms;
-      default:
-        return false;
-    }
-  };
+  // Use Jotai computed atom for step validation
+  const isStepValid = useAtomValue(isStepValidAtom);
 
   const userTypes = [
     {
@@ -133,13 +221,24 @@ export default function SignupPage() {
     }
   ];
 
+  // Don't render theme-dependent content until hydration is complete
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`min-h-screen overflow-hidden relative transition-all duration-500 ${
       isDarkMode 
         ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white'
         : 'bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900'
     }`}>
-      
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse ${
@@ -154,117 +253,7 @@ export default function SignupPage() {
       </div>
 
       {/* Navigation */}
-      <motion.nav
-        className="relative z-50 px-6 py-6"
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div
-            className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-              Dissertation Scaffold
-            </span>
-          </motion.div>
-
-          <div className="hidden md:flex items-center space-x-8">
-            <motion.a
-              href="/"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Home
-            </motion.a>
-            <motion.a
-              href="/community"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Community
-            </motion.a>
-            <motion.a
-              href="/pricing"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Pricing
-            </motion.a>
-            <motion.a
-              href="/evaluation"
-              className={`font-medium transition-colors duration-300 ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              whileHover={{ y: -2 }}
-            >
-              Evaluation
-            </motion.a>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <motion.button
-              onClick={toggleTheme}
-              className={`p-3 rounded-xl transition-all duration-300 ${
-                isDarkMode
-                  ? "bg-white/10 hover:bg-white/20 text-gray-700"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </motion.button>
-
-            <motion.a
-              href="/signin"
-              className="bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Sign In
-            </motion.a>
-          </div>
-        </div>
-      </motion.nav>
+      <Navbar />
 
       {/* Main Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
@@ -369,6 +358,26 @@ export default function SignupPage() {
                 : 'bg-white/90 border-gray-200'
             }`}>
               
+                            {/* Step Indicator */}
+              <div className="mb-6">
+               
+                {currentStep > 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`text-center p-3 rounded-lg mb-4 ${
+                      isDarkMode 
+                        ? 'bg-blue-500/10 border border-blue-500/20 text-blue-300' 
+                        : 'bg-blue-50 border border-blue-200 text-blue-700'
+                    }`}
+                  >
+                    <span className="text-sm">
+                      ✨ Welcome back! You can continue from where you left off.
+                    </span>
+                  </motion.div>
+                )}
+              </div>
+
               {/* Header */}
               <div className="text-center mb-8">
                 <motion.div 
@@ -389,11 +398,30 @@ export default function SignupPage() {
                   {
                     currentStep === 1 ? 'Choose your category' :
                     currentStep === 2 ? 'Tell us about yourself' :
-                    currentStep === 3 ? 'Contact & affiliation' :
-                    'Secure your account'
+                    currentStep === 3 ? 'Create your account' :
+                    'Review & complete'
                   }
                 </p>
               </div>
+
+              {/* Error Display */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-4 rounded-xl border-l-4 ${isDarkMode 
+                    ? 'bg-red-900/20 border-red-500 text-red-300' 
+                    : 'bg-red-50 border-red-500 text-red-700'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">!</span>
+                    </div>
+                    <p className="font-medium">{error}</p>
+                  </div>
+                </motion.div>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 
@@ -557,13 +585,20 @@ export default function SignupPage() {
                         isDarkMode ? 'text-gray-200' : 'text-gray-700'
                       }`}>
                         Email Address
+                        {(formData.userType === 'institution' || formData.userType === 'mentor') && (
+                          <span className="text-blue-500 text-xs ml-2">(edu.ng required)</span>
+                        )}
                       </label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                           type="email"
                           id="email"
-                          placeholder="Enter your email"
+                          placeholder={
+                            (formData.userType === 'institution' || formData.userType === 'mentor') 
+                              ? "Enter your edu.ng email" 
+                              : "Enter your email"
+                          }
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
@@ -574,6 +609,13 @@ export default function SignupPage() {
                           required
                         />
                       </div>
+                      {(formData.userType === 'institution' || formData.userType === 'mentor') && 
+                       formData.email && !formData.email.toLowerCase().includes('edu.ng') && (
+                        <p className="text-red-500 text-sm flex items-center space-x-1">
+                          <span>⚠️</span>
+                          <span>Institution and Academic Mentor accounts require an edu.ng email address</span>
+                        </p>
+                      )}
                     </div>
 
                     {/* Institution Field */}
@@ -596,7 +638,7 @@ export default function SignupPage() {
                               ? 'bg-gray-700 border-gray-600 text-white' 
                               : 'bg-white border-gray-200 text-gray-900'
                           }`}
-                          required
+                          required={formData.userType === 'institution'}
                         />
                       </div>
                     </div>
@@ -684,7 +726,7 @@ export default function SignupPage() {
                           className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
                             isDarkMode 
                               ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-200 text-gray-900'
+                              : 'text-gray-900'
                           }`}
                           required
                         />
@@ -724,6 +766,23 @@ export default function SignupPage() {
                   </motion.div>
                 )}
 
+                {/* Clear Form Button */}
+                <div className="flex justify-center mb-4">
+                  <motion.button
+                    type="button"
+                    onClick={resetSignup}
+                    className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 ${
+                      isDarkMode 
+                        ? 'text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500' 
+                        : 'text-gray-500 hover:text-gray-600 border border-gray-200 hover:border-gray-300'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Clear Form & Start Over
+                  </motion.button>
+                </div>
+
                 {/* Navigation Buttons */}
                 <div className="flex justify-between space-x-4">
                   {currentStep > 1 && (
@@ -744,12 +803,12 @@ export default function SignupPage() {
                   
                   <motion.button
                     type="submit"
-                    disabled={!isStepValid() || isSubmitting}
+                    disabled={!isStepValid || isSubmitting}
                     className={`flex-1 py-4 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl flex items-center justify-center space-x-2 text-lg ${
                       currentStep === 1 ? 'ml-0' : ''
                     }`}
-                    whileHover={{ scale: isStepValid() ? 1.02 : 1 }}
-                    whileTap={{ scale: isStepValid() ? 0.98 : 1 }}
+                    whileHover={{ scale: isStepValid ? 1.02 : 1 }}
+                    whileTap={{ scale: isStepValid ? 0.98 : 1 }}
                   >
                     {isSubmitting ? (
                       <>
@@ -774,7 +833,7 @@ export default function SignupPage() {
                   isDarkMode ? 'text-gray-300' : 'text-gray-600'
                 }`}>
                   Already have an account?{' '}
-                  <Link href="/login" className="text-blue-500 hover:text-blue-600 font-bold underline transition-colors">
+                  <Link href="/signin" className="text-blue-500 hover:text-blue-600 font-bold underline transition-colors">
                     Sign In
                   </Link>
                 </p>

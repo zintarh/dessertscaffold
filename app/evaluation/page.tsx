@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "../contexts/ThemeContext";
 import {
   GraduationCap,
@@ -20,8 +21,9 @@ import {
 } from "lucide-react";
 
 export default function EvaluationPage() {
-  const { isDarkMode, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme, isHydrated } = useTheme();
   const [expandedMetrics, setExpandedMetrics] = useState<string[]>([]);
+  const router = useRouter();
 
   const evaluationData = {
     topic:
@@ -123,6 +125,18 @@ export default function EvaluationPage() {
         : [...prev, metricName]
     );
   };
+
+  // Don't render theme-dependent content until hydration is complete
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -256,7 +270,11 @@ export default function EvaluationPage() {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <motion.button
-              className="bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2"
+              onClick={() => {
+                const documentId = Math.floor(Math.random() * 1000) + 1; 
+                router.push(`/student/documents/${documentId}`);
+              }}
+              className="bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >

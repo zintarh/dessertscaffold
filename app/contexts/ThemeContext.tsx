@@ -6,6 +6,7 @@ interface ThemeContextType {
   isDarkMode: boolean;
   setIsDarkMode: (isDark: boolean) => void;
   toggleTheme: () => void;
+  isHydrated: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -15,32 +16,29 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 function getInitialTheme(): boolean {
-  if (typeof window === 'undefined') return true; // SSR default
-  
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    return savedTheme === 'dark';
-  }
-  
-  // Default to system preference
-  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Always return false for SSR to prevent hydration mismatch
+  // We'll set the actual theme after hydration
+  return false;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDarkMode, setIsDarkMode] = useState(() => getInitialTheme());
+  const [isDarkMode, setIsDarkMode] = useState(false); // Start with light mode for SSR
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate theme on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-    } else {
-      // Default to system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(prefersDark);
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        setIsDarkMode(savedTheme === 'dark');
+      } else {
+        // Default to system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(prefersDark);
+      }
+      setIsHydrated(true);
     }
-    setIsHydrated(true);
   }, []);
 
   // Save theme to localStorage whenever it changes
@@ -57,7 +55,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, setIsDarkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDarkMode, setIsDarkMode, toggleTheme, isHydrated }}>
       {children}
     </ThemeContext.Provider>
   );
