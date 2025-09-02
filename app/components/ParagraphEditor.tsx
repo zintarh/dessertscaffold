@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef, useEffect } from 'react';
+import { Plus, Edit2, Trash2, Save, X, Bold, Italic, Underline, List, Quote, LinkIcon, ImageIcon } from 'lucide-react';
+import GradientButton from './ui/GradientButton';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
-import { Bold, Italic, Link as LinkIcon, Image as ImageIcon, Plus } from './Icons';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface ParagraphBlock {
   id: string;

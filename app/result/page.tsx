@@ -406,7 +406,7 @@ export default function ResultPage() {
         >
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => router.push(`/student/documents/${documentId}`)}
+              onClick={() => router.push(`/user/documents/${documentId}`)}
               className="bg-gradient-to-r from-blue-600 to-emerald-500 px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 text-white"
             >
               <FileText className="w-5 h-5" />

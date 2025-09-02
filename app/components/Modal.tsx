@@ -10,7 +10,7 @@ interface ModalProps {
   title: string;
   children: React.ReactNode;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
   showCloseButton?: boolean;
   className?: string;
 }
@@ -20,6 +20,7 @@ const sizeClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
+  '2xl': 'max-w-2xl',
   full: 'max-w-full mx-4'
 };
 
@@ -36,7 +37,7 @@ export default function Modal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 bg-opacity-30 backdrop-blur-sm z-50" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
         <Dialog.Content
           className={cn(
             "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
@@ -70,7 +71,7 @@ export default function Modal({
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-6 bg-white">
             {children}
           </div>
         </Dialog.Content>
@@ -113,9 +114,9 @@ export function ModalSection({
     <div className={cn("mb-6", className)}>
       {title && (
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-1">{title}</h4>
+          <h4 className="text-sm font-semibold text-gray-900 mb-1">{title}</h4>
           {description && (
-            <p className="text-xs text-gray-500">{description}</p>
+            <p className="text-sm text-gray-700">{description}</p>
           )}
         </div>
       )}

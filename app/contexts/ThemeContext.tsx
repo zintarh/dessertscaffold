@@ -12,7 +12,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: true,
   setIsDarkMode: () => {},
-  toggleTheme: () => {}
+  toggleTheme: () => {},
+  isHydrated: false
 });
 
 function getInitialTheme(): boolean {

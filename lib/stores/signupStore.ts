@@ -48,16 +48,21 @@ export const isStepValidAtom = atom((get) => {
     case 2:
       // Personal details step: require first and last name only
       isValid = !!(formData.firstName?.trim() && formData.lastName?.trim());
+      
+      // For students, also require academic level
+      if (formData.userType === 'STUDENT') {
+        isValid = isValid && !!(formData.academicLevel?.trim());
+      }
       break;
     case 3:
-      // Contact/affiliation step: require valid email; if userType is institution/mentor, also require edu.ng email
+      // Contact/affiliation step: require valid email; if userType is institution, also require edu.ng email
       if (!isEmail(formData.email)) {
         isValid = false;
         break;
       }
       
-      // Validate edu.ng email for institution and academic mentor users
-      if (formData.userType === 'institution' || formData.userType === 'mentor') {
+      // Validate edu.ng email for institution users only
+      if (formData.userType === 'institution') {
         if (!formData.email.toLowerCase().includes('edu.ng')) {
           isValid = false;
           break;
@@ -80,8 +85,6 @@ export const isStepValidAtom = atom((get) => {
       const hasAgreedToTerms = !!formData.agreeToTerms;
       
       isValid = hasPassword && hasConfirmPassword && passwordsMatch && hasValidLength && hasAgreedToTerms;
-      
-
       break;
     default:
       isValid = false;

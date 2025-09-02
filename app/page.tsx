@@ -14,20 +14,14 @@ import {
   Brain,
   Clock,
   Award,
-  CheckCircle,
   BarChart3,
   Lightbulb,
-  Search,
-  FileText,
-  Beaker,
 } from "lucide-react";
 import { useTheme } from "./contexts/ThemeContext";
 import Navbar from "./components/Navbar";
 
 export default function Home() {
-  const { isDarkMode, toggleTheme, isHydrated } = useTheme();
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [researchTopic, setResearchTopic] = useState("");
+  const { isDarkMode, isHydrated } = useTheme();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -39,11 +33,7 @@ export default function Home() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const handleEvaluate = async () => {
-    if (!researchTopic.trim()) return;
-    setIsEvaluating(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsEvaluating(false);
+  const handleEvaluate = () => {
     window.location.href = "/evaluation";
   };
 
@@ -216,130 +206,60 @@ export default function Home() {
                   >
                     Get instant expert evaluation of your research topic across 6 key academic metrics
                   </p>
+                  
+                  {/* Demo Instructions */}
+                  <div className={`mt-4 p-4 rounded-lg border ${
+                    isDarkMode 
+                      ? "bg-blue-900/20 border-blue-700/30 text-blue-200" 
+                      : "bg-blue-50 border-blue-200 text-blue-800"
+                  }`}>
+                    <p className="text-sm">
+                      <strong>Demo Mode:</strong> Sign up with any email or use demo@example.com with password "password123"
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-6 mb-8">
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      placeholder="Enter your research topic here..."
-                      value={researchTopic}
-                      onChange={(e) => setResearchTopic(e.target.value)}
-                      className={`w-full rounded-2xl px-8 py-6 text-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all duration-300 ${
-                        isDarkMode
-                          ? "bg-white/10 border border-white/20 text-white placeholder-gray-400"
-                          : "bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-500"
-                      }`}
-                    />
-                    {researchTopic && (
-                      <motion.div
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 30,
-                        }}
-                      >
-                        <CheckCircle className="w-7 h-7 text-emerald-500" />
-                      </motion.div>
-                    )}
-                  </div>
+                <div className="text-center">
                   <motion.button
                     onClick={handleEvaluate}
-                    disabled={isEvaluating || !researchTopic.trim()}
-                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-10 py-6 rounded-2xl font-bold text-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 text-white min-w-[220px]"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-12 py-8 rounded-2xl font-bold text-2xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-4 text-white mx-auto"
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {isEvaluating ? (
-                      <>
-                        <motion.div
-                          className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
-                          animate={{ rotate: 360 }}
-                          transition={{
-                            duration: 1,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        />
-                        <span>Analyzing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Zap className="w-6 h-6" />
-                        <span>Evaluate Now</span>
-                      </>
-                    )}
+                    <Zap className="w-8 h-8" />
+                    <span>Evaluate Research Topic</span>
                   </motion.button>
                 </div>
 
-                {/* Sample Topics */}
-                <div className="text-center">
-                  <p
-                    className={`text-sm mb-4 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    Try these sample topics:
-                  </p>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    {[
-                      "AI Ethics in Healthcare",
-                      "Sustainable Urban Planning",
-                      "Quantum Computing Applications",
-                    ].map((sample, index) => (
-                      <motion.button
-                        key={index}
-                        onClick={() => setResearchTopic(sample)}
-                        className={`px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                          isDarkMode
-                            ? "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
-                            : "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 border border-gray-200 hover:border-gray-300"
-                        }`}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {sample}
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
+                
               </div>
             </div>
-            {/* Evaluation Metrics Preview */}
-            <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8 ">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
               {[
                 { icon: Target, label: "Novelty", color: "text-blue-500" },
                 {
-                  icon: Lightbulb,
-                  label: "Research Gap",
-                  color: "text-amber-500",
+                  icon: TrendingUp,
+                  label: "Trends",
+                  color: "text-emerald-500",
                 },
                 {
                   icon: BarChart3,
                   label: "Methodological Complexity",
-                  color: "text-emerald-500",
-                },
-                {
-                  icon: Search,
-                  label: "Research Trend",
                   color: "text-purple-500",
                 },
                 {
-                  icon: FileText,
-                  label: "Researchability",
+                  icon: Lightbulb,
+                  label: "Research Gaps",
+                  color: "text-amber-500",
+                },
+                {
+                  icon: Award,
+                  label: "Grant Potential",
                   color: "text-orange-500",
                 },
                 {
-                  icon: Beaker,
+                  icon: BookOpen,
                   label: "Literature Availability",
-                  color: "text-red-500",
-                },
-                {
-                  icon: Beaker,
-                  label: "Grant Potential",
                   color: "text-red-500",
                 },
               ].map((metric, index) => {
@@ -373,41 +293,7 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-6"
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.0 }}
-          >
-            <motion.button
-              className="bg-gradient-to-r from-blue-600 to-emerald-500 px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 text-white"
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span>Start Free Trial</span>
-              <ArrowRight className="w-5 h-5" />
-            </motion.button>
 
-            <motion.button
-              className={`flex items-center space-x-2 transition-colors duration-300 group ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-white"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              whileHover={{ x: 5 }}
-            >
-              <div
-                className={`w-12 h-12 backdrop-blur-sm rounded-full flex items-center justify-center transition-all duration-300 ${
-                  isDarkMode
-                    ? "bg-white/10 border border-white/20 group-hover:bg-white/20"
-                    : "bg-white/70 border border-gray-200 group-hover:bg-white shadow-lg"
-                }`}
-              >
-                <Play className="w-5 h-5 ml-1" />
-              </div>
-              <span className="font-medium">Watch Demo</span>
-            </motion.button>
-          </motion.div>
         </div>
       </motion.section>
 

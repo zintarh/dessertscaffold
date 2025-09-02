@@ -2,11 +2,22 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { GraduationCap, Sun, Moon } from "lucide-react";
+import { GraduationCap, Sun, Moon, User } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
+import { useAtomValue } from "jotai";
+import { userAtom, isAuthenticatedAtom,  } from "../../lib/stores/authStore";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const { isDarkMode, toggleTheme } = useTheme();
+  const currentUser = useAtomValue(userAtom);
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+
+  const userRole = currentUser?.userType || 'student';
+  const isStudent = userRole === 'student';
+
+  const router = useRouter();
+
 
   return (
     <motion.nav
@@ -32,9 +43,23 @@ export default function Navbar() {
         </motion.div>
 
         <div className="hidden md:flex items-center space-x-8">
-          <NavLink href="/community" label="Community" delay={0.1} />
-          <NavLink href="/pricing" label="Pricing" delay={0.2} />
-          <NavLink href="/result" label="Result" delay={0.3} />
+          {isAuthenticated ? (
+            <>
+              <NavLink href="/user/dashboard" label="Dashboard" delay={0.1} />
+              {isStudent ? (
+                <NavLink href="/user/mentors" label="Find Mentors" delay={0.2} />
+              ) : (
+                <NavLink href="/user/mentors" label="Mentor Dashboard" delay={0.2} />
+              )}
+              <NavLink href="/community" label="Community" delay={0.3} />
+            </>
+          ) : (
+            <>
+              <NavLink href="/community" label="Community" delay={0.1} />
+              <NavLink href="/pricing" label="Pricing" delay={0.2} />
+              <NavLink href="/result" label="Result" delay={0.3} />
+            </>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
@@ -56,17 +81,37 @@ export default function Navbar() {
             )}
           </motion.button>
 
-          <motion.a
-            href="/signup"
-            className="bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white"
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Sign Up
-          </motion.a>
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-3">
+              <motion.div
+                className="flex items-center space-x-2 px-4 cursor-pointer py-2 bg-gray-100 rounded-xl text-gray-700"
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                onClick={() => router.push('/user/dashboard')}
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {isStudent ? 'Student' : 'Mentor'}
+                </span>
+              </motion.div>
+              
+             
+
+            </div>
+          ) : (
+            <motion.a
+              href="/signin"
+              className="bg-gradient-to-r from-blue-600 to-emerald-500 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-white"
+              initial={{ x: 100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get Started
+            </motion.a>
+          )}
         </div>
       </div>
     </motion.nav>

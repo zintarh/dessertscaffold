@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Bold, Italic, Link, Image, Code, Plus, 
-  ChevronDown, X, ExternalLink
-} from './Icons';
+import React, { useRef, useState } from 'react';
+import { Bold, Italic, Underline, Link, List, Quote, Image, Type, Plus, X, Code } from 'lucide-react';
+import GradientButton from './ui/GradientButton';
+import { AnimatePresence, motion } from 'framer-motion';
+
 
 interface EditorToolbarProps {
   onBold: () => void;
@@ -201,12 +200,14 @@ export default function EditorToolbar({
                 </div>
                 
                 <div className="flex space-x-3">
-                  <button
+                  <GradientButton
                     onClick={handleAddLink}
-                    className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                    variant="primary"
+                    size="md"
+                    className="flex-1"
                   >
                     Add Link
-                  </button>
+                  </GradientButton>
                   <button
                     onClick={() => setShowLinkInput(false)}
                     className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
@@ -278,12 +279,14 @@ export default function EditorToolbar({
                 </div>
                 
                 <div className="flex space-x-3">
-                  <button
+                  <GradientButton
                     onClick={handleAddImage}
-                    className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+                    variant="success"
+                    size="md"
+                    className="flex-1"
                   >
                     Add Image
-                  </button>
+                  </GradientButton>
                   <button
                     onClick={() => setShowImageInput(false)}
                     className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"

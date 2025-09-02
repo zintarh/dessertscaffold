@@ -1,98 +1,125 @@
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { sendVerificationEmail, generateVerificationToken, isValidEduNgEmail } from "@/lib/email";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 
+// Enhanced registration schema with all user fields
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  userType: z.string().optional(),
+  email: z.string().email("Invalid email address"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(100, "Password too long"),
+  firstName: z
+    .string()
+    .min(1, "First name is required")
+    .max(50, "First name too long"),
+  lastName: z
+    .string()
+    .min(1, "Last name is required")
+    .max(50, "Last name too long"),
+  userType: z.enum(["STUDENT", "MENTOR", "INSTITUTION"]).default("STUDENT"),
   institutionName: z.string().optional(),
   researchArea: z.string().optional(),
-  academicLevel: z.string().optional(),
+  academicLevel: z
+    .enum(["UNDERGRADUATE", "MASTERS", "PHD", "POSTDOC"])
+    .optional(),
 });
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const parsed = registerSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.flatten() },
-        { status: 400 }
-      );
-    }
+    // Parse and validate request body
+    const body = await request.json();
+    const validatedData = registerSchema.parse(body);
 
-    const { email, password, firstName, lastName, userType, institutionName, researchArea, academicLevel } = parsed.data;
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: validatedData.email },
+    });
 
-    // Validate edu.ng email for institution and academic mentor users
-    if ((userType === 'institution' || userType === 'mentor') && !isValidEduNgEmail(email)) {
+    if (existingUser) {
       return NextResponse.json(
-        { error: "Institution and Academic Mentor accounts require an edu.ng email address" },
-        { status: 400 }
-      );
-    }
-
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json(
-        { error: "Email already in use" },
+        {
+          success: false,
+          error: "User with this email already exists",
+        },
         { status: 409 }
       );
     }
 
-    const hashed = await bcrypt.hash(password, 12);
-    const verificationToken = generateVerificationToken();
-    const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    // Hash password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(
+      validatedData.password,
+      saltRounds
+    );
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashed,
-        firstName: firstName ?? null,
-        lastName: lastName ?? null,
-        userType: userType ?? null,
-        institutionName: institutionName ?? null,
-        researchArea: researchArea ?? null,
-        academicLevel: academicLevel ?? null,
-        isActive: false,
-        verificationToken,
-        verificationTokenExpires,
-      },
+    // Create user
+    const userData: any = {
+      email: validatedData.email,
+      password: hashedPassword,
+      firstName: validatedData.firstName,
+      lastName: validatedData.lastName,
+      name: `${validatedData.firstName} ${validatedData.lastName}`,
+      userType: validatedData.userType,
+      institutionName: validatedData.institutionName,
+      researchArea: validatedData.researchArea,
+      academicLevel: validatedData.academicLevel,
+      isActive: true, // Set as active immediately (no email verification required)
+    };
+
+    const user = await (prisma as any).user.create({
+      data: userData,
     });
 
-    // Send verification email
-    try {
-      await sendVerificationEmail(email, verificationToken, firstName);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Don't fail registration if email fails, but log it
+    // Email verification removed for now - will be added later
+    // try {
+    //   await sendVerificationEmail(validatedData.email, verificationToken, validatedData.firstName);
+    // } catch (emailError) {
+    //   console.error('Failed to send verification email:', emailError);
+    //   // Don't fail registration if email fails, but log it
+    // }
+
+    // Return success response
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Registration successful! You can now sign in.",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userType: user.userType,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation failed",
+          details: error.errors.map((err) => ({
+            field: err.path.join("."),
+            message: err.message,
+          })),
+        },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Registration successful! Please check your email to verify your account.",
-      requiresVerification: true 
-    });
-  } catch (err) {
-    console.error('Registration error:', err);
-    console.error('Error stack:', err instanceof Error ? err.stack : 'No stack trace');
-    console.error('Error details:', {
-      message: err instanceof Error ? err.message : String(err),
-      name: err instanceof Error ? err.name : 'Unknown',
-      cause: err instanceof Error ? err.cause : undefined
-    });
-    
     return NextResponse.json(
-      { 
-        error: "Internal server error", 
-        details: process.env.NODE_ENV === 'development' ? {
-          message: err instanceof Error ? err.message : String(err),
-          stack: err instanceof Error ? err.stack : undefined
-        } : undefined 
+      {
+        success: false,
+        error: "Internal server error",
+        debug:
+          process.env.NODE_ENV === "development"
+            ? (error as any)?.message
+            : undefined,
       },
       { status: 500 }
     );

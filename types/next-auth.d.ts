@@ -8,16 +8,28 @@ declare module 'next-auth' {
       email: string | null;
       image: string | null;
       id?: string;
+      userType?: string;
+      institutionName?: string;
+      researchArea?: string;
+      academicLevel?: string;
     };
   }
 
   interface User extends DefaultUser {
     id: string;
+    userType?: string;
+    institutionName?: string;
+    researchArea?: string;
+    academicLevel?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT extends DefaultJWT {
     id?: string;
+    userType?: string;
+    institutionName?: string;
+    researchArea?: string;
+    academicLevel?: string;
   }
 }

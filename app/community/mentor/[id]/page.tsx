@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useTheme } from '../../../contexts/ThemeContext';
-import Modal, { ModalFooter, ModalSection } from '../../../components/Modal';
+import { useTheme } from "../../../contexts/ThemeContext";
+import GradientButton from "../../../components/ui/GradientButton";
+import Modal, { ModalFooter, } from '../../../components/Modal';
 import {
   ArrowLeft, Star, MapPin, Clock, Users, MessageCircle, Heart,
-  Award, Share2, Bookmark, Calendar, Globe, CheckCircle, BookOpen
+  Award, Bookmark, Calendar, CheckCircle, BookOpen
 } from 'lucide-react';
 
 export default function MentorDetailsPage() {
@@ -377,13 +378,14 @@ export default function MentorDetailsPage() {
           >
             Cancel
           </button>
-          <button
+          <GradientButton
             type="submit"
             onClick={handleBookingSubmit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            variant="primary"
+            size="md"
           >
             Book Session
-          </button>
+          </GradientButton>
         </ModalFooter>
       </Modal>
     </div>

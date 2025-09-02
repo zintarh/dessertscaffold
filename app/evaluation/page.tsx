@@ -15,118 +15,294 @@ import {
   Sun,
   Moon,
   ChevronDown,
-  FileText,
-  Download,
   ChevronUp,
+  Download,
 } from "lucide-react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { isAuthenticatedAtom } from "../../lib/stores/authStore";
+import { evaluationSyncAtom } from "../../lib/stores/timelineStore";
+import TimelineCreationModal from "../components/TimelineCreationModal";
+import { evaluationData } from "@/lib/constants";
+
+// Define the EvaluationData type for the UI
+interface EvaluationData {
+  topic: string;
+  overallScore: number;
+  metrics: Array<{
+    name: string;
+    score: number;
+    color: string;
+    description: string;
+    details: string;
+    recommendations: string[];
+  }>;
+  recommendations: string[];
+}
+
+// Define the API response type
+interface EvaluationResponse {
+  metadata?: {
+    topic: string;
+  };
+  evaluation: {
+    novelty: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    trends: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    methodological_complexity: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    research_gaps: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    grant_potential: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    literature_availability: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    overall_recommendations?: string[];
+    overall_summary: string;
+  };
+}
+
+// Disable static generation for this page
+export const dynamic = "force-dynamic";
 
 export default function EvaluationPage() {
   const { isDarkMode, toggleTheme, isHydrated } = useTheme();
   const [expandedMetrics, setExpandedMetrics] = useState<string[]>([]);
+  const [researchTopic, setResearchTopic] = useState("");
+  const [isEvaluating, setIsEvaluating] = useState(false);
+  const [evaluationResults, setEvaluationResults] =
+    useState<EvaluationResponse | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showTimelineModal, setShowTimelineModal] = useState(false);
   const router = useRouter();
+  const isAuthenticated = useAtomValue(isAuthenticatedAtom);
+  const syncEvaluationData = useSetAtom(evaluationSyncAtom);
 
-  const evaluationData = {
-    topic:
-      "The Impact of Artificial Intelligence on Modern Research Methodologies",
-    overallScore: 87,
+  // Use evaluation results if available, otherwise fall back to static data
+  const displayData = evaluationResults
+    ? {
+    topic: evaluationResults.metadata?.topic || researchTopic,
+    overallScore: Math.round(
+          ((evaluationResults.evaluation.novelty.score +
+       evaluationResults.evaluation.trends.score +
+       evaluationResults.evaluation.methodological_complexity.score +
+       evaluationResults.evaluation.research_gaps.score +
+       evaluationResults.evaluation.grant_potential.score +
+            evaluationResults.evaluation.literature_availability.score) /
+            6) *
+            10
+    ),
     metrics: [
       {
         name: "Novelty",
-        score: 85,
+        score: evaluationResults.evaluation.novelty.score * 10,
         color: "from-emerald-500 to-emerald-600",
         description: "Originality and uniqueness of research approach",
-        details:
-          "Your research topic shows good novelty potential. AI's impact on research methodologies is a growing field with room for innovative approaches.",
-        recommendations: [
-          "Explore interdisciplinary connections to enhance novelty",
-          "Consider emerging AI trends in your methodology",
-          "Identify unique angles within the AI-research intersection",
-        ],
+        details: evaluationResults.evaluation.novelty.justification,
+            recommendations:
+              evaluationResults.evaluation.novelty.recommendations || [],
       },
       {
         name: "Trends",
-        score: 92,
+        score: evaluationResults.evaluation.trends.score * 10,
         color: "from-blue-500 to-blue-600",
         description: "Alignment with current academic and industry trends",
-        details:
-          "Excellent alignment with current trends. AI in research is highly relevant and gaining significant attention across disciplines.",
-        recommendations: [
-          "Leverage current AI research momentum",
-          "Connect with trending AI research communities",
-          "Align with funding priorities in AI research",
-        ],
+        details: evaluationResults.evaluation.trends.justification,
+            recommendations:
+              evaluationResults.evaluation.trends.recommendations || [],
       },
       {
         name: "Methodology",
-        score: 88,
+            score:
+              evaluationResults.evaluation.methodological_complexity.score * 10,
         color: "from-purple-500 to-purple-600",
         description: "Sophistication and feasibility of research methods",
-        details:
-          "Strong methodological foundation with clear research design. Your approach demonstrates academic rigor and practical feasibility.",
-        recommendations: [
-          "Consider mixed-methods approach to strengthen rigor",
-          "Incorporate AI tools in your methodology",
-          "Plan for iterative methodology refinement",
-        ],
+            details:
+              evaluationResults.evaluation.methodological_complexity
+                .justification,
+            recommendations:
+              evaluationResults.evaluation.methodological_complexity
+                .recommendations || [],
       },
       {
         name: "Research Gaps",
-        score: 83,
+        score: evaluationResults.evaluation.research_gaps.score * 10,
         color: "from-orange-500 to-orange-600",
         description: "Identification of unexplored areas in the field",
-        details:
-          "Good identification of research gaps. The intersection of AI and research methodologies presents several unexplored opportunities.",
-        recommendations: [
-          "Narrow focus to specific AI-research intersections",
-          "Identify methodological gaps in current literature",
-          "Explore emerging research questions in the field",
-        ],
+        details: evaluationResults.evaluation.research_gaps.justification,
+            recommendations:
+              evaluationResults.evaluation.research_gaps.recommendations || [],
       },
       {
         name: "Grant Potential",
-        score: 89,
+        score: evaluationResults.evaluation.grant_potential.score * 10,
         color: "from-yellow-500 to-yellow-600",
         description: "Likelihood of securing funding for the research",
-        details:
-          "High grant potential due to AI's current relevance and funding priorities. Multiple funding bodies are actively supporting AI research.",
-        recommendations: [
-          "Target AI-focused funding bodies",
-          "Highlight interdisciplinary collaboration potential",
-          "Emphasize practical applications and impact",
-        ],
+        details: evaluationResults.evaluation.grant_potential.justification,
+            recommendations:
+              evaluationResults.evaluation.grant_potential.recommendations ||
+              [],
       },
       {
-        name: "Impact Score",
-        score: 91,
+        name: "Literature Availability",
+            score:
+              evaluationResults.evaluation.literature_availability.score * 10,
         color: "from-pink-500 to-pink-600",
-        description: "Potential academic and societal impact",
-        details:
-          "Exceptional impact potential. Your research could significantly influence how research is conducted across multiple disciplines.",
-        recommendations: [
-          "Focus on practical implementation strategies",
-          "Plan for knowledge transfer to other fields",
-          "Consider policy implications of your findings",
+        description: "Availability of existing research and resources",
+            details:
+              evaluationResults.evaluation.literature_availability
+                .justification,
+            recommendations:
+              evaluationResults.evaluation.literature_availability
+                .recommendations || [],
+          },
         ],
-      },
-    ],
-    recommendations: [
-      "Narrow your focus to a specific aspect of AI's impact to increase researchability",
-      "Consider mixed-methods approach to strengthen methodological rigor",
-      "Explore interdisciplinary connections to enhance novelty and impact",
-      "Identify specific funding bodies that align with your research focus",
-      "Consider ethical implications of AI research in your methodology",
-    ],
-  };
+        recommendations:
+          evaluationResults.evaluation.overall_recommendations ||
+          evaluationData.recommendations,
+      }
+    : evaluationData;
 
   const toggleMetric = (metricName: string) => {
-    setExpandedMetrics((prev) =>
-      prev.includes(metricName)
-        ? prev.filter((name) => name !== metricName)
-        : [...prev, metricName]
-    );
+    setExpandedMetrics((prev) => {
+      if (prev.includes(metricName)) {
+        return prev.filter((name) => name !== metricName);
+      }
+      return [metricName];
+    });
   };
 
-  // Don't render theme-dependent content until hydration is complete
+  const handleEvaluate = async () => {
+    if (!researchTopic.trim()) return;
+    
+    setIsEvaluating(true);
+    setError(null);
+    setEvaluationResults(null);
+    setShowResults(false);
+    
+    try {
+      const response = await fetch("/api/evaluate-research", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          research_topic: researchTopic.trim(),
+          additional_keywords: [],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || "Evaluation failed");
+      }
+
+      const result = await response.json();
+      setEvaluationResults(result);
+      setShowResults(true);
+    } catch (err: any) {
+      console.error("Evaluation failed:", err);
+      setError(
+        err.message || "Failed to evaluate research topic. Please try again."
+      );
+    } finally {
+      setIsEvaluating(false);
+    }
+  };
+
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const downloadEvaluationPDF = async () => {
+    if (!evaluationResults || !displayData || isDownloading) return;
+    
+    // Ensure we have real evaluation data, not fallback data
+    if (
+      !evaluationResults.evaluation ||
+      !displayData.metrics ||
+      displayData.metrics.length === 0
+    ) {
+      alert(
+        "No evaluation data available for download. Please run an evaluation first."
+      );
+      return;
+    }
+    
+    setIsDownloading(true);
+    
+    try {
+      const response = await fetch("/api/download-evaluation-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          research_topic: researchTopic,
+          evaluation_results: evaluationResults,
+          display_data: displayData,
+        }),
+      });
+
+      if (!response.ok) {
+        // Check if response is JSON or HTML
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          throw new Error(errorData.details || "Failed to generate PDF");
+        } else {
+          // Handle HTML error responses
+          const errorText = await response.text();
+          console.error("Non-JSON error response:", errorText);
+          throw new Error("Server error occurred while generating PDF");
+        }
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `evaluation-${researchTopic.replace(
+        /[^a-zA-Z0-9]/g,
+        "-"
+      )}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+    } catch (error) {
+      console.error("PDF download failed:", error);
+      alert(
+        `Failed to download PDF: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -149,7 +325,6 @@ export default function EvaluationPage() {
       <nav className="relative z-10 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-3 group">
-            
             <div className="flex items-center space-x-3 mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
                   <GraduationCap className="w-6 h-6 text-white" />
@@ -197,9 +372,7 @@ export default function EvaluationPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        {/* Header Section */}
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
@@ -220,7 +393,7 @@ export default function EvaluationPage() {
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            Evaluation Results
+            {showResults ? "Evaluation Results" : "Research Topic Evaluation"}
           </h1>
 
           <p
@@ -228,41 +401,132 @@ export default function EvaluationPage() {
               isDarkMode ? "text-gray-300" : "text-gray-600"
             }`}
           >
-            Your research topic has been analyzed across 6 key academic metrics
+            {showResults 
+              ? `Comprehensive analysis of "${evaluationResults?.metadata?.topic}" across six key academic metrics`
+              : "Enter your research topic to get a comprehensive evaluation across 6 key academic metrics"}
           </p>
 
-          {/* Overall Score */}
-          <motion.div className="inline-block" whileHover={{ scale: 1.05 }}>
-            <div
-              className={`relative p-8 rounded-3xl shadow-2xl ${
-                isDarkMode
-                  ? "bg-gray-800/90 border border-gray-700"
-                  : "bg-white/90 border border-gray-200"
-              } backdrop-blur-sm`}
+          {!showResults && (
+            <motion.div
+              className="max-w-4xl mx-auto mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="text-center">
-                <div className="text-6xl font-bold bg-gradient-to-r from-emerald-500 to-blue-500 bg-clip-text text-transparent mb-2">
-                  {evaluationData.overallScore}%
+              <div className="flex flex-col gap-6">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Enter your research topic here..."
+                    value={researchTopic}
+                    onChange={(e) => setResearchTopic(e.target.value)}
+                    className={`w-full rounded-3xl px-8 py-6 text-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all duration-300 ${
+                      isDarkMode
+                        ? "bg-white/10 border-2 border-white/20 text-white placeholder-gray-400"
+                        : "bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-500"
+                    }`}
+                  />
+                  {researchTopic && (
+                    <motion.div
+                      className="absolute right-6 top-1/2 transform -translate-y-1/2"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    >
+                      <CheckCircle className="w-8 h-8 text-emerald-500" />
+                    </motion.div>
+                  )}
                 </div>
-                <div
-                  className={`text-lg font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-600"
-                  }`}
+                
+                <motion.button
+                  onClick={handleEvaluate}
+                  disabled={isEvaluating || !researchTopic.trim()}
+                  className="bg-gradient-to-r from-blue-600 to-emerald-500 px-12 py-6 rounded-3xl font-semibold text-2xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-4 text-white mx-auto min-w-[300px]"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Overall Score
+                  {isEvaluating ? (
+                    <>
+                      <motion.div
+                        className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      />
+                      <span>Analyzing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-6 h-6" />
+                      <span>Evaluate Now</span>
+                    </>
+                    )}
+                </motion.button>
                 </div>
-                <div
-                  className={`text-sm ${
+
+              {/* Sample Topics */}
+              <div className="text-center mt-8">
+                <p
+                  className={`text-lg mb-4 ${
                     isDarkMode ? "text-gray-400" : "text-gray-500"
                   }`}
                 >
-                  Excellent potential for research success
+                  Try these sample topics:
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {[
+                    "AI Ethics in Healthcare",
+                    "Sustainable Urban Planning",
+                    "Quantum Computing Applications",
+                  ].map((sample, index) => (
+                    <motion.button
+                      key={index}
+                      onClick={() => setResearchTopic(sample)}
+                      className={`px-6 py-3 rounded-2xl text-base font-medium transition-all duration-300 ${
+                        isDarkMode
+                          ? "bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10"
+                          : "bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 border border-gray-200 hover:border-gray-300"
+                      }`}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {sample}
+                    </motion.button>
+                  ))}
                 </div>
               </div>
-            </div>
-          </motion.div>
 
-          {/* Action Buttons */}
+              {/* Error Display */}
+              {error && (
+                <motion.div
+                  className="mt-6"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div
+                    className={`p-6 rounded-2xl border ${
+                    isDarkMode
+                      ? "bg-red-900/20 border-red-700/30 text-red-200"
+                      : "bg-red-50 border-red-200 text-red-700"
+                    }`}
+                  >
+                    <p className="text-base font-medium">{error}</p>
+            </div>
+              </motion.div>
+            )}
+          </motion.div>
+          )}
+
+          {/* Action Buttons - Only show after evaluation */}
+          {showResults && (
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center mt-8"
             initial={{ opacity: 0, y: 20 }}
@@ -271,33 +535,52 @@ export default function EvaluationPage() {
           >
             <motion.button
               onClick={() => {
-                const documentId = Math.floor(Math.random() * 1000) + 1; 
-                router.push(`/student/documents/${documentId}`);
-              }}
-              className="bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2 cursor-pointer"
+                   // Sync evaluation data with timeline creation state
+                   if (researchTopic) {
+                     syncEvaluationData(researchTopic);
+                   }
+                   setShowTimelineModal(true);
+                 }}
+                 className="bg-gradient-to-r from-emerald-600 to-blue-500 text-white px-10 py-5 rounded-2xl font-semibold text-xl shadow-lg hover:from-emerald-700 hover:to-blue-600 transition-all duration-300 flex items-center justify-center space-x-1"
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
-              <FileText className="w-5 h-5" />
-              <span>Continue to Writing</span>
+                <Target className="w-6 h-6" />
+                <span>Create Timeline</span>
             </motion.button>
 
-            <motion.button
-              className={`px-8 py-4 rounded-xl font-semibold text-lg border-2 transition-all duration-300 flex items-center justify-center space-x-2 ${
-                isDarkMode
-                  ? "border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
-                  : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
-              }`}
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Download className="w-5 h-5" />
-              <span>Download Evaluation</span>
+             
+
+              <motion.button
+                onClick={() => downloadEvaluationPDF()}
+                disabled={isDownloading}
+                className={`px-10 py-5 rounded-2xl font-semibold text-xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-3 ${
+                  isDownloading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 hover:scale-105"
+                }`}
+                whileHover={!isDownloading ? { scale: 1.02, y: -2 } : {}}
+                whileTap={!isDownloading ? { scale: 0.98 } : {}}
+              >
+                {isDownloading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    <span>Generating PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-6 h-6" />
+                    <span>Download PDF</span>
+                  </>
+                )}
             </motion.button>
           </motion.div>
+          )}
         </motion.div>
 
-        {/* Research Topic */}
+                {/* Results Section - Only show after evaluation */}
+        {showResults && (
+          <>
         <motion.div
           className={`mb-8 p-6 rounded-2xl shadow-xl ${
             isDarkMode
@@ -320,48 +603,61 @@ export default function EvaluationPage() {
               isDarkMode ? "text-gray-300" : "text-gray-600"
             }`}
           >
-            {evaluationData.topic}
+                {displayData.topic}
           </p>
         </motion.div>
 
-        {/* Metrics Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-12">
-          {evaluationData.metrics.map((metric, index) => (
-            <motion.div
-              key={metric.name}
-              className={`rounded-2xl shadow-xl overflow-hidden ${
-                isDarkMode
-                  ? "bg-gray-800/90 border border-gray-700"
-                  : "bg-white/90 border border-gray-200"
-              } backdrop-blur-sm`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
-              whileHover={{ y: -5 }}
-            >
+         
+
+            <div className="grid lg:grid-cols-2 gap-8 mb-16">
+              {displayData.metrics.map((metric, index) => {
+                const metricId = `${metric.name}-${index}`;
+                return (
+                <motion.div
+                  key={metricId}
+                  className={`relative rounded-3xl overflow-hidden ${
+                    isDarkMode
+                      ? "bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-700/50"
+                      : "bg-gradient-to-br from-white/90 to-gray-50/90 border border-gray-200/50"
+                  } backdrop-blur-xl shadow-2xl`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                >
+                  {/* Background decoration */}
+                    <div
+                      className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${metric.color
+                        .replace("from-", "from-")
+                        .replace(
+                          "to-",
+                          "to-"
+                        )} opacity-20 rounded-full blur-xl`}
+                    ></div>
+                  
               {/* Metric Header */}
               <div
-                className="p-6 cursor-pointer"
-                onClick={() => toggleMetric(metric.name)}
+                    className="p-8 cursor-pointer"
+                    onClick={() => toggleMetric(metricId)}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-4">
                     <div
-                      className={`w-12 h-12 bg-gradient-to-br ${metric.color} rounded-xl flex items-center justify-center`}
+                          className={`w-16 h-16 bg-gradient-to-br ${metric.color} rounded-2xl flex items-center justify-center shadow-lg`}
                     >
-                      <Target className="w-6 h-6 text-white" />
+                          <Target className="w-8 h-8 text-white" />
                     </div>
                     <div>
                       <h3
-                        className={`text-xl font-bold ${
+                            className={`text-2xl font-bold mb-2 ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
                         {metric.name}
                       </h3>
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                            className={`text-base ${
+                              isDarkMode ? "text-gray-300" : "text-gray-600"
                         }`}
                       >
                         {metric.description}
@@ -369,43 +665,56 @@ export default function EvaluationPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-4">
                     <div className="text-right">
                       <div
-                        className={`text-2xl font-bold bg-gradient-to-br ${metric.color} bg-clip-text text-transparent`}
+                            className={`text-4xl font-black bg-gradient-to-br ${metric.color} bg-clip-text text-transparent`}
                       >
                         {metric.score}%
                       </div>
                     </div>
                     <motion.div
+                          className={`p-2 rounded-xl ${
+                            isDarkMode ? "bg-gray-700/50" : "bg-gray-100"
+                          }`}
                       animate={{
-                        rotate: expandedMetrics.includes(metric.name) ? 180 : 0,
+                              rotate: expandedMetrics.includes(metricId)
+                                ? 180
+                                : 0,
                       }}
                       transition={{ duration: 0.3 }}
                     >
-                      {expandedMetrics.includes(metric.name) ? (
-                        <ChevronUp className="w-5 h-5 text-gray-400" />
+                          {expandedMetrics.includes(metricId) ? (
+                            <ChevronUp className="w-6 h-6 text-gray-400" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-400" />
+                            <ChevronDown className="w-6 h-6 text-gray-400" />
                       )}
                     </motion.div>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                    {/* Enhanced Progress Bar */}
+                      <div
+                        className={`w-full rounded-2xl h-4 overflow-hidden ${
+                      isDarkMode ? "bg-gray-700/50" : "bg-gray-200"
+                        }`}
+                      >
                   <motion.div
-                    className={`h-full bg-gradient-to-r ${metric.color} rounded-full`}
+                        className={`h-full bg-gradient-to-r ${metric.color} rounded-2xl shadow-lg`}
                     initial={{ width: 0 }}
                     animate={{ width: `${metric.score}%` }}
-                    transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
+                          transition={{
+                            duration: 1.5,
+                            delay: 0.5 + index * 0.1,
+                            ease: "easeOut",
+                          }}
                   />
                 </div>
               </div>
 
               {/* Expandable Content */}
               <AnimatePresence>
-                {expandedMetrics.includes(metric.name) && (
+                    {expandedMetrics.includes(metricId) && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
@@ -430,7 +739,8 @@ export default function EvaluationPage() {
                         >
                           Recommendations:
                         </h4>
-                        {metric.recommendations.map((rec, recIndex) => (
+                              {metric.recommendations.map(
+                                (rec: string, recIndex: number) => (
                           <motion.div
                             key={recIndex}
                             className="flex items-start space-x-3"
@@ -441,39 +751,47 @@ export default function EvaluationPage() {
                             <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
                             <span
                               className={`text-sm ${
-                                isDarkMode ? "text-gray-300" : "text-gray-600"
+                                        isDarkMode
+                                          ? "text-gray-300"
+                                          : "text-gray-600"
                               }`}
                             >
                               {rec}
                             </span>
                           </motion.div>
-                        ))}
+                                )
+                              )}
                       </div>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
-          ))}
+              );
+              })}
         </div>
 
-        {/* Recommendations Section */}
+            {/* Recommendations Section - Modern Enhanced */}
         <motion.div
-          className={`mb-8 p-8 rounded-2xl shadow-xl ${
+              className={`relative mb-12 p-10 rounded-3xl ${
             isDarkMode
-              ? "bg-gray-800/90 border border-gray-700"
-              : "bg-white/90 border border-gray-200"
-          } backdrop-blur-sm`}
+                  ? "bg-gradient-to-br from-gray-900/80 to-gray-800/80 border border-gray-700/50"
+                  : "bg-gradient-to-br from-white/90 to-gray-50/90 border border-gray-200/50"
+              } backdrop-blur-xl shadow-2xl overflow-hidden`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
-              <Award className="w-5 h-5 text-white" />
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-400/20 to-blue-400/20 rounded-full blur-2xl"></div>
+              
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Award className="w-7 h-7 text-white" />
             </div>
             <h2
-              className={`text-2xl font-bold ${
+                  className={`text-3xl font-bold ${
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
@@ -481,58 +799,62 @@ export default function EvaluationPage() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {evaluationData.recommendations.map((rec, index) => (
+              <div className="grid md:grid-cols-2 gap-6">
+                {displayData.recommendations.map(
+                  (rec: string, index: number) => (
               <motion.div
                 key={index}
-                className="flex items-start space-x-3 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20"
+                    className={`group relative p-6 rounded-2xl ${
+                      isDarkMode 
+                        ? "bg-gradient-to-br from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 hover:border-emerald-500/50" 
+                        : "bg-gradient-to-br from-emerald-50 to-blue-50 border border-emerald-200 hover:border-emerald-300"
+                    } transition-all duration-300 hover:scale-105 hover:shadow-lg`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 + index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    whileHover={{ y: -4 }}
+                  >
+                    <div className="flex items-start space-x-4">
+                        <div
+                          className={`p-2 rounded-xl ${
+                        isDarkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+                          } group-hover:scale-110 transition-transform duration-200`}
+                        >
+                        <CheckCircle className="w-6 h-6 text-emerald-500" />
+                      </div>
                 <span
-                  className={`text-sm font-medium ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                        className={`text-base font-medium leading-relaxed ${
+                          isDarkMode ? "text-emerald-200" : "text-emerald-800"
                   }`}
                 >
                   {rec}
                 </span>
+                    </div>
               </motion.div>
-            ))}
+                  )
+                )}
           </div>
         </motion.div>
+          </>
+        )}
 
-        {/* Action Buttons */}
-        <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.0 }}
-        >
-          <motion.button
-            className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold rounded-xl hover:from-emerald-600 hover:to-blue-600 shadow-xl hover:shadow-2xl flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Brain className="w-5 h-5" />
-            <span>Start Research Journey</span>
-          </motion.button>
-
-          <motion.button
-            className={`px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 ${
-              isDarkMode
-                ? "text-gray-300 border-2 border-gray-600 hover:border-gray-500 hover:bg-gray-800"
-                : "text-gray-600 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Zap className="w-5 h-5" />
-            <span>Get Detailed Report</span>
-          </motion.button>
-        </motion.div>
+        {/* Timeline Creation Modal */}
+        {showTimelineModal && (
+          <TimelineCreationModal
+            isOpen={showTimelineModal}
+            onClose={() => setShowTimelineModal(false)}
+            researchTopic={researchTopic}
+            onTimelineCreated={(timelineId) => {
+              setShowTimelineModal(false);
+              // Redirect to dashboard to show the newly created timeline
+              router.push("/user/dashboard");
+            }}
+            refreshTimelines={() => {
+              // This will be handled by the dashboard's useEffect
+              // The dashboard will automatically refresh when navigated to
+            }}
+          />
+        )}
       </div>
     </div>
   );

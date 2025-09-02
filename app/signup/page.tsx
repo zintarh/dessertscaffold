@@ -1,19 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import toast from "react-hot-toast";
 
-import { 
-  GraduationCap, 
-  Mail, 
-  Lock, 
-  User, 
-  Eye, 
-  EyeOff, 
+import {
+  GraduationCap,
+  Mail,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
   ArrowRight,
   Users,
   Target,
@@ -21,11 +22,15 @@ import {
   Brain,
   Award,
   Building,
-  Sun,
-  Moon
-} from '../components/Icons';
+} from "../components/Icons";
+import { registerUserAtom } from "../../lib/stores/authStore";
+import {
+  SIGNUP_CONSTANTS,
+  UserType,
+  AcademicLevel,
+} from "../../lib/constants/signup";
 
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from "../contexts/ThemeContext";
 import Navbar from "../components/Navbar";
 import {
   signupStepAtom,
@@ -38,12 +43,15 @@ import {
   updateFormDataAtom,
   resetSignupAtom,
   goToStepAtom,
-  type SignupFormData
-} from '../../lib/stores/signupStore';
+  type SignupFormData,
+} from "../../lib/stores/signupStore";
+
+// Disable static generation for this page
+export const dynamic = "force-dynamic";
 
 export default function SignupPage() {
   const { isDarkMode, toggleTheme, isHydrated } = useTheme();
-  
+
   // Jotai atoms for persistent state
   const [currentStep, setCurrentStep] = useAtom(signupStepAtom);
   const [formData, setFormData] = useAtom(signupFormDataAtom);
@@ -54,12 +62,14 @@ export default function SignupPage() {
   const updateFormData = useSetAtom(updateFormDataAtom);
   const resetSignup = useSetAtom(resetSignupAtom);
   const goToStep = useSetAtom(goToStepAtom);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Jotai atoms for authentication
+  const registerUser = useSetAtom(registerUserAtom);
 
   // Cleanup effect - reset signup state when component unmounts
   useEffect(() => {
@@ -72,9 +82,17 @@ export default function SignupPage() {
     };
   }, [currentStep]);
 
-
   const handleNext = () => {
     if (canProceed) {
+      // Additional validation for step 2 (student academic level)
+      if (
+        currentStep === 2 &&
+        formData.userType === "STUDENT" &&
+        !formData.academicLevel?.trim()
+      ) {
+        toast.error("Please select your academic level before proceeding.");
+        return;
+      }
       setNextStep();
     }
   };
@@ -85,97 +103,6 @@ export default function SignupPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (currentStep < 4) {
-      handleNext();
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (!formData.userType) {
-      setError('Please select your user type');
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          firstName: formData.firstName || undefined,
-          lastName: formData.lastName || undefined,
-          userType: formData.userType || undefined,
-          institutionName: formData.institutionName || undefined,
-          researchArea: formData.researchArea || undefined,
-          academicLevel: formData.academicLevel || undefined,
-        }),
-      });
-
-      console.log('Response status:', res.status);
-      console.log('Response headers:', res.headers);
-      
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        console.error('Registration failed:', {
-          status: res.status,
-          statusText: res.statusText,
-          data
-        });
-        throw new Error(data.error || 'Registration failed');
-      }
-      const data = await res.json();
-      
-      // If registration requires verification, show success message
-      if (data.requiresVerification) {
-        // Reset signup state after successful registration
-        resetSignup();
-        // Redirect to a success page or show success message
-        router.replace('/signup-success');
-        return;
-      }
-
-      // For users that don't require verification, sign them in directly
-      const signInRes = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-      if (signInRes?.error) {
-        throw new Error('Sign-in failed');
-      }
-      // Reset signup state after successful registration
-      resetSignup();
-      router.replace('/writing');
-    } catch (err: any) {
-      console.error('Signup error caught:', err);
-      console.error('Error details:', {
-        message: err?.message,
-        stack: err?.stack,
-        name: err?.name
-      });
-      
-      const errorMessage = err?.message || 'Something went wrong';
-      // Make error messages more user-friendly
-      if (errorMessage.includes('Email already in use')) {
-        setError('This email is already registered. Try signing in instead or use a different email.');
-      } else if (errorMessage.includes('Registration failed')) {
-        setError('Unable to create your account. Please check your information and try again.');
-      } else if (errorMessage.includes('Sign-in failed')) {
-        setError('Account created but sign-in failed. Please try signing in manually.');
-      } else {
-        setError(errorMessage);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const handleInputChange = (field: string, value: string | boolean) => {
     updateFormData({ [field]: value });
   };
@@ -183,43 +110,113 @@ export default function SignupPage() {
   // Use Jotai computed atom for step validation
   const isStepValid = useAtomValue(isStepValidAtom);
 
-  const userTypes = [
-    {
-      id: 'msc',
-      title: 'MSc Student',
-      description: 'Master\'s degree research',
-      icon: GraduationCap,
-      color: 'from-blue-600 to-blue-700'
-    },
-    {
-      id: 'phd',
-      title: 'PhD Candidate',
-      description: 'Doctoral research journey',
-      icon: Brain,
-      color: 'from-emerald-500 to-emerald-600'
-    },
-    {
-      id: 'researcher',
-      title: 'Academic Researcher',
-      description: 'Scholarly research work',
-      icon: Award,
-      color: 'from-amber-500 to-amber-600'
-    },
-    {
-      id: 'mentor',
-      title: 'Academic Mentor',
-      description: 'Supervisor or advisor',
-      icon: Users,
-      color: 'from-slate-500 to-slate-600'
-    },
-    {
-      id: 'institution',
-      title: 'Institution',
-      description: 'University or organization',
-      icon: Building,
-      color: 'from-gray-600 to-gray-700'
+  // Use constants from the constants file
+  const userTypes = SIGNUP_CONSTANTS.USER_TYPES;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (currentStep < 4) {
+      handleNext();
+      return;
     }
-  ];
+
+    const {
+      password,
+      confirmPassword,
+      userType,
+      email,
+      firstName,
+      lastName,
+      institutionName,
+      researchArea,
+    } = formData as SignupFormData;
+
+    if (password !== confirmPassword) {
+      toast.error(SIGNUP_CONSTANTS.VALIDATION_MESSAGES.PASSWORDS_MISMATCH);
+      return;
+    }
+    if (!userType) {
+      toast.error(SIGNUP_CONSTANTS.VALIDATION_MESSAGES.USER_TYPE_REQUIRED);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare user data for registration
+      const userData: any = {
+        email,
+        password,
+        firstName,
+        lastName,
+        userType: userType as "STUDENT" | "MENTOR" | "INSTITUTION",
+        institutionName,
+        researchArea,
+      };
+
+      // Only add academicLevel if it has a valid value
+      if (formData.academicLevel && formData.academicLevel.trim() !== "") {
+        userData.academicLevel = formData.academicLevel;
+      }
+
+      // Step 1: Register user with backend API (doesn't update local state yet)
+      const registeredUser = await registerUser(userData);
+
+      console.log("✅ User registered successfully, attempting sign-in...");
+      toast.success("Account created successfully! Signing you in...");
+
+      // Step 2: Attempt to sign in with NextAuth.js
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Sign-in failed - don't update local state
+        console.error(
+          "❌ Sign-in failed after registration:",
+          signInResult.error
+        );
+        toast.error(
+          `Registration successful but sign-in failed: ${signInResult.error}`
+        );
+        return;
+      }
+
+      // Step 3: Sign-in successful - now update local state
+      console.log("✅ Sign-in successful, updating local state...");
+      // User state will be automatically updated by useAuthSync hook
+
+      // Step 4: Complete the flow
+      console.log(
+        "✅ Registration and sign-in complete, redirecting to dashboard..."
+      );
+      toast.success("Welcome! Redirecting to your dashboard...");
+      resetSignup();
+      router.push("/user/dashboard");
+    } catch (err: any) {
+      console.error("Signup error:", err);
+
+      const msg = err?.message || "";
+
+      if (msg.includes("Validation failed") && Array.isArray(err.details)) {
+        const errorMessages = err.details
+          .map((d: any) => `${d.field}: ${d.message}`)
+          .join(", ");
+        toast.error(`Please fix the following: ${errorMessages}`);
+      } else if (msg.includes("already exists")) {
+        toast.error(
+          "This email is already registered. Try signing in instead or use a different email."
+        );
+      } else {
+        toast.error(msg || "Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Don't render theme-dependent content until hydration is complete
   if (!isHydrated) {
@@ -234,33 +231,39 @@ export default function SignupPage() {
   }
 
   return (
-    <div className={`min-h-screen overflow-hidden relative transition-all duration-500 ${
-      isDarkMode 
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white'
-        : 'bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900'
-    }`}>
+    <div
+      className={`min-h-screen overflow-hidden relative transition-all duration-500 ${
+        isDarkMode
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white"
+          : "bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900"
+      }`}
+    >
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse ${
-          isDarkMode ? 'bg-blue-600/20' : 'bg-blue-600/10'
-        }`} style={{ left: '20%', top: '20%' }} />
-        <div className={`absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-2xl animate-bounce ${
-          isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/5'
-        }`} />
-        <div className={`absolute bottom-1/4 left-1/4 w-48 h-48 rounded-full blur-xl animate-pulse ${
-          isDarkMode ? 'bg-amber-500/10' : 'bg-amber-500/5'
-        }`} />
+        <div
+          className={`absolute w-96 h-96 rounded-full blur-3xl animate-pulse ${
+            isDarkMode ? "bg-blue-600/20" : "bg-blue-600/10"
+          }`}
+          style={{ left: "20%", top: "20%" }}
+        />
+        <div
+          className={`absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-2xl animate-bounce ${
+            isDarkMode ? "bg-emerald-500/10" : "bg-emerald-500/5"
+          }`}
+        />
+        <div
+          className={`absolute bottom-1/4 left-1/4 w-48 h-48 rounded-full blur-xl animate-pulse ${
+            isDarkMode ? "bg-amber-500/10" : "bg-amber-500/5"
+          }`}
+        />
       </div>
 
-      {/* Navigation */}
       <Navbar />
 
-      {/* Main Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
         <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-16 items-center">
-          
           {/* Left Side - School Image */}
-          <motion.div 
+          <motion.div
             className="relative"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -269,42 +272,53 @@ export default function SignupPage() {
             <div className="relative">
               {/* School Image Container */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <div 
+                <div
                   className="w-full h-[600px] bg-cover bg-center bg-no-repeat"
                   style={{
-                    backgroundImage: `url('/images/signup-bg.jpg')`
+                    backgroundImage: `url('/images/signup-bg.jpg')`,
                   }}
                 >
                   {/* Academic Icons Pattern */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="grid grid-cols-3 gap-8 opacity-20">
-                      {[GraduationCap, Brain, Award, Target, Building, Users].map((Icon, i) => (
+                      {[
+                        GraduationCap,
+                        Brain,
+                        Award,
+                        Target,
+                        Building,
+                        Users,
+                      ].map((Icon, i) => (
                         <motion.div
                           key={i}
                           className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
-                            isDarkMode ? 'bg-white/10' : 'bg-white/30'
+                            isDarkMode ? "bg-white/10" : "bg-white/30"
                           }`}
-                          animate={{ 
+                          animate={{
                             y: [0, -10, 0],
-                            rotate: [0, 5, 0]
+                            rotate: [0, 5, 0],
                           }}
-                          transition={{ 
+                          transition={{
                             duration: 3 + i,
                             repeat: Infinity,
-                            delay: i * 0.5
+                            delay: i * 0.5,
                           }}
                         >
-                          <Icon className={`w-8 h-8 ${isDarkMode ? 'text-white' : 'text-gray-600'}`} />
+                          <Icon
+                            className={`w-8 h-8 ${
+                              isDarkMode ? "text-white" : "text-gray-600"
+                            }`}
+                          />
                         </motion.div>
                       ))}
                     </div>
                   </div>
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-                  
+
                   {/* Content Overlay */}
                   <div className="absolute inset-0 flex flex-col justify-end p-8">
-                    <motion.div 
+                    <motion.div
                       className="text-white space-y-6"
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -312,14 +326,14 @@ export default function SignupPage() {
                     >
                       <div className="text-center space-y-4">
                         <h2 className="text-3xl font-bold">
-                          Join <span className="text-blue-300">10,000+</span> Researchers
+                          Join <span className="text-blue-300">10,000+</span>{" "}
+                          Researchers
                         </h2>
                         <p className="text-blue-100 text-lg leading-relaxed max-w-md mx-auto">
-                          Transform your academic journey with expert insights and a supportive research community.
+                          Transform your academic journey with expert insights
+                          and a supportive research community.
                         </p>
                       </div>
-                      
-
                     </motion.div>
                   </div>
                 </div>
@@ -328,7 +342,9 @@ export default function SignupPage() {
               {/* Floating Stats */}
               <motion.div
                 className={`absolute -top-6 -right-6 p-4 rounded-2xl shadow-xl ${
-                  isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'
+                  isDarkMode
+                    ? "bg-gray-800 border border-gray-700"
+                    : "bg-white border border-gray-100"
                 }`}
                 animate={{ y: [-10, 10, -10] }}
                 transition={{ duration: 4, repeat: Infinity }}
@@ -337,7 +353,11 @@ export default function SignupPage() {
                   <div className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-emerald-500 bg-clip-text text-transparent">
                     10K+
                   </div>
-                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <div
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     Active Researchers
                   </div>
                 </div>
@@ -346,29 +366,29 @@ export default function SignupPage() {
           </motion.div>
 
           {/* Right Side - Multi-Step Form */}
-          <motion.div 
+          <motion.div
             className="relative"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <div className={`rounded-3xl p-8 shadow-2xl border backdrop-blur-sm ${
-              isDarkMode 
-                ? 'bg-gray-800/90 border-gray-700' 
-                : 'bg-white/90 border-gray-200'
-            }`}>
-              
-                            {/* Step Indicator */}
+            <div
+              className={`rounded-3xl p-8 shadow-2xl border backdrop-blur-sm ${
+                isDarkMode
+                  ? "bg-gray-800/90 border-gray-700"
+                  : "bg-white/90 border-gray-200"
+              }`}
+            >
+              {/* Step Indicator */}
               <div className="mb-6">
-               
                 {currentStep > 1 && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`text-center p-3 rounded-lg mb-4 ${
-                      isDarkMode 
-                        ? 'bg-blue-500/10 border border-blue-500/20 text-blue-300' 
-                        : 'bg-blue-50 border border-blue-200 text-blue-700'
+                      isDarkMode
+                        ? "bg-blue-500/10 border border-blue-500/20 text-blue-300"
+                        : "bg-blue-50 border border-blue-200 text-blue-700"
                     }`}
                   >
                     <span className="text-sm">
@@ -380,38 +400,39 @@ export default function SignupPage() {
 
               {/* Header */}
               <div className="text-center mb-8">
-                <motion.div 
+                <motion.div
                   className="w-20 h-20 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl"
                   whileHover={{ scale: 1.05, rotate: 5 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <GraduationCap className="w-10 h-10 text-white" />
                 </motion.div>
-                <h1 className={`text-4xl font-bold mb-3 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>
+                <h1
+                  className={`text-4xl font-bold mb-3 ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   Join the Future
                 </h1>
-                <p className={`text-lg ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                }`}>
-                  {
-                    currentStep === 1 ? 'Choose your category' :
-                    currentStep === 2 ? 'Tell us about yourself' :
-                    currentStep === 3 ? 'Create your account' :
-                    'Review & complete'
-                  }
+                <p
+                  className={`text-lg ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {SIGNUP_CONSTANTS.STEPS[currentStep - 1]?.title ||
+                    "Complete your registration"}
                 </p>
               </div>
 
-              {/* Error Display */}
-              {error && (
+              {/* Error Display - REMOVED: Now using toast notifications */}
+              {/* {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`p-4 rounded-xl border-l-4 ${isDarkMode 
-                    ? 'bg-red-900/20 border-red-500 text-red-300' 
-                    : 'bg-red-50 border-red-500 text-red-700'
+                  className={`p-4 rounded-xl border-l-4 ${
+                    isDarkMode
+                      ? "bg-red-900/20 border-red-500 text-red-300"
+                      : "bg-red-50 border-red-500 text-red-700"
                   }`}
                 >
                   <div className="flex items-center space-x-2">
@@ -421,10 +442,9 @@ export default function SignupPage() {
                     <p className="font-medium">{error}</p>
                   </div>
                 </motion.div>
-              )}
+              )} */}
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                
                 {/* Step 1: User Type Selection Only */}
                 {currentStep === 1 && (
                   <motion.div
@@ -434,10 +454,12 @@ export default function SignupPage() {
                   >
                     {/* User Type Selection */}
                     <div className="space-y-3">
-                      <label className={`text-lg font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
-                        I am a...
+                      <label
+                        className={`text-lg font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
+                        {SIGNUP_CONSTANTS.LABELS.USER_TYPE}
                       </label>
                       <div className="grid grid-cols-1 gap-3">
                         {userTypes.map((type) => {
@@ -446,32 +468,44 @@ export default function SignupPage() {
                             <motion.button
                               key={type.id}
                               type="button"
-                              onClick={() => handleInputChange('userType', type.id)}
+                              onClick={() =>
+                                handleInputChange("userType", type.id)
+                              }
                               className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
                                 formData.userType === type.id
                                   ? isDarkMode
-                                    ? 'border-blue-500 bg-blue-500/10'
-                                    : 'border-blue-500 bg-blue-50'
+                                    ? "border-blue-500 bg-blue-500/10"
+                                    : "border-blue-500 bg-blue-50"
                                   : isDarkMode
-                                    ? 'border-gray-600 hover:border-gray-500 bg-gray-700/50'
-                                    : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'
+                                  ? "border-gray-600 hover:border-gray-500 bg-gray-700/50"
+                                  : "border-gray-200 hover:border-gray-300 bg-gray-50/50"
                               }`}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                             >
                               <div className="flex items-center space-x-3">
-                                <div className={`w-10 h-10 bg-gradient-to-br ${type.color} rounded-xl flex items-center justify-center`}>
+                                <div
+                                  className={`w-10 h-10 bg-gradient-to-br ${type.color} rounded-xl flex items-center justify-center`}
+                                >
                                   <IconComponent className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                  <div className={`font-semibold ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                  }`}>
+                                  <div
+                                    className={`font-semibold ${
+                                      isDarkMode
+                                        ? "text-white"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
                                     {type.title}
                                   </div>
-                                  <div className={`text-sm ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                  }`}>
+                                  <div
+                                    className={`text-sm ${
+                                      isDarkMode
+                                        ? "text-gray-400"
+                                        : "text-gray-600"
+                                    }`}
+                                  >
                                     {type.description}
                                   </div>
                                 </div>
@@ -491,12 +525,15 @@ export default function SignupPage() {
                     animate={{ opacity: 1, x: 0 }}
                     className="space-y-6"
                   >
-                    {formData.userType === 'institution' ? (
+                    {formData.userType === "INSTITUTION" ? (
                       /* Institution Name Field */
                       <div className="space-y-2">
-                        <label htmlFor="institutionName" className={`text-sm font-semibold ${
-                          isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                        }`}>
+                        <label
+                          htmlFor="institutionName"
+                          className={`text-sm font-semibold ${
+                            isDarkMode ? "text-gray-200" : "text-gray-700"
+                          }`}
+                        >
                           Institution Name
                         </label>
                         <div className="relative">
@@ -506,11 +543,16 @@ export default function SignupPage() {
                             id="institutionName"
                             placeholder="Enter institution name"
                             value={formData.institutionName}
-                            onChange={(e) => handleInputChange('institutionName', e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "institutionName",
+                                e.target.value
+                              )
+                            }
                             className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                              isDarkMode 
-                                ? 'bg-gray-700 border-gray-600 text-white' 
-                                : 'bg-white border-gray-200 text-gray-900'
+                              isDarkMode
+                                ? "bg-gray-700 border-gray-600 text-white"
+                                : "bg-white border-gray-200 text-gray-900"
                             }`}
                             required
                           />
@@ -521,9 +563,12 @@ export default function SignupPage() {
                       <>
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <label htmlFor="firstName" className={`text-sm font-semibold ${
-                              isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                            }`}>
+                            <label
+                              htmlFor="firstName"
+                              className={`text-sm font-semibold ${
+                                isDarkMode ? "text-gray-200" : "text-gray-700"
+                              }`}
+                            >
                               First Name
                             </label>
                             <div className="relative">
@@ -533,20 +578,25 @@ export default function SignupPage() {
                                 id="firstName"
                                 placeholder="Enter your first name"
                                 value={formData.firstName}
-                                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                                onChange={(e) =>
+                                  handleInputChange("firstName", e.target.value)
+                                }
                                 className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                                  isDarkMode 
-                                    ? 'bg-gray-700 border-gray-600 text-white' 
-                                    : 'bg-white border-gray-200 text-gray-900'
+                                  isDarkMode
+                                    ? "bg-gray-700 border-gray-600 text-white"
+                                    : "bg-white border-gray-200 text-gray-900"
                                 }`}
                                 required
                               />
                             </div>
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="lastName" className={`text-sm font-semibold ${
-                              isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                            }`}>
+                            <label
+                              htmlFor="lastName"
+                              className={`text-sm font-semibold ${
+                                isDarkMode ? "text-gray-200" : "text-gray-700"
+                              }`}
+                            >
                               Last Name
                             </label>
                             <div className="relative">
@@ -556,16 +606,66 @@ export default function SignupPage() {
                                 id="lastName"
                                 placeholder="Enter your last name"
                                 value={formData.lastName}
-                                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                                onChange={(e) =>
+                                  handleInputChange("lastName", e.target.value)
+                                }
                                 className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                                  isDarkMode 
-                                    ? 'bg-gray-700 border-gray-600 text-white' 
-                                    : 'bg-white border-gray-200 text-gray-900'
+                                  isDarkMode
+                                    ? "bg-gray-700 border-gray-600 text-white"
+                                    : "bg-white border-gray-200 text-gray-900"
                                 }`}
                                 required
                               />
                             </div>
                           </div>
+
+                          {/* Academic Level Field for Students */}
+                          {formData.userType === "STUDENT" && (
+                            <div className="space-y-2">
+                              <label
+                                htmlFor="academicLevel"
+                                className={`text-sm font-semibold ${
+                                  isDarkMode ? "text-gray-200" : "text-gray-700"
+                                }`}
+                              >
+                                Academic Level{" "}
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <div className="relative">
+                                <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <select
+                                  id="academicLevel"
+                                  value={formData.academicLevel || ""}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      "academicLevel",
+                                      e.target.value
+                                    )
+                                  }
+                                  className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+                                    isDarkMode
+                                      ? "bg-gray-700 border-gray-600 text-white"
+                                      : "bg-white border-gray-200 text-gray-900"
+                                  }`}
+                                  required
+                                >
+                                  <option value="">
+                                    Select your academic level
+                                  </option>
+                                  <option value="UNDERGRADUATE">
+                                    Undergraduate
+                                  </option>
+                                  <option value="MASTERS">Masters</option>
+                                  <option value="PHD">PhD</option>
+                                  <option value="POSTDOC">Postdoc</option>
+                                </select>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Required for students to help match you with
+                                  appropriate mentors
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
@@ -581,12 +681,17 @@ export default function SignupPage() {
                   >
                     {/* Email Field */}
                     <div className="space-y-2">
-                      <label htmlFor="email" className={`text-sm font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
+                      <label
+                        htmlFor="email"
+                        className={`text-sm font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
                         Email Address
-                        {(formData.userType === 'institution' || formData.userType === 'mentor') && (
-                          <span className="text-blue-500 text-xs ml-2">(edu.ng required)</span>
+                        {formData.userType === "INSTITUTION" && (
+                          <span className="text-blue-500 text-xs ml-2">
+                            (edu.ng required)
+                          </span>
                         )}
                       </label>
                       <div className="relative">
@@ -595,34 +700,42 @@ export default function SignupPage() {
                           type="email"
                           id="email"
                           placeholder={
-                            (formData.userType === 'institution' || formData.userType === 'mentor') 
-                              ? "Enter your edu.ng email" 
+                            formData.userType === "INSTITUTION"
+                              ? "Enter your edu.ng email"
                               : "Enter your email"
                           }
                           value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("email", e.target.value)
+                          }
                           className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-200 text-gray-900'
+                            isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-200 text-gray-900"
                           }`}
                           required
                         />
                       </div>
-                      {(formData.userType === 'institution' || formData.userType === 'mentor') && 
-                       formData.email && !formData.email.toLowerCase().includes('edu.ng') && (
-                        <p className="text-red-500 text-sm flex items-center space-x-1">
-                          <span>⚠️</span>
-                          <span>Institution and Academic Mentor accounts require an edu.ng email address</span>
-                        </p>
-                      )}
+                      {formData.userType === "INSTITUTION" &&
+                        formData.email &&
+                        !formData.email.toLowerCase().includes("edu.ng") && (
+                          <p className="text-red-500 text-sm flex items-center space-x-1">
+                            <span>⚠️</span>
+                            <span>
+                              Institution accounts require an edu.ng email address
+                            </span>
+                          </p>
+                        )}
                     </div>
 
                     {/* Institution Field */}
                     <div className="space-y-2">
-                      <label htmlFor="institution" className={`text-sm font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
+                      <label
+                        htmlFor="institution"
+                        className={`text-sm font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
                         Institution
                       </label>
                       <div className="relative">
@@ -632,23 +745,29 @@ export default function SignupPage() {
                           id="institution"
                           placeholder="Your university or organization"
                           value={formData.institutionName}
-                          onChange={(e) => handleInputChange('institutionName', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("institutionName", e.target.value)
+                          }
                           className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-200 text-gray-900'
+                            isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-200 text-gray-900"
                           }`}
-                          required={formData.userType === 'institution'}
+                          required={formData.userType === "INSTITUTION"}
                         />
                       </div>
                     </div>
 
                     {/* Research Area Field */}
                     <div className="space-y-2">
-                      <label htmlFor="researchArea" className={`text-sm font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
-                        Research Area <span className="text-gray-400">(Optional)</span>
+                      <label
+                        htmlFor="researchArea"
+                        className={`text-sm font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
+                        Research Area{" "}
+                        <span className="text-gray-400">(Optional)</span>
                       </label>
                       <div className="relative">
                         <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -657,11 +776,13 @@ export default function SignupPage() {
                           id="researchArea"
                           placeholder="e.g., Machine Learning, Psychology, Biology"
                           value={formData.researchArea}
-                          onChange={(e) => handleInputChange('researchArea', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("researchArea", e.target.value)
+                          }
                           className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-200 text-gray-900'
+                            isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-200 text-gray-900"
                           }`}
                         />
                       </div>
@@ -678,9 +799,12 @@ export default function SignupPage() {
                   >
                     {/* Password Field */}
                     <div className="space-y-2">
-                      <label htmlFor="password" className={`text-sm font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
+                      <label
+                        htmlFor="password"
+                        className={`text-sm font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
                         Password
                       </label>
                       <div className="relative">
@@ -690,11 +814,13 @@ export default function SignupPage() {
                           id="password"
                           placeholder="Create a strong password"
                           value={formData.password}
-                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("password", e.target.value)
+                          }
                           className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'bg-white border-gray-200 text-gray-900'
+                            isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-200 text-gray-900"
                           }`}
                           required
                         />
@@ -703,16 +829,23 @@ export default function SignupPage() {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
                     </div>
 
                     {/* Confirm Password Field */}
                     <div className="space-y-2">
-                      <label htmlFor="confirmPassword" className={`text-sm font-semibold ${
-                        isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                      }`}>
+                      <label
+                        htmlFor="confirmPassword"
+                        className={`text-sm font-semibold ${
+                          isDarkMode ? "text-gray-200" : "text-gray-700"
+                        }`}
+                      >
                         Confirm Password
                       </label>
                       <div className="relative">
@@ -722,20 +855,28 @@ export default function SignupPage() {
                           id="confirmPassword"
                           placeholder="Confirm your password"
                           value={formData.confirmPassword}
-                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange("confirmPassword", e.target.value)
+                          }
                           className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white' 
-                              : 'text-gray-900'
+                            isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "text-gray-900"
                           }`}
                           required
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                          {showConfirmPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -746,19 +887,30 @@ export default function SignupPage() {
                         type="checkbox"
                         id="agreeToTerms"
                         checked={formData.agreeToTerms}
-                        onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
+                        onChange={(e) =>
+                          handleInputChange("agreeToTerms", e.target.checked)
+                        }
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-1"
                         required
                       />
-                      <label htmlFor="agreeToTerms" className={`text-sm ${
-                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                      }`}>
-                        I agree to the{' '}
-                        <a href="#" className="text-blue-500 hover:text-blue-600 underline font-medium">
+                      <label
+                        htmlFor="agreeToTerms"
+                        className={`text-sm ${
+                          isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
+                      >
+                        I agree to the{" "}
+                        <a
+                          href="#"
+                          className="text-blue-500 hover:text-blue-600 underline font-medium"
+                        >
                           Terms of Service
-                        </a>{' '}
-                        and{' '}
-                        <a href="#" className="text-blue-500 hover:text-blue-600 underline font-medium">
+                        </a>{" "}
+                        and{" "}
+                        <a
+                          href="#"
+                          className="text-blue-500 hover:text-blue-600 underline font-medium"
+                        >
                           Privacy Policy
                         </a>
                       </label>
@@ -772,9 +924,9 @@ export default function SignupPage() {
                     type="button"
                     onClick={resetSignup}
                     className={`px-4 py-2 text-sm rounded-lg transition-all duration-300 ${
-                      isDarkMode 
-                        ? 'text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500' 
-                        : 'text-gray-500 hover:text-gray-600 border border-gray-200 hover:border-gray-300'
+                      isDarkMode
+                        ? "text-gray-400 hover:text-gray-300 border border-gray-600 hover:border-gray-500"
+                        : "text-gray-500 hover:text-gray-600 border border-gray-200 hover:border-gray-300"
                     }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -790,22 +942,22 @@ export default function SignupPage() {
                       type="button"
                       onClick={handlePrevious}
                       className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
-                        isDarkMode 
-                          ? 'text-gray-300 border border-gray-600 hover:border-gray-500 hover:bg-gray-700' 
-                          : 'text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        isDarkMode
+                          ? "text-gray-300 border border-gray-600 hover:border-gray-500 hover:bg-gray-700"
+                          : "text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Previous
+                      {SIGNUP_CONSTANTS.BUTTONS.PREVIOUS}
                     </motion.button>
                   )}
-                  
+
                   <motion.button
                     type="submit"
                     disabled={!isStepValid || isSubmitting}
                     className={`flex-1 py-4 bg-gradient-to-r from-blue-500 to-emerald-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl flex items-center justify-center space-x-2 text-lg ${
-                      currentStep === 1 ? 'ml-0' : ''
+                      currentStep === 1 ? "ml-0" : ""
                     }`}
                     whileHover={{ scale: isStepValid ? 1.02 : 1 }}
                     whileTap={{ scale: isStepValid ? 0.98 : 1 }}
@@ -818,7 +970,9 @@ export default function SignupPage() {
                     ) : (
                       <>
                         <span>
-                          {currentStep === 4 ? 'Create Account' : 'Continue'}
+                          {currentStep === 4
+                            ? SIGNUP_CONSTANTS.BUTTONS.SUBMIT
+                            : "Continue"}
                         </span>
                         <ArrowRight className="w-6 h-6" />
                       </>
@@ -829,11 +983,16 @@ export default function SignupPage() {
 
               {/* Login Link */}
               <div className="text-center mt-8">
-                <p className={`${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                }`}>
-                  Already have an account?{' '}
-                  <Link href="/signin" className="text-blue-500 hover:text-blue-600 font-bold underline transition-colors">
+                <p
+                  className={`${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  Already have an account?{" "}
+                  <Link
+                    href="/signin"
+                    className="text-blue-500 hover:text-blue-600 font-bold underline transition-colors"
+                  >
                     Sign In
                   </Link>
                 </p>

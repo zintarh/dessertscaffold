@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Bold, Italic, Underline, Link, List, Quote, Type, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
+import GradientButton from './ui/GradientButton';
 import ParagraphEditor from './ParagraphEditor';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface ParagraphBlock {
   id: string;
@@ -186,7 +188,7 @@ export default function MediumEditor({
                       setActiveToolbar(null);
                     }
                   }}
-                  className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   Add Link
                 </button>
@@ -248,7 +250,7 @@ export default function MediumEditor({
                         setActiveToolbar(null);
                       }
                     }}
-                    className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg transition-all duration-200"
                   >
                     Add Image
                   </button>
