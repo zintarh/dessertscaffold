@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, X } from "lucide-react";
+import { AlertTriangle, Trash2,  } from "lucide-react";
 import GradientButton from "./ui/GradientButton";
 import { Timeline } from '@/types';
 import toast from 'react-hot-toast';

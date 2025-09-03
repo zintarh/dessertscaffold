@@ -3,10 +3,10 @@ import { prisma } from "../../../../lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const mentorId = params.id;
+    const { id: mentorId } = await params;
 
     // Get the mentor user
     const mentorUser = await prisma.user.findUnique({

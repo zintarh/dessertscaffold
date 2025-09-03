@@ -14,12 +14,13 @@ export const DISSERTATION: TimelineSection[] = [
       "Implications",
     ],
     proTips: [
-      "Write this last",
-      "Include key statistics",
-      "Keep within word limit",
+      "Keep it concise (300-500 words)",
+      "Write it last after completing all chapters",
+      "Include quantifiable results",
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "introduction",
@@ -43,6 +44,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 3,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "literature-review",
@@ -66,6 +68,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 4,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "methodology",
@@ -89,6 +92,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 3,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -112,6 +116,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 4,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -135,6 +140,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 3,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -159,6 +165,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 2,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "references",
@@ -182,6 +189,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "appendices",
@@ -204,6 +212,7 @@ export const DISSERTATION: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 ];
 
@@ -229,6 +238,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -253,6 +263,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 2,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -277,6 +288,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 2,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -300,6 +312,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -324,6 +337,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 3,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -348,6 +362,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 2,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -372,6 +387,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -396,6 +412,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 
   {
@@ -420,6 +437,7 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
   {
     id: "references",
@@ -443,5 +461,6 @@ export const RESEARCH_PROPOSAL_SECTIONS: TimelineSection[] = [
     ],
     duration: 1,
     status: "not-started",
+    isCompleted: false,
   },
 ];

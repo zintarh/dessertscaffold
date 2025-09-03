@@ -25,8 +25,6 @@ interface MentorProfileData {
   };
 }
 
-
-
 const EXPERTISE_OPTIONS = [
   "Machine Learning",
   "Artificial Intelligence",
@@ -47,7 +45,7 @@ const EXPERTISE_OPTIONS = [
   "Environmental Science",
   "Social Sciences",
   "Humanities",
-  "Other"
+  "Other",
 ];
 
 const SPECIALIZATION_OPTIONS = [
@@ -62,7 +60,7 @@ const SPECIALIZATION_OPTIONS = [
   "Publication Strategy",
   "Presentation Skills",
   "Time Management",
-  "Project Management"
+  "Project Management",
 ];
 
 const LANGUAGE_OPTIONS = [
@@ -78,7 +76,7 @@ const LANGUAGE_OPTIONS = [
   "Arabic",
   "Russian",
   "Hindi",
-  "Other"
+  "Other",
 ];
 
 // Simple MultiSelect component
@@ -140,8 +138,18 @@ function MultiSelect({
           )}
         </div>
         <div className="ml-2">
-          <svg className="h-4 w-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="h-4 w-4 opacity-50"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </div>
@@ -157,8 +165,16 @@ function MultiSelect({
               >
                 <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
                   {value.includes(option) && (
-                    <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    <svg
+                      className="h-4 w-4 text-blue-600"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   )}
                 </span>
@@ -170,10 +186,7 @@ function MultiSelect({
       )}
 
       {open && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setOpen(false)}
-        />
+        <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
       )}
     </div>
   );
@@ -211,7 +224,7 @@ export default function MentorSettings() {
       try {
         setIsLoading(true);
         const response = await fetch("/api/user/mentor-profile");
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.mentorProfile) {
@@ -235,8 +248,6 @@ export default function MentorSettings() {
       fetchMentorProfile();
     }
   }, [user]);
-
-
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -269,6 +280,9 @@ export default function MentorSettings() {
 
       toast.success("Profile updated successfully!");
       setIsEditing(false);
+
+      // Dispatch custom event to notify other components of profile update
+      window.dispatchEvent(new CustomEvent("mentorProfileUpdated"));
     } catch (error: any) {
       console.error("Error updating mentor profile:", error);
       toast.error(error.message || "Failed to update profile");
@@ -277,26 +291,28 @@ export default function MentorSettings() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be less than 5MB');
+      toast.error("Image size must be less than 5MB");
       return;
     }
 
     try {
       await updateUserImage(file);
-      toast.success('Profile image updated successfully!');
+      toast.success("Profile image updated successfully!");
     } catch (error: any) {
-      console.error('Image upload error:', error);
-      toast.error(error.message || 'Failed to upload image');
+      console.error("Image upload error:", error);
+      toast.error(error.message || "Failed to upload image");
     }
   };
 
@@ -346,8 +362,6 @@ export default function MentorSettings() {
     });
   };
 
-
-
   if (!user || isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -365,7 +379,9 @@ export default function MentorSettings() {
       <div className="border-b border-gray-200 px-8 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-normal text-gray-900">Mentor Settings</h1>
+            <h1 className="text-2xl font-normal text-gray-900">
+              Mentor Settings
+            </h1>
             <p className="text-sm text-gray-500 mt-1">
               Manage your mentor profile and preferences
             </p>
@@ -502,7 +518,12 @@ export default function MentorSettings() {
                 {isEditing ? (
                   <textarea
                     value={editedProfile.bio}
-                    onChange={(e) => setEditedProfile({ ...editedProfile, bio: e.target.value })}
+                    onChange={(e) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        bio: e.target.value,
+                      })
+                    }
                     rows={4}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     placeholder="Describe your research background, expertise, and mentoring approach..."
@@ -523,20 +544,28 @@ export default function MentorSettings() {
                   <MultiSelect
                     options={EXPERTISE_OPTIONS}
                     value={editedProfile.expertise}
-                    onChange={(value) => setEditedProfile({ ...editedProfile, expertise: value })}
+                    onChange={(value) =>
+                      setEditedProfile({ ...editedProfile, expertise: value })
+                    }
                     placeholder="Select your areas of expertise..."
                     className="w-full"
                   />
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    {editedProfile.expertise && editedProfile.expertise.length > 0 ? (
+                    {editedProfile.expertise &&
+                    editedProfile.expertise.length > 0 ? (
                       editedProfile.expertise.map((expertise) => (
-                        <span key={expertise} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                        <span
+                          key={expertise}
+                          className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                        >
                           {expertise}
                         </span>
                       ))
                     ) : (
-                      <span className="text-gray-500">No expertise areas selected</span>
+                      <span className="text-gray-500">
+                        No expertise areas selected
+                      </span>
                     )}
                   </div>
                 )}
@@ -552,14 +581,19 @@ export default function MentorSettings() {
                     <input
                       type="number"
                       value={editedProfile.hourlyRate}
-                      onChange={(e) => setEditedProfile({ ...editedProfile, hourlyRate: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) =>
+                        setEditedProfile({
+                          ...editedProfile,
+                          hourlyRate: parseFloat(e.target.value) || 0,
+                        })
+                      }
                       min="0"
                       step="5"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     />
                   ) : (
                     <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">
-                      ${editedProfile.hourlyRate}/hour
+                      {editedProfile.hourlyRate}/hour
                     </p>
                   )}
                 </div>
@@ -570,7 +604,12 @@ export default function MentorSettings() {
                   {isEditing ? (
                     <select
                       value={editedProfile.availability}
-                      onChange={(e) => setEditedProfile({ ...editedProfile, availability: e.target.value })}
+                      onChange={(e) =>
+                        setEditedProfile({
+                          ...editedProfile,
+                          availability: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     >
                       <option value="Available">Available</option>
@@ -590,7 +629,12 @@ export default function MentorSettings() {
                   {isEditing ? (
                     <select
                       value={editedProfile.responseTime}
-                      onChange={(e) => setEditedProfile({ ...editedProfile, responseTime: e.target.value })}
+                      onChange={(e) =>
+                        setEditedProfile({
+                          ...editedProfile,
+                          responseTime: e.target.value,
+                        })
+                      }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                     >
                       <option value="1-2 hours">1-2 hours</option>
@@ -614,20 +658,28 @@ export default function MentorSettings() {
                   <MultiSelect
                     options={LANGUAGE_OPTIONS}
                     value={editedProfile.languages}
-                    onChange={(value) => setEditedProfile({ ...editedProfile, languages: value })}
+                    onChange={(value) =>
+                      setEditedProfile({ ...editedProfile, languages: value })
+                    }
                     placeholder="Select languages you speak..."
                     className="w-full"
                   />
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    {editedProfile.languages && editedProfile.languages.length > 0 ? (
+                    {editedProfile.languages &&
+                    editedProfile.languages.length > 0 ? (
                       editedProfile.languages.map((language) => (
-                        <span key={language} className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+                        <span
+                          key={language}
+                          className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full"
+                        >
                           {language}
                         </span>
                       ))
                     ) : (
-                      <span className="text-gray-500">No languages selected</span>
+                      <span className="text-gray-500">
+                        No languages selected
+                      </span>
                     )}
                   </div>
                 )}
@@ -642,20 +694,31 @@ export default function MentorSettings() {
                   <MultiSelect
                     options={SPECIALIZATION_OPTIONS}
                     value={editedProfile.specializations}
-                    onChange={(value) => setEditedProfile({ ...editedProfile, specializations: value })}
+                    onChange={(value) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        specializations: value,
+                      })
+                    }
                     placeholder="Select your mentoring specializations..."
                     className="w-full"
                   />
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    {editedProfile.specializations && editedProfile.specializations.length > 0 ? (
+                    {editedProfile.specializations &&
+                    editedProfile.specializations.length > 0 ? (
                       editedProfile.specializations.map((specialization) => (
-                        <span key={specialization} className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                        <span
+                          key={specialization}
+                          className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+                        >
                           {specialization}
                         </span>
                       ))
                     ) : (
-                      <span className="text-gray-500">No specializations selected</span>
+                      <span className="text-gray-500">
+                        No specializations selected
+                      </span>
                     )}
                   </div>
                 )}
@@ -673,7 +736,9 @@ export default function MentorSettings() {
                         <input
                           type="text"
                           value={edu}
-                          onChange={(e) => updateEducation(index, e.target.value)}
+                          onChange={(e) =>
+                            updateEducation(index, e.target.value)
+                          }
                           placeholder="e.g., PhD in Computer Science, MIT"
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                         />
@@ -696,14 +761,20 @@ export default function MentorSettings() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {editedProfile.education && editedProfile.education.length > 0 ? (
+                    {editedProfile.education &&
+                    editedProfile.education.length > 0 ? (
                       editedProfile.education.map((edu, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div
+                          key={index}
+                          className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                        >
                           <p className="text-gray-900">{edu}</p>
                         </div>
                       ))
                     ) : (
-                      <span className="text-gray-500">No education information provided</span>
+                      <span className="text-gray-500">
+                        No education information provided
+                      </span>
                     )}
                   </div>
                 )}
@@ -721,7 +792,9 @@ export default function MentorSettings() {
                         <input
                           type="text"
                           value={pub}
-                          onChange={(e) => updatePublication(index, e.target.value)}
+                          onChange={(e) =>
+                            updatePublication(index, e.target.value)
+                          }
                           placeholder="e.g., Smith, J. (2023). AI in Healthcare. Nature."
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                         />
@@ -744,14 +817,20 @@ export default function MentorSettings() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {editedProfile.publications && editedProfile.publications.length > 0 ? (
+                    {editedProfile.publications &&
+                    editedProfile.publications.length > 0 ? (
                       editedProfile.publications.map((pub, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div
+                          key={index}
+                          className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                        >
                           <p className="text-gray-900">{pub}</p>
                         </div>
                       ))
                     ) : (
-                      <span className="text-gray-500">No publications provided</span>
+                      <span className="text-gray-500">
+                        No publications provided
+                      </span>
                     )}
                   </div>
                 )}
@@ -771,10 +850,15 @@ export default function MentorSettings() {
                       <input
                         type="url"
                         value={editedProfile.socialLinks.linkedin}
-                        onChange={(e) => setEditedProfile({
-                          ...editedProfile,
-                          socialLinks: { ...editedProfile.socialLinks, linkedin: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setEditedProfile({
+                            ...editedProfile,
+                            socialLinks: {
+                              ...editedProfile.socialLinks,
+                              linkedin: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="https://linkedin.com/in/yourprofile"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                       />
@@ -792,10 +876,15 @@ export default function MentorSettings() {
                       <input
                         type="url"
                         value={editedProfile.socialLinks.twitter}
-                        onChange={(e) => setEditedProfile({
-                          ...editedProfile,
-                          socialLinks: { ...editedProfile.socialLinks, twitter: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setEditedProfile({
+                            ...editedProfile,
+                            socialLinks: {
+                              ...editedProfile.socialLinks,
+                              twitter: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="https://twitter.com/yourhandle"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                       />
@@ -813,10 +902,15 @@ export default function MentorSettings() {
                       <input
                         type="url"
                         value={editedProfile.socialLinks.github}
-                        onChange={(e) => setEditedProfile({
-                          ...editedProfile,
-                          socialLinks: { ...editedProfile.socialLinks, github: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setEditedProfile({
+                            ...editedProfile,
+                            socialLinks: {
+                              ...editedProfile.socialLinks,
+                              github: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="https://github.com/yourusername"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                       />
@@ -834,10 +928,15 @@ export default function MentorSettings() {
                       <input
                         type="url"
                         value={editedProfile.socialLinks.website}
-                        onChange={(e) => setEditedProfile({
-                          ...editedProfile,
-                          socialLinks: { ...editedProfile.socialLinks, website: e.target.value }
-                        })}
+                        onChange={(e) =>
+                          setEditedProfile({
+                            ...editedProfile,
+                            socialLinks: {
+                              ...editedProfile.socialLinks,
+                              website: e.target.value,
+                            },
+                          })
+                        }
                         placeholder="https://yourwebsite.com"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                       />
@@ -849,8 +948,6 @@ export default function MentorSettings() {
                   </div>
                 </div>
               </div>
-
-
             </div>
           </div>
         </div>

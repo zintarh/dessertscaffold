@@ -766,12 +766,7 @@ export default function WritingSpacePage() {
       // Toggle sidebar visibility (Ctrl/Cmd + B)
       if ((event.ctrlKey || event.metaKey) && event.key === "b") {
         event.preventDefault();
-        if (isSidebarVisible) {
-          setIsSidebarVisible(false);
-        } else {
-          setIsSidebarVisible(true);
-          setIsChatVisible(false); // Hide chat when showing sidebar
-        }
+        setIsSidebarVisible(!isSidebarVisible);
       }
       
       // Save content (Ctrl/Cmd + S)
@@ -894,14 +889,7 @@ export default function WritingSpacePage() {
             <div className="flex items-center space-x-2">
               {/* Chat Toggle Button */}
               <button
-                onClick={() => {
-                  if (isChatVisible) {
-                    setIsChatVisible(false);
-                  } else {
-                    setIsChatVisible(true);
-                    setIsSidebarVisible(false); // Hide sidebar when showing chat
-                  }
-                }}
+                onClick={() => setIsChatVisible(!isChatVisible)}
                 className={`p-2 transition-colors rounded-lg ${
                   isChatVisible 
                     ? "text-blue-600 bg-blue-50 hover:bg-blue-100" 
@@ -915,14 +903,7 @@ export default function WritingSpacePage() {
               </button>
               
                           <button
-                onClick={() => {
-                  if (isSidebarVisible) {
-                    setIsSidebarVisible(false);
-                  } else {
-                    setIsSidebarVisible(true);
-                    setIsChatVisible(false); // Hide chat when showing sidebar
-                  }
-                }}
+                onClick={() => setIsSidebarVisible(!isSidebarVisible)}
                 className={`p-2 transition-colors rounded-lg ${
                   isSidebarVisible 
                     ? "text-blue-600 bg-blue-50 hover:bg-blue-100" 
@@ -949,41 +930,44 @@ export default function WritingSpacePage() {
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div
           className={`grid grid-cols-1 gap-6 ${
-            isSidebarVisible || isChatVisible
+            isSidebarVisible
               ? "xl:grid-cols-5"
               : "xl:grid-cols-1"
           }`}
         >
           {/* Research Sidebar */}
           {isSidebarVisible && (
+            <div className="h-[calc(100vh-12rem)]">
             <ResearchSidebar
               timeline={timelines.find(t => t.id === timelineId) || timeline}
               currentSectionId={sectionId}
               onSectionClick={handleSectionClick}
               onToggleCompletion={handleToggleCompletion}
               onExportSection={(sectionItem) => {
-                              const currentTimeline = timelines.find(t => t.id === timelineId) || timeline;
+                const currentTimeline = timelines.find(t => t.id === timelineId) || timeline;
                               const sectionContent = sectionItem.content || "";
                               const exportData = {
                                 title: sectionItem.title,
                                 content: sectionContent,
-                                timeline: currentTimeline,
+                  timeline: currentTimeline,
                                 section: sectionItem,
                               };
                               exportSectionContent(exportData);
-                            }}
+              } }
               isVisible={isSidebarVisible}
               onToggleVisibility={() => setIsSidebarVisible(!isSidebarVisible)}
               wordCount={0}
-              onMarkComplete={() => {}}
-              showCompletionButton={false}
-            />
+              onMarkComplete={() => { } }
+              showCompletionButton={false} onToggleSectionStatus={function (sectionId: string, currentStatus: "not-started" | "in-progress" | "completed"): void {
+                throw new Error("Function not implemented.");
+              } }            />
+            </div>
           )}
 
           {/* Main Writing Area */}
           <div
             className={
-              isSidebarVisible || isChatVisible
+              isSidebarVisible
                 ? "xl:col-span-4"
                 : "xl:col-span-1"
             }
@@ -1173,20 +1157,7 @@ export default function WritingSpacePage() {
             </div>
           </div>
 
-          {/* Writing Chat Component */}
-          {isChatVisible && (
-            <WritingChat
-              isVisible={isChatVisible}
-              onToggleVisibility={() => setIsChatVisible(!isChatVisible)}
-              timelineId={timelineId}
-              sectionId={sectionId}
-              currentUser={{
-                id: "student1", // This should come from auth context
-                name: "John Doe", // This should come from auth context
-                role: "student" as const,
-              }}
-            />
-          )}
+
           </div>
         </div>
       </div>
@@ -1260,6 +1231,29 @@ export default function WritingSpacePage() {
               )}
             </button>
           </ModalFooter>
+        </div>
+      </Modal>
+
+      {/* Writing Chat Modal */}
+      <Modal
+        open={isChatVisible}
+        onOpenChange={setIsChatVisible}
+        title="Writing Comments"
+        description="Discuss your research with mentors and collaborators"
+        size="2xl"
+      >
+        <div className="h-[700px]">
+            <WritingChat
+            isVisible={true}
+            onToggleVisibility={() => setIsChatVisible(false)}
+              timelineId={timelineId}
+              sectionId={sectionId}
+              currentUser={{
+                id: "student1", // This should come from auth context
+                name: "John Doe", // This should come from auth context
+                role: "student" as const,
+              }}
+            />
         </div>
       </Modal>
     </div>

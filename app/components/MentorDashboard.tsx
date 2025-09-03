@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { userAtom } from '../../lib/stores/authStore';
 import { 
   mentorBookingsByMentorAtom, 

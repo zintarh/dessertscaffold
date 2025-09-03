@@ -42,7 +42,7 @@ const navigationItems = [
     icon: MessageCircle,
     description: "Sent & received messages",
   },
- 
+
   {
     name: "Invite Codes",
     href: "/user/mentor/invite-codes",

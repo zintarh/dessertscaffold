@@ -27,8 +27,8 @@ import { Loader2, Plus, X, Search, RotateCcw } from 'lucide-react';
  */
 
 export function EvaluationForm() {
-  const [topic, setTopic] = useAtom(topicAtom);
-  const [keywords, setKeywords] = useAtom(keywordsAtom);
+  const [topic, ] = useAtom(topicAtom);
+  const [keywords, ] = useAtom(keywordsAtom);
   const [status] = useAtom(statusAtom);
   const [error] = useAtom(errorAtom);
   

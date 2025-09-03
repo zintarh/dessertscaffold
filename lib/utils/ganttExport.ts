@@ -1,4 +1,4 @@
-import { Timeline, TimelineSection } from '../stores/timelineStore';
+import { Timeline, TimelineSection } from '@/types';
 
 // Types for export options
 export interface ExportOptions {

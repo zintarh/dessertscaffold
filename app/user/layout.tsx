@@ -15,12 +15,9 @@ export default function StudentLayout({
   return (
     <div>
       <div className="min-h-screen bg-white">
-        {/* Sidebar */}
         <StudentSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
         
-        {/* Main Content */}
         <div className="lg:ml-64">
-          {/* Navbar */}
           <StudentNavbar onMenuClick={() => setSidebarOpen(true)} />
           
           {/* Page Content */}

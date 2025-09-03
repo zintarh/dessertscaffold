@@ -7,6 +7,7 @@ import { currentUserAtom } from '@/lib/stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { AlertCircle, Settings, Users } from 'lucide-react';
+import { isProfileRecentlyUpdated } from '@/lib/utils/profile-utils';
 
 /**
  * Mentor Profile Update Card Component
@@ -47,27 +48,11 @@ export function MentorProfileUpdateCard() {
   // Check if mentor profile is incomplete
   const isProfileIncomplete = () => {
     if (!currentUser || currentUser.userType !== 'MENTOR') return false;
-    
-    // Check basic User fields
-    const basicFieldsIncomplete = [
-      currentUser.researchArea,
-      currentUser.institutionName,
-      currentUser.image
-    ].some(field => !field || field.trim() === '');
-
-    // Check MentorProfile fields
-    const mentorFieldsIncomplete = !mentorProfile || 
-      !mentorProfile.bio || 
-      !mentorProfile.expertise || 
-      mentorProfile.expertise.length === 0 ||
-      !mentorProfile.specializations ||
-      mentorProfile.specializations.length === 0;
-    
-    return basicFieldsIncomplete || mentorFieldsIncomplete;
+    return !mentorProfile || !mentorProfile.bio || !mentorProfile.expertise || mentorProfile.expertise.length === 0;
   };
 
-  // Don't show card if loading, not a mentor, or profile is complete
-  if (isLoading || !currentUser || currentUser.userType !== 'MENTOR' || !isProfileIncomplete()) {
+  // Don't show card if loading, not a mentor, profile is complete, or recently updated
+  if (isLoading || !currentUser || currentUser.userType !== 'MENTOR' || !isProfileIncomplete() || isProfileRecentlyUpdated(mentorProfile?.updatedAt)) {
     return null;
   }
 
@@ -101,6 +86,8 @@ export function MentorProfileUpdateCard() {
               </p>
             </div>
           </div>
+          
+
           
           <div className="pt-2">
             <Button 

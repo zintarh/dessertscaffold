@@ -3,28 +3,27 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 
-// PUT - Mark a message as read
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id: messageId } = await params;
 
     // Get the current user
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.user.email || "" },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    const messageId = params.id;
 
     // Check if the message exists and belongs to the current user
     const message = await prisma.message.findFirst({
@@ -32,7 +31,7 @@ export async function PUT(
         id: messageId,
         OR: [
           { senderId: user.id },
-          { recipientId: user.id }
+          { receiverId: user.id }
         ]
       }
     });
@@ -44,7 +43,7 @@ export async function PUT(
     // Mark the message as read
     const updatedMessage = await prisma.message.update({
       where: { id: messageId },
-      data: { isRead: true },
+      data: { status: "read" },
       include: {
         sender: {
           select: {
@@ -55,7 +54,7 @@ export async function PUT(
             userType: true,
           }
         },
-        recipient: {
+        receiver: {
           select: {
             id: true,
             name: true,
@@ -85,25 +84,25 @@ export async function PUT(
 // DELETE - Delete a message
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id: messageId } = await params;
 
     // Get the current user
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.user.email ?? "" },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    const messageId = params.id;
 
     // Check if the message exists and belongs to the current user
     const message = await prisma.message.findFirst({
@@ -111,7 +110,7 @@ export async function DELETE(
         id: messageId,
         OR: [
           { senderId: user.id },
-          { recipientId: user.id }
+          { receiverId: user.id }
         ]
       }
     });

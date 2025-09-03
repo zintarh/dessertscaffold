@@ -4,18 +4,18 @@ import { authOptions } from '../../../../lib/auth';
 import { prisma } from '../../../../lib/prisma';
 
 // GET - Fetch user profile by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params,  }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id: userId } = await params;
 
     // Fetch user profile
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Only allow mentors to view student profiles, or users to view their own profile
-    if (session.user.userType !== 'MENTOR' && session.user.id !== id) {
+    if (session.user.userType !== 'MENTOR' && session.user.id !== (await params).id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 

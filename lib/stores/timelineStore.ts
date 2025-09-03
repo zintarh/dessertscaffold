@@ -1,31 +1,38 @@
 import { atom } from "jotai";
-import { 
-  DISSERTATION_SECTIONS, 
-  RESEARCH_TIMELINE_SECTIONS 
+import {
+  DISSERTATION_SECTIONS,
+  RESEARCH_TIMELINE_SECTIONS,
 } from "../constants/timeline-sections";
-import { Timeline, TimelineCreationState, TimelineSection, DocumentType, AcademicLevel, Discipline } from "@/types";
+import {
+  Timeline,
+  TimelineCreationState,
+  TimelineSection,
+  DocumentType,
+  AcademicLevel,
+  Discipline,
+} from "@/types";
 
-// Types for timeline creation
 
 
-// Dynamic section generation based on document type
 const generateSections = (documentType: DocumentType): TimelineSection[] => {
   if (documentType === "Research Proposal") {
-    return RESEARCH_TIMELINE_SECTIONS.map(section => ({
+    return RESEARCH_TIMELINE_SECTIONS.map((section) => ({
       ...section,
       id: `section-${Date.now()}-${section.order}`,
-      duration: 2, // Default duration of 2 weeks
+      duration: 2,
       status: "not-started" as const,
       content: "",
+      isCompleted: false,
     }));
   } else {
     // Dissertation sections
-    return DISSERTATION_SECTIONS.map(section => ({
+    return DISSERTATION_SECTIONS.map((section) => ({
       ...section,
       id: `section-${Date.now()}-${section.order}`,
-      duration: 2, // Default duration of 2 weeks
+      duration: 2,
       status: "not-started" as const,
       content: "",
+      isCompleted: false,
     }));
   }
 };
@@ -54,27 +61,6 @@ const saveTimelinesToStorage = (timelines: Timeline[]) => {
   }
 };
 
-const loadTimelinesFromStorage = (): Timeline[] => {
-  if (typeof window !== "undefined") {
-    try {
-      const stored = localStorage.getItem(TIMELINES_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.map((timeline: any) => ({
-          ...timeline,
-          startDate: new Date(timeline.startDate),
-          completionDate: new Date(timeline.completionDate),
-          createdAt: new Date(timeline.createdAt),
-          updatedAt: new Date(timeline.updatedAt),
-        }));
-      }
-    } catch (error) {
-      console.error("Error loading timelines:", error);
-    }
-  }
-  return [];
-};
-
 export const evaluationSyncAtom = atom(
   (get) => get(timelineCreationStateAtom).researchTopic,
   (get, set, researchTopic: string) => {
@@ -98,7 +84,6 @@ export const evaluationSyncAtom = atom(
   }
 );
 
-// Computed atom to get current evaluation context
 export const currentEvaluationContextAtom = atom((get) => {
   const state = get(timelineCreationStateAtom);
   return {
@@ -110,51 +95,43 @@ export const currentEvaluationContextAtom = atom((get) => {
   };
 });
 
-// Function to clear evaluation context
 export const clearEvaluationContextAtom = atom(null, (get, set) => {
   set(timelineCreationStateAtom, initialState);
 });
 
-// Function to clear all timelines (useful for removing sample data)
 export const clearAllTimelinesAtom = atom(null, (get, set) => {
   set(timelinesAtom, []);
   localStorage.removeItem(TIMELINES_KEY);
 });
 
-// Atom to store timelines from API
 export const timelinesAtom = atom<Timeline[]>([]);
 
-// Loading and error states for API calls
 export const timelinesLoadingAtom = atom<boolean>(false);
 export const timelinesErrorAtom = atom<string | null>(null);
 
-// API-based timeline fetching with loading states
-export const fetchTimelinesAtom = atom(
-  null,
-  async (get, set) => {
-    try {
-      set(timelinesLoadingAtom, true);
-      set(timelinesErrorAtom, null);
-      
-      const response = await fetch('/api/timelines');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          set(timelinesAtom, data.timelines);
-        } else {
-          set(timelinesErrorAtom, data.error || 'Failed to fetch timelines');
-        }
+export const fetchTimelinesAtom = atom(null, async (get, set) => {
+  try {
+    set(timelinesLoadingAtom, true);
+    set(timelinesErrorAtom, null);
+
+    const response = await fetch("/api/timelines");
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success) {
+        set(timelinesAtom, data.timelines);
       } else {
-        set(timelinesErrorAtom, 'Failed to fetch timelines');
+        set(timelinesErrorAtom, data.error || "Failed to fetch timelines");
       }
-    } catch (error) {
-      console.error('Error fetching timelines:', error);
-      set(timelinesErrorAtom, 'Network error occurred');
-    } finally {
-      set(timelinesLoadingAtom, false);
+    } else {
+      set(timelinesErrorAtom, "Failed to fetch timelines");
     }
+  } catch (error) {
+    console.error("Error fetching timelines:", error);
+    set(timelinesErrorAtom, "Network error occurred");
+  } finally {
+    set(timelinesLoadingAtom, false);
   }
-);
+});
 
 // Function to save timelines to localStorage
 export const saveTimelinesAtom = atom(null, (get, set) => {
@@ -181,7 +158,7 @@ export const canProceedToStep3Atom = atom((get) => {
 
 export const canCreateTimelineAtom = atom((get) => {
   const state = get(timelineCreationStateAtom);
-  
+
   return !!(
     state.documentType &&
     state.startDate &&
@@ -189,7 +166,7 @@ export const canCreateTimelineAtom = atom((get) => {
     state.academicLevel &&
     state.discipline &&
     state.sections.length > 0 &&
-    state.sections.every(section => section.duration > 0)
+    state.sections.every((section) => section.duration > 0)
   );
 });
 
@@ -393,10 +370,6 @@ export const goToStepAtom = atom(null, (get, set, step: 1 | 2 | 3) => {
   set(timelineCreationStateAtom, { ...state, step });
 });
 
-
-
-
-
 export const updateSectionStatusAtom = atom(
   null,
   (
@@ -477,32 +450,35 @@ export const resetTimelineCreationAtom = atom(null, (get, set) => {
 });
 
 // Function to delete a timeline from API
-export const deleteTimelineAtom = atom(null, async (get, set, timelineId: string) => {
-  try {
-    console.log('🗑️ Deleting timeline:', timelineId);
-    
-    const response = await fetch(`/api/timelines?id=${timelineId}`, {
-      method: 'DELETE',
-    });
+export const deleteTimelineAtom = atom(
+  null,
+  async (get, set, timelineId: string) => {
+    try {
+      console.log("🗑️ Deleting timeline:", timelineId);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to delete timeline');
+      const response = await fetch(`/api/timelines?id=${timelineId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete timeline");
+      }
+
+      // If API call successful, update local state
+      const timelines = get(timelinesAtom);
+      const updatedTimelines = timelines.filter(
+        (timeline) => timeline.id !== timelineId
+      );
+      set(timelinesAtom, updatedTimelines);
+
+      console.log(
+        `🗑️ Timeline ${timelineId} deleted successfully. Remaining timelines:`,
+        updatedTimelines.length
+      );
+    } catch (error) {
+      console.error("Error deleting timeline:", error);
+      throw error; // Re-throw to let UI handle the error
     }
-
-    // If API call successful, update local state
-    const timelines = get(timelinesAtom);
-    const updatedTimelines = timelines.filter(
-      (timeline) => timeline.id !== timelineId
-    );
-    set(timelinesAtom, updatedTimelines);
-
-    console.log(
-      `🗑️ Timeline ${timelineId} deleted successfully. Remaining timelines:`,
-      updatedTimelines.length
-    );
-  } catch (error) {
-    console.error('Error deleting timeline:', error);
-    throw error; // Re-throw to let UI handle the error
   }
-});
+);

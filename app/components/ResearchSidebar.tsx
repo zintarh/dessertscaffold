@@ -176,7 +176,7 @@ export default function ResearchSidebar({
 
   if (isCollapsed) {
     return (
-      <div className="xl:col-span-1">
+      <div className="">
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-3 sticky top-8">
           <button
             onClick={() => setIsCollapsed(false)}
@@ -200,8 +200,8 @@ export default function ResearchSidebar({
   }
 
   return (
-    <div className="xl:col-span-1">
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 sticky top-8">
+    <div className="h-full">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 h-full flex flex-col overflow-hidden">
         {/* Header with collapse button */}
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
@@ -209,9 +209,7 @@ export default function ResearchSidebar({
             <span>Research Sections</span>
           </h3>
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-              Ctrl+B
-            </span>
+            
             <button
               onClick={onToggleVisibility}
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -223,7 +221,13 @@ export default function ResearchSidebar({
         </div>
 
         {/* Sections List */}
-        <div className="space-y-3">
+        <div 
+          className="space-y-3 flex-1 overflow-y-auto"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#d1d5db #f3f4f6'
+          }}
+        >
           {timeline.sections.map((sectionItem) => {
             const isActive = sectionItem.id === currentSectionId;
             const isCompleted = sectionItem.isCompleted;

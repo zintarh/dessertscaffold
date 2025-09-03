@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Bold, Italic, Underline, Link, List, Quote, Image, Type, Plus, X, Code } from 'lucide-react';
+import { Bold, Italic,  Link, Image,  Plus, X, Code } from 'lucide-react';
 import GradientButton from './ui/GradientButton';
 import { AnimatePresence, motion } from 'framer-motion';
 

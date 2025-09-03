@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../../../lib/stores/authStore";
 import Modal, { ModalFooter } from "../../../components/Modal";
@@ -49,12 +49,9 @@ interface MentorData {
   updatedAt: string;
 }
 
-export default function MentorProfilePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function MentorProfilePage() {
   const router = useRouter();
+  const params = useParams();
   const user = useAtomValue(userAtom);
 
   const [messageText, setMessageText] = useState("");
@@ -68,7 +65,7 @@ export default function MentorProfilePage({
     const fetchMentor = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/mentors/${params.id}`);
+        const response = await fetch(`/api/mentors/${params.id as string}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch mentor");

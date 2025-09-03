@@ -208,6 +208,12 @@ export const updateUserProfileAtom = atom(
       });
 
       console.log('✅ User profile updated successfully');
+      
+      // Dispatch custom event to notify other components of user profile update
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('userProfileUpdated'));
+      }
+      
       return updatedUser;
       
     } catch (error) {

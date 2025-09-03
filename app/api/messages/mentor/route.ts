@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     // Get messages where current user is the recipient
     const messages = await prisma.message.findMany({
       where: {
-        recipientId: user.id
+        receiverId: user.id
       },
       include: {
         sender: {

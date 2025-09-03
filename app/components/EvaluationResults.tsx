@@ -86,11 +86,7 @@ export function EvaluationResults() {
     },
   ];
 
-  const getScoreColor = (score: number) => {
-    if (score >= 7) return 'text-green-600';
-    if (score >= 4) return 'text-yellow-600';
-    return 'text-red-600';
-  };
+
 
   const getScoreBadgeVariant = (score: number) => {
     if (score >= 7) return 'default';

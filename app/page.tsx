@@ -183,11 +183,7 @@ export default function Home() {
           >
 
             <div
-              className={`backdrop-blur-sm rounded-3xl p-12 relative overflow-hidden mb-8 ${
-                isDarkMode
-                  ? "bg-white/10 border border-white/20"
-                  : "bg-white/95 border border-gray-200 shadow-2xl"
-              }`}
+              className="py-6 mb-8"
             >
               <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
                 <div className="w-full h-full bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full blur-3xl"></div>
@@ -196,45 +192,29 @@ export default function Home() {
                 <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-orange-500 rounded-full blur-2xl"></div>
               </div>
 
-              <div className="relative z-10 max-w-4xl mx-auto">
-                <div className="text-center mb-8">
-
-                  <p
-                    className={`text-lg ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
-                    } max-w-2xl mx-auto`}
-                  >
-                    Get instant expert evaluation of your research topic across 6 key academic metrics
-                  </p>
-                  
-                  {/* Demo Instructions */}
-                  <div className={`mt-4 p-4 rounded-lg border ${
-                    isDarkMode 
-                      ? "bg-blue-900/20 border-blue-700/30 text-blue-200" 
-                      : "bg-blue-50 border-blue-200 text-blue-800"
-                  }`}>
-                    <p className="text-sm">
-                      <strong>Demo Mode:</strong> Sign up with any email or use demo@example.com with password "password123"
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-center">
+              <div className="relative z-10 max-w-6xl mx-auto">
+                <div className="flex items-center space-x-4 max-w-4xl mx-auto">
+                  <input
+                    type="text"
+                    placeholder="Please Enter Topic eg: Machine learning applications in healthcare diagnostics"
+                    className={`flex-1 px-10 py-6 rounded-xl text-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 ${
+                      isDarkMode
+                        ? "bg-transparent border-white/30 text-white placeholder-gray-300 focus:border-blue-400 focus:ring-blue-400/20"
+                        : "bg-transparent border-gray-300 text-gray-900  focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
+                  />
                   <motion.button
                     onClick={handleEvaluate}
-                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-12 py-8 rounded-2xl font-bold text-2xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center space-x-4 text-white mx-auto"
-                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-8 py-6 rounded-xl font-semibold text-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 text-white whitespace-nowrap"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Zap className="w-8 h-8" />
-                    <span>Evaluate Research Topic</span>
+                    <span>Evaluate</span>
                   </motion.button>
                 </div>
-
-                
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-2">
               {[
                 { icon: Target, label: "Novelty", color: "text-blue-500" },
                 {
@@ -299,7 +279,7 @@ export default function Home() {
 
       {/* Stats Section */}
       <motion.section
-        className="py-20 px-6 relative z-10"
+        className="py-10 px-6 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}

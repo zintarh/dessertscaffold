@@ -380,7 +380,6 @@ export default function MentorDetailsPage() {
           </button>
           <GradientButton
             type="submit"
-            onClick={handleBookingSubmit}
             variant="primary"
             size="md"
           >

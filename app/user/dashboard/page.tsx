@@ -31,6 +31,7 @@ import GradientButton from "../../components/ui/GradientButton";
 
 import { Timeline } from "@/types";
 import AcceptedResearchProjects from "../components/AcceptedResearchProjects";
+import { Mentor } from "@/lib/types";
 
 export default function UnifiedDashboard() {
   const router = useRouter();
@@ -43,6 +44,10 @@ export default function UnifiedDashboard() {
   const allMentors = useAtomValue(availableMentorsAtom);
   const isStudent = useAtomValue(isStudentAtom);
   const userName = useAtomValue(userNameAtom);
+
+  // Mentor profile state
+  const [mentorProfile, setMentorProfile] = useState<Mentor | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState<{
@@ -59,10 +64,61 @@ export default function UnifiedDashboard() {
     fetchTimelines();
   }, [fetchTimelines]);
 
-  // Log timelines when they change
+  // Fetch mentor profile for mentors
   useEffect(() => {
-    console.log("📊 Dashboard: Timelines updated:", timelines);
-  }, [timelines]);
+    const fetchMentorProfile = async () => {
+      if (!currentUser || currentUser.userType !== "MENTOR") {
+        setMentorProfile(null);
+        return;
+      }
+
+      setProfileLoading(true);
+      try {
+        const response = await fetch("/api/user/mentor-profile", {
+          cache: "no-cache",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Fetched mentor profile:", data.mentorProfile);
+          setMentorProfile(data.mentorProfile);
+        } else {
+          console.log("No mentor profile found or error:", response.status);
+          setMentorProfile(null);
+        }
+      } catch (error) {
+        console.error("Error fetching mentor profile:", error);
+        setMentorProfile(null);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchMentorProfile();
+
+    // Listen for profile updates via custom event
+    const handleProfileUpdate = () => {
+      console.log("Profile update event received, refetching...");
+      fetchMentorProfile();
+    };
+
+    // Listen for user profile updates too
+    const handleUserUpdate = () => {
+      console.log("User update event received, refetching mentor profile...");
+      fetchMentorProfile();
+    };
+
+    window.addEventListener("mentorProfileUpdated", handleProfileUpdate);
+    window.addEventListener("userProfileUpdated", handleUserUpdate);
+
+    return () => {
+      window.removeEventListener("mentorProfileUpdated", handleProfileUpdate);
+      window.removeEventListener("userProfileUpdated", handleUserUpdate);
+    };
+  }, [currentUser]);
 
   // Handle delete click
   const handleDeleteClick = (timeline: Timeline) => {
@@ -75,17 +131,15 @@ export default function UnifiedDashboard() {
   // Handle timeline deletion
   const handleDeleteTimeline = async (timelineId: string) => {
     await deleteTimeline(timelineId);
-    // Refresh timelines after deletion
     fetchTimelines();
   };
 
-  // Remove manual role checking - now using atoms
-  const isMentor = !isStudent; // Simplified logic
+  const isMentor = !isStudent;
 
-  const currentUserId = currentUser?.id || "";
-  const currentDocumentId = timelines.length > 0 ? timelines[0].id : "";
+  // Check if mentor profile is complete
+  const isProfileComplete = mentorProfile?.updatedAt !== null;
 
-  console.log(timelines);
+  console.log(isProfileComplete, "isProfileComplete");
 
   return (
     <div className="min-h-screen bg-white">
@@ -103,26 +157,22 @@ export default function UnifiedDashboard() {
             )}
           </div>
           <div className="flex items-center space-x-4">
-            {isStudent && (
-              <>
-                <button
-                  onClick={() => router.push("/user/communities")}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Users className="w-4 h-4" />
-                  <span>Communities</span>
-                </button>
-                <GradientButton
-                  onClick={() => router.push("/user/new")}
-                  variant="primary"
-                  size="md"
-                  className="flex items-center space-x-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Write</span>
-                </GradientButton>
-              </>
-            )}
+            <button
+              onClick={() => router.push("/user/communities")}
+              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <Users className="w-4 h-4" />
+              <span>Communities</span>
+            </button>
+            <GradientButton
+              onClick={() => router.push("/user/new")}
+              variant="primary"
+              size="md"
+              className="flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Write</span>
+            </GradientButton>
           </div>
         </div>
       </div>
@@ -133,9 +183,7 @@ export default function UnifiedDashboard() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder={
-                isStudent ? "Search in Research" : "Search in Mentor Projects"
-              }
+              placeholder="Search in Research"
               className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -148,48 +196,39 @@ export default function UnifiedDashboard() {
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {isStudent && (
-              <>
-                <button
-                  onClick={() => router.push("/user/new")}
-                  className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
-                      <FileText className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        Create Timeline
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Plan your research journey
-                      </p>
-                    </div>
-                  </div>
-                </button>
-                
+            <button
+              onClick={() => router.push("/user/new")}
+              className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Create Timeline</h3>
+                  <p className="text-sm text-gray-500">
+                    Plan your research journey
+                  </p>
+                </div>
+              </div>
+            </button>
 
-                <button
-                  onClick={() => router.push("/user/communities")}
-                  className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
-                      <Users className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        Find Mentors
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Connect with expert researchers
-                      </p>
-                    </div>
-                  </div>
-                </button>
-              </>
-            )}
+            <button
+              onClick={() => router.push("/user/communities")}
+              className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Find Mentors</h3>
+                  <p className="text-sm text-gray-500">
+                    Connect with expert researchers
+                  </p>
+                </div>
+              </div>
+            </button>
 
             {isMentor && (
               <>
@@ -231,132 +270,130 @@ export default function UnifiedDashboard() {
                   </div>
                 </button>
 
-                <button
-                  onClick={() => router.push("/user/mentors")}
-                  className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center shadow-sm">
-                      <Award className="w-5 h-5 text-white" />
+                {!isProfileComplete && (
+                  <button
+                    onClick={() => router.push("/user/settings")}
+                    className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center shadow-sm">
+                        <Award className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">
+                          Update Profile
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Complete your mentor profile
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">
-                        Update Profile
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Manage your mentor profile
-                      </p>
-                    </div>
-                  </div>
-                </button>
+                  </button>
+                )}
               </>
             )}
           </div>
         </div>
 
-        {/* Timeline Section - Only for Students */}
-        {isStudent && (
-          <>
-            {isLoading && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    Active Research Timelines
-                  </h2>
-                  <button
-                    onClick={() => fetchTimelines()}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
-                  >
-                    <span>Refresh</span>
-                  </button>
-                </div>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                    <p className="text-gray-500">Loading timelines...</p>
-                  </div>
-                </div>
+        {/* Timeline Section - For All Users */}
+        {isLoading && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">
+                Active Research Timelines
+              </h2>
+              <button
+                onClick={() => fetchTimelines()}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+              >
+                <span>Refresh</span>
+              </button>
+            </div>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-gray-500">Loading timelines...</p>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {error && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    Active Research Timelines
-                  </h2>
-                  <button
-                    onClick={() => fetchTimelines()}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
-                  >
-                    <span>Refresh</span>
-                  </button>
-                </div>
-                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-                  <div className="text-center">
-                    <p className="text-red-600 mb-2">Error loading timelines</p>
-                    <p className="text-red-500 text-sm">{error}</p>
-                  </div>
-                </div>
+        {error && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">
+                Active Research Timelines
+              </h2>
+              <button
+                onClick={() => fetchTimelines()}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+              >
+                <span>Refresh</span>
+              </button>
+            </div>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+              <div className="text-center">
+                <p className="text-red-600 mb-2">Error loading timelines</p>
+                <p className="text-red-500 text-sm">{error}</p>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {!isLoading && !error && timelines.length > 0 && (
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    Active Research Timelines
-                  </h2>
-                  <button
-                    onClick={() => fetchTimelines()}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
-                  >
-                    <span>Refresh</span>
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {timelines.map((timeline) => (
-                    <TimelineCard
-                      key={timeline.id}
-                      timeline={timeline}
-                      onDeleteClick={() => handleDeleteClick(timeline)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+        {isStudent && !isLoading && !error && timelines.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">
+                Active Research Timelines
+              </h2>
+              <button
+                onClick={() => fetchTimelines()}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+              >
+                <span>Refresh</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {timelines.map((timeline) => (
+                <TimelineCard
+                  key={timeline.id}
+                  timeline={timeline}
+                  onDeleteClick={() => handleDeleteClick(timeline)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
-            {!isLoading && !error && timelines.length === 0 && (
-              <div className="mb-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">
-                  Get Started with Research Planning
-                </h2>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                  <div className="text-center">
-                    <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No timelines yet
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      Start by evaluating your research topic, then create a
-                      comprehensive timeline to plan your academic journey
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <GradientButton
-                        onClick={() => router.push("/")}
-                        variant="primary"
-                        size="md"
-                        className="inline-flex items-center space-x-2"
-                      >
-                        <Brain className="w-4 h-4" />
-                        <span>Evaluate Topic</span>
-                      </GradientButton>
-                    </div>
-                  </div>
+        {!isLoading && !error && timelines.length === 0 && (
+          <div className="mb-8">
+            <h2 className="text-lg font-medium text-gray-900 mb-4">
+              Get Started with Research Planning
+            </h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="text-center">
+                <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No timelines yet
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Start by evaluating your research topic, then create a
+                  comprehensive timeline to plan your academic journey
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <GradientButton
+                    onClick={() => router.push("/")}
+                    variant="primary"
+                    size="md"
+                    className="inline-flex items-center space-x-2"
+                  >
+                    <Brain className="w-4 h-4" />
+                    <span>Evaluate Topic</span>
+                  </GradientButton>
                 </div>
               </div>
-            )}
-          </>
+            </div>
+          </div>
         )}
 
         {isMentor && (
@@ -392,16 +429,17 @@ export default function UnifiedDashboard() {
               </div>
             </div>
 
-            <div className="mb-8">
-              <MentorProfileUpdateCard />
-            </div>
+            {!isProfileComplete && (
+              <div className="mb-8">
+                <MentorProfileUpdateCard />
+              </div>
+            )}
 
             <div className="mb-8">
               <AcceptedResearchProjects />
             </div>
           </>
         )}
-
       </div>
 
       <DeleteTimelineModal

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Download, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef, useMemo } from 'react';
 import GradientButton from './ui/GradientButton';
-import { Calendar, Download, Eye, FileText, Settings } from 'lucide-react';
+import { Calendar, Download, FileText, Settings } from 'lucide-react';
 import { Timeline, TimelineSection } from '@/types';
 import { exportGanttChart, generateGanttData, ExportOptions } from '../../lib/utils/ganttExport';
+import { motion } from 'framer-motion';
 
 // Utility function to safely parse dates from API
 const parseDate = (dateValue: Date | string | null | undefined): Date | null => {
@@ -236,7 +236,7 @@ export default function GanttChart({ timeline, onExport }: GanttChartProps) {
 
         {/* Chart Rows */}
         <div className="divide-y divide-gray-200">
-          {chartData.map((section, index) => (
+          {chartData.map((section: any, index: number) => (
             <motion.div
               key={section.id}
               initial={{ opacity: 0, y: 20 }}

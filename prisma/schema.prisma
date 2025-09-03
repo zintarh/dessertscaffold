@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Account {
@@ -73,6 +74,7 @@ model User {
   studentProjects MentorProject[] @relation("StudentProjects")
   sentInvites Invite[] @relation("SentInvites")
   receivedInvites Invite[] @relation("ReceivedInvites")
+  comments Comment[] @relation("CommentAuthor")
 }
 
 // Mentor Profile model for detailed mentor information
@@ -121,6 +123,7 @@ model Timeline {
   writingSpaceAccess WritingSpaceAccess[]
   mentorProjects MentorProject[]
   invites       Invite[]
+  comments      Comment[]
 }
 
 // Timeline sections with durations
@@ -240,4 +243,19 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  content    String   // Comment content
+  timelineId String   // Timeline this comment belongs to
+  sectionId  String?  // Optional: specific section this comment is about
+  authorId   String   // User who wrote the comment
+  isEdited   Boolean  @default(false) // Track if comment was edited
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  timeline   Timeline @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  author     User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 }

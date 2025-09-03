@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai';
 import { useTheme } from "../contexts/ThemeContext";
 import { motion } from "framer-motion";
 import GradientButton from "../components/ui/GradientButton";
 import { availableMentorsAtom, searchMentorsAtom } from '../../lib/stores/mentorStore';
 import { isAuthenticatedAtom, userAtom } from '../../lib/stores/authStore';
-import MentorCard from '../../components/MentorCard';
+import MentorCard from '../components/MentorCard';
 import { Search, Filter, Users, Clock, ArrowRight } from 'lucide-react';
 
 export default function CommunityPage() {
