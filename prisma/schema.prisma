@@ -113,6 +113,7 @@ model Timeline {
   academicLevel String?
   discipline    String?
   researchTopic String?
+  wordCount     Int      @default(2000) // Target word count for the project
   userId        String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

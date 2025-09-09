@@ -18,6 +18,7 @@ import {
   UserPlus,
   CheckSquare,
   Square,
+  MessageCircle,
 } from "lucide-react";
 import {
   timelinesAtom,
@@ -29,11 +30,10 @@ import {
   RESEARCH_TIMELINE_SECTIONS,
   DISSERTATION_SECTIONS,
 } from "../../../../lib/constants/timeline-sections";
-import DeleteTimelineModal from "../../../components/DeleteTimelineModal";
-import GradientButton from "../../../components/ui/GradientButton";
 import MentorInvitationsList from "../../components/MentorInvitationsList";
 import MentorInviteModal from "../../components/MentorInviteModal";
 import toast from "react-hot-toast";
+import { isStudentAtom } from "@/lib/stores/authStore";
 
 // Utility function to safely parse dates from API
 const parseDate = (
@@ -76,7 +76,7 @@ function AccordionSection({
   ) => Promise<void>;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isToggling, setIsToggling] = useState(false);
+  const isStudent = useAtomValue(isStudentAtom);
 
   // Get static section data based on document type and section title
   const getStaticSectionData = () => {
@@ -143,7 +143,10 @@ function AccordionSection({
               {index + 1}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate" title={section.title}>
+              <h3
+                className="text-lg font-semibold text-gray-900 mb-2 truncate"
+                title={section.title}
+              >
                 {section.title}
               </h3>
               <p className="text-gray-600 text-sm leading-relaxed max-w-2xl">
@@ -169,7 +172,7 @@ function AccordionSection({
               </p>
             </div>
 
-            {!section.isCompleted && (
+            {!section.isCompleted && !timeline.isMentorAccess && (
               <button
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent accordion expansion
@@ -180,6 +183,11 @@ function AccordionSection({
                 <FileText className="w-4 h-4" />
                 <span>Write</span>
               </button>
+            )}
+            {timeline.isMentorAccess && (
+              <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+                View Only
+              </span>
             )}
             <div
               className={`w-5 h-5 transition-transform duration-200 ${
@@ -323,7 +331,7 @@ function AccordionSection({
                   </div>
                 )}
               </div>
-              {!section.isCompleted && (
+              {!section.isCompleted && !timeline.isMentorAccess && (
                 <button
                   onClick={() => onSectionClick(section)}
                   className="px-6 py-2 bg-gradient-to-r from-blue-600 to-emerald-500 text-white rounded-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 font-medium text-sm"
@@ -331,6 +339,11 @@ function AccordionSection({
                   <FileText className="w-4 h-4" />
                   <span>Continue Writing</span>
                 </button>
+              )}
+              {timeline.isMentorAccess && (
+                <span className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200">
+                  Mentor View - Comments Available
+                </span>
               )}
             </div>
           </div>
@@ -342,7 +355,10 @@ function AccordionSection({
         <div className="border-t border-gray-200 p-6 bg-gray-50">
           <div className="text-center text-gray-500">
             <Info className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-            <p className="truncate" title={`Section details not available for "${section.title}"`}>
+            <p
+              className="truncate"
+              title={`Section details not available for "${section.title}"`}
+            >
               Section details not available for "{section.title}"
             </p>
             <p className="text-sm mt-1">
@@ -388,7 +404,8 @@ export default function TimelineDetailsPage() {
 
   const timeline = timelines.find((t) => t.id === timelineId);
 
-  // Calculate progress when timeline changes
+  const isMentorAccess = timeline?.isMentorAccess || false;
+
   useEffect(() => {
     if (timeline) {
       const completedSections = timeline.sections.filter(
@@ -408,7 +425,6 @@ export default function TimelineDetailsPage() {
     }
   }, [timeline]);
 
-  // Toggle section completion
   const handleToggleCompletion = async (
     sectionId: string,
     isCompleted: boolean
@@ -490,7 +506,6 @@ export default function TimelineDetailsPage() {
   // Use the state-based progress instead of calculating each time
 
   const getCurrentSection = () => {
-    // Find the first incomplete section
     const nextSection = timeline.sections.find((s) => !s.isCompleted);
     return nextSection;
   };
@@ -516,13 +531,10 @@ export default function TimelineDetailsPage() {
 
   const handleSectionClick = (section: TimelineSection) => {
     console.log("Section clicked:", section);
-    // Navigate to writing space for this section
     router.push(`/user/writing/${timelineId}/${section.id}`);
   };
 
-  const handleEditTimeline = () => {
-    console.log("Edit timeline clicked");
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -539,23 +551,36 @@ export default function TimelineDetailsPage() {
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div>
-                  <h1 className="text-xl font-semibold text-gray-900">
-                    {timeline.documentType} Timeline
-                  </h1>
+                  <div className="flex items-center space-x-3">
+                    <h1 className="text-xl font-semibold text-gray-900">
+                      {timeline.documentType} Timeline
+                    </h1>
+                    {isMentorAccess && (
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                        Mentor Access
+                      </span>
+                    )}
+                  </div>
                   {timeline.researchTopic && (
                     <p className="text-base font-medium text-blue-600 mb-1">
                       {timeline.researchTopic}
                     </p>
                   )}
-                  <p className="text-sm text-gray-600">
-                    {timeline.academicLevel} • {timeline.discipline}
-                  </p>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <span>
+                      {timeline.academicLevel} • {timeline.discipline}
+                    </span>
+                    {isMentorAccess && timeline.user && (
+                      <>
+                        <span>•</span>
+                        <span>Student: {timeline.user.name}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
-               
-
                 <button
                   onClick={() =>
                     router.push(`/user/timelines/${timelineId}/gantt`)
@@ -565,20 +590,15 @@ export default function TimelineDetailsPage() {
                   <BarChart3 className="w-4 h-4" />
                   <span>View Gantt Chart</span>
                 </button>
-
-              
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Unified Timeline Overview */}
         <div className="mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Overall Progress Card */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 col-span-1 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Overall Progress
@@ -685,7 +705,7 @@ export default function TimelineDetailsPage() {
                     </div>
                   </div>
                 </div>
-                {!currentSection.isCompleted && (
+                {!currentSection.isCompleted && !isMentorAccess && (
                   <button
                     onClick={() => handleSectionClick(currentSection)}
                     className="px-6 py-2 bg-gradient-to-r from-blue-600 to-emerald-500 text-white rounded-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl font-medium text-sm flex items-center space-x-2"
@@ -693,6 +713,23 @@ export default function TimelineDetailsPage() {
                     <FileText className="w-4 h-4" />
                     <span>Continue Writing</span>
                   </button>
+                )}
+
+                {isMentorAccess && (
+                  <button
+                    onClick={() => handleSectionClick(currentSection)}
+                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-emerald-500 text-white rounded-lg hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl font-medium text-sm flex items-center space-x-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>View Student's Work</span>
+                  </button>
+                )}
+
+                {isMentorAccess && (
+                  <span className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 flex items-center space-x-2">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Mentor Access - Can Comment</span>
+                  </span>
                 )}
               </div>
             </div>
@@ -780,10 +817,12 @@ export default function TimelineDetailsPage() {
           </div>
         </div>
 
-        {/* Mentor Invitations Section */}
-        <div className="mt-8">
-          <MentorInvitationsList projectId={timelineId} />
-        </div>
+        {/* Mentor Invitations Section - Only show for project owners */}
+        {!isMentorAccess && (
+          <div className="mt-8">
+            <MentorInvitationsList projectId={timelineId} />
+          </div>
+        )}
       </div>
 
       {/* Mentor Invite Modal */}

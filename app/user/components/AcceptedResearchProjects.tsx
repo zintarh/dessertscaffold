@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { userAtom } from "@/lib/stores/authStore";
 import { Calendar, User, CheckCircle, FileText } from "lucide-react";
 import GradientButton from "./ui/GradientButton";
+import { useRouter } from "next/navigation";
 
 interface AcceptedProject {
   id: string;
@@ -22,6 +23,7 @@ export default function AcceptedResearchProjects() {
   const user = useAtomValue(userAtom);
   const [projects, setProjects] = useState<AcceptedProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter()
 
   useEffect(() => {
     if (user?.userType === "MENTOR") {
@@ -104,7 +106,7 @@ export default function AcceptedResearchProjects() {
                 </div>
                 
                 <GradientButton
-                  onClick={() => window.location.href = `/user/timelines/${project.id}`}
+                  onClick={() => router.push(`/user/timelines/${project.id}`)}
                   variant="primary"
                   size="sm"
                 >

@@ -32,6 +32,15 @@ export interface Timeline {
   sections: TimelineSection[];
   createdAt: Date;
   updatedAt: Date;
+  // Mentor access properties
+  isMentorAccess?: boolean;
+  mentorAccessType?: string | null;
+  mentorAccessGrantedAt?: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export interface TimelineCreationState {

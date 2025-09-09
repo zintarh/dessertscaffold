@@ -41,7 +41,6 @@ export default function UnifiedDashboard() {
   const isLoading = useAtomValue(timelinesLoadingAtom);
   const error = useAtomValue(timelinesErrorAtom);
   const currentUser = useAtomValue(userAtom);
-  const allMentors = useAtomValue(availableMentorsAtom);
   const isStudent = useAtomValue(isStudentAtom);
   const userName = useAtomValue(userNameAtom);
 
@@ -101,13 +100,11 @@ export default function UnifiedDashboard() {
 
     // Listen for profile updates via custom event
     const handleProfileUpdate = () => {
-      console.log("Profile update event received, refetching...");
       fetchMentorProfile();
     };
 
     // Listen for user profile updates too
     const handleUserUpdate = () => {
-      console.log("User update event received, refetching mentor profile...");
       fetchMentorProfile();
     };
 
@@ -196,39 +193,45 @@ export default function UnifiedDashboard() {
             Quick Actions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <button
-              onClick={() => router.push("/user/new")}
-              className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
-                  <FileText className="w-5 h-5 text-white" />
+            {isStudent && (
+              <button
+                onClick={() => router.push("/user/new")}
+                className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">
+                      Create Timeline
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Plan your research journey
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Create Timeline</h3>
-                  <p className="text-sm text-gray-500">
-                    Plan your research journey
-                  </p>
-                </div>
-              </div>
-            </button>
+              </button>
+            )}
 
-            <button
-              onClick={() => router.push("/user/communities")}
-              className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
-                  <Users className="w-5 h-5 text-white" />
+            {isStudent && (
+              <button
+                onClick={() => router.push("/user/communities")}
+                className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900">Find Mentors</h3>
+                    <p className="text-sm text-gray-500">
+                      Connect with expert researchers
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Find Mentors</h3>
-                  <p className="text-sm text-gray-500">
-                    Connect with expert researchers
-                  </p>
-                </div>
-              </div>
-            </button>
+              </button>
+            )}
 
             {isMentor && (
               <>
@@ -365,7 +368,7 @@ export default function UnifiedDashboard() {
           </div>
         )}
 
-        {!isLoading && !error && timelines.length === 0 && (
+        {!isLoading && isStudent && !error && timelines.length === 0 && (
           <div className="mb-8">
             <h2 className="text-lg font-medium text-gray-900 mb-4">
               Get Started with Research Planning
@@ -398,7 +401,6 @@ export default function UnifiedDashboard() {
 
         {isMentor && (
           <>
-            {/* Active Projects and Rate - Moved up */}
             <div className="mb-8">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 Your Mentor Profile

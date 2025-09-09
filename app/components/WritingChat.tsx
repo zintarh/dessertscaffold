@@ -52,6 +52,7 @@ export default function WritingChat({
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [editingMessage, setEditingMessage] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
@@ -60,7 +61,7 @@ export default function WritingChat({
   // Fetch comments/messages when component mounts
   useEffect(() => {
     fetchMessages();
-  }, [timelineId]);
+  }, [timelineId, sectionId]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -96,7 +97,11 @@ export default function WritingChat({
   }, [onToggleVisibility]);
 
   const handleSendMessage = async () => {
-    if (newMessage.trim()) {
+    if (newMessage.trim() && !isSending) {
+      const messageContent = newMessage.trim();
+      setNewMessage(""); // Clear input immediately to prevent double sends
+      setIsSending(true);
+      
       try {
         const response = await fetch(`/api/timelines/${timelineId}/comments`, {
           method: 'POST',
@@ -104,7 +109,7 @@ export default function WritingChat({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            content: newMessage.trim(),
+            content: messageContent,
             sectionId: sectionId || undefined,
           }),
         });
@@ -112,10 +117,16 @@ export default function WritingChat({
         if (response.ok) {
           const data = await response.json();
           setMessages((prev) => [...prev, data.comment]);
-          setNewMessage("");
+        } else {
+          // Restore message if send failed
+          setNewMessage(messageContent);
         }
       } catch (error) {
         console.error('Error sending message:', error);
+        // Restore message if send failed
+        setNewMessage(messageContent);
+      } finally {
+        setIsSending(false);
       }
     }
   };
@@ -234,124 +245,184 @@ export default function WritingChat({
               <p className="text-sm text-gray-500">No feedback yet. Start the conversation!</p>
             </div>
           ) : (
-            messages.map((message) => (
+            messages.map((message) => {
+              const isCurrentUser = message.author.id === currentUser.id;
+              const isMentor = message.author.userType === "MENTOR";
+              
+              
+              return (
             <div
               key={message.id}
-              className={`flex space-x-3 ${
-                message.author.id === currentUser.id
-                  ? "flex-row-reverse space-x-reverse"
-                  : ""
+              className={`flex mb-4 ${
+                isCurrentUser
+                  ? "justify-start"
+                  : "justify-end"
               }`}
             >
-              {/* Avatar */}
-              <div className="flex-shrink-0">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    message.author.userType === "MENTOR"
-                      ? "bg-purple-100 text-purple-600"
-                      : "bg-blue-100 text-blue-600"
-                  }`}
-                >
-                  {message.author.image ? (
-                    <img
-                      src={message.author.image}
-                      alt={message.author.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    message.author.name.charAt(0).toUpperCase()
-                  )}
-                </div>
-              </div>
+              {/* For current user messages (left side) */}
+              {isCurrentUser ? (
+                <>
+                  {/* Avatar - Current User */}
+                  <div className="flex-shrink-0 mr-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        isMentor
+                          ? "bg-purple-100 text-purple-600"
+                          : "bg-blue-100 text-blue-600"
+                      }`}
+                    >
+                      {message.author.image ? (
+                        <img
+                          src={message.author.image}
+                          alt={message.author.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        message.author.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Message Content - Current User */}
+                  <div className="max-w-xs">
+                    {/* User role and name */}
+                    <div className="text-xs font-medium mb-1 text-left">
+                      <span className={`${
+                        isMentor ? "text-purple-600" : "text-blue-600"
+                      }`}>
+                        {message.author.name} ({isMentor ? "Mentor" : "Student"})
+                      </span>
+                    </div>
+                    
+                    <div
+                      className={`inline-block px-3 py-2 rounded-lg ${
+                        isMentor
+                          ? "bg-purple-600 text-white"
+                          : "bg-blue-600 text-white"
+                      }`}
+                    >
+                      {editingMessage === message.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            className="w-full p-2 text-sm border rounded resize-none text-gray-900 bg-white"
+                            rows={2}
+                            autoFocus
+                          />
+                          <div className="flex space-x-2">
+                            <GradientButton
+                              onClick={() =>
+                                handleEditMessage(message.id, editContent)
+                              }
+                              variant="primary"
+                              size="sm"
+                            >
+                              Save
+                            </GradientButton>
+                            <button
+                              onClick={() => setEditingMessage(null)}
+                              className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-sm">{message.content}</p>
+                          {message.isEdited && (
+                            <span className="text-xs opacity-70">(edited)</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
-              {/* Message Content */}
-              <div
-                className={`flex-1 max-w-xs ${
-                  message.author.id === currentUser.id ? "text-right" : ""
-                }`}
-              >
-                <div
-                  className={`inline-block px-3 py-2 rounded-lg ${
-                    message.author.id === currentUser.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-900"
-                  }`}
-                >
-                  {editingMessage === message.id ? (
-                    <div className="space-y-2">
-                      <textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        className="w-full p-2 text-sm border rounded resize-none text-gray-900 bg-white"
-                        rows={2}
-                        autoFocus
-                      />
-                      <div className="flex space-x-2">
-                        <GradientButton
-                          onClick={() =>
-                            handleEditMessage(message.id, editContent)
-                          }
-                          variant="primary"
-                          size="sm"
-                        >
-                          Save
-                        </GradientButton>
+                    {/* Message Actions */}
+                    <div className="flex items-center justify-start space-x-2 mt-1 text-xs">
+                      <span className="text-gray-500">{formatTimestamp(message.createdAt)}</span>
+                      <div className="flex space-x-1 ml-2">
                         <button
-                          onClick={() => setEditingMessage(null)}
-                          className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                          onClick={() => startEditing(message)}
+                          className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit message"
                         >
-                          Cancel
+                          <Edit3 className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to delete this message?')) {
+                              handleDeleteMessage(message.id);
+                            }
+                          }}
+                          className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete message"
+                        >
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    <div>
-                      <p className="text-sm">{message.content}</p>
-                      {message.isEdited && (
-                        <span className="text-xs opacity-70">(edited)</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Avatar - Other User */}
+                  <div className="flex-shrink-0 mr-3">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        isMentor
+                          ? "bg-purple-100 text-purple-600"
+                          : "bg-blue-100 text-blue-600"
+                      }`}
+                    >
+                      {message.author.image ? (
+                        <img
+                          src={message.author.image}
+                          alt={message.author.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        message.author.name.charAt(0).toUpperCase()
                       )}
                     </div>
-                  )}
-                </div>
-
-                {/* Message Actions */}
-                <div
-                  className={`flex items-center space-x-2 mt-1 text-xs ${
-                    message.author.id === currentUser.id ? "justify-end" : ""
-                  }`}
-                >
-                  <span className="text-gray-500">{formatTimestamp(message.createdAt)}</span>
-                  {/* Debug: Show user IDs for troubleshooting */}
-                  {process.env.NODE_ENV === 'development' && (
-                    <span className="text-xs text-red-500 ml-2">
-                      Author: {message.author.id} | Current: {currentUser.id}
-                    </span>
-                  )}
-                  {/* Always show buttons for testing - remove this condition temporarily */}
-                  <div className="flex space-x-1 ml-2">
-                      <button
-                        onClick={() => startEditing(message)}
-                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                        title="Edit message"
-                      >
-                        <Edit3 className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Are you sure you want to delete this message?')) {
-                            handleDeleteMessage(message.id);
-                          }
-                        }}
-                        className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete message"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
+                  </div>
+                  
+                  {/* Message Content - Other User */}
+                  <div className="max-w-xs">
+                    {/* User role and name */}
+                    <div className="text-xs font-medium mb-1 text-left">
+                      <span className={`${
+                        isMentor ? "text-purple-600" : "text-blue-600"
+                      }`}>
+                        {message.author.name} ({isMentor ? "Mentor" : "Student"})
+                      </span>
                     </div>
-                </div>
-              </div>
+                    
+                    <div
+                      className={`inline-block px-3 py-2 rounded-lg ${
+                        isMentor
+                          ? "bg-purple-50 text-purple-900 border border-purple-200"
+                          : "bg-gray-100 text-gray-900"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm">{message.content}</p>
+                        {message.isEdited && (
+                          <span className="text-xs opacity-70">(edited)</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Message Actions */}
+                    <div className="flex items-center justify-start space-x-2 mt-1 text-xs">
+                      <span className="text-gray-500">{formatTimestamp(message.createdAt)}</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-            ))
+            );
+            })
           )}
           <div ref={messagesEndRef} />
         </div>
@@ -368,12 +439,16 @@ export default function WritingChat({
             />
             <GradientButton
               onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
+              disabled={!newMessage.trim() || isSending}
               variant="primary"
               size="md"
               className="px-4 py-2"
             >
-              <Send className="w-4 h-4" />
+              {isSending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
             </GradientButton>
           </div>
         </div>

@@ -118,14 +118,51 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const timelines = await (prisma as any).timeline.findMany({
-      where: {
+    // Build the where clause based on user type
+    let whereClause;
+    if (session.user.userType === 'MENTOR') {
+      // For mentors, get timelines they own OR have access to through WritingSpaceAccess
+      whereClause = {
+        OR: [
+          { userId: session.user.id }, // Timelines they own
+          {
+            writingSpaceAccess: {
+              some: {
+                mentorId: session.user.id,
+              },
+            },
+          }, // Timelines they have access to as a mentor
+        ],
+      };
+    } else {
+      // For students, only get timelines they own
+      whereClause = {
         userId: session.user.id,
-      },
+      };
+    }
+
+    const timelines = await (prisma as any).timeline.findMany({
+      where: whereClause,
       include: {
         sections: {
           orderBy: {
             order: 'asc',
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        writingSpaceAccess: {
+          where: {
+            mentorId: session.user.id,
+          },
+          select: {
+            accessType: true,
+            grantedAt: true,
           },
         },
       },
@@ -134,13 +171,17 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Transform the data to include isCompleted field and ensure proper typing
+    // Transform the data to include isCompleted field and mentor access info
     const transformedTimelines = timelines.map((timeline: any) => ({
       ...timeline,
       sections: timeline.sections.map((section: any) => ({
         ...section,
         isCompleted: section.isCompleted || false, // Ensure isCompleted is always present
       })),
+      // Add mentor access information
+      isMentorAccess: timeline.userId !== session.user.id,
+      mentorAccessType: timeline.writingSpaceAccess?.[0]?.accessType || null,
+      mentorAccessGrantedAt: timeline.writingSpaceAccess?.[0]?.grantedAt || null,
     }));
 
     return NextResponse.json({

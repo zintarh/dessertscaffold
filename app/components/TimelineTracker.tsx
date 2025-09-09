@@ -64,7 +64,6 @@ export function TimelineCard({
     return Math.round((completedSections / totalSections) * 100);
   };
 
-  const progress = calculateProgress();
 
   const getCurrentSection = () => {
     const inProgressSection = timeline.sections.find(

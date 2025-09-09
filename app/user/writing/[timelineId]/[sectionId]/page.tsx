@@ -10,6 +10,7 @@ import {
   fetchTimelinesAtom,
 } from "../../../../../lib/stores/timelineStore";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSession } from "next-auth/react"; 
 import { Timeline, TimelineSection } from "@/types";
 import {
   ArrowLeft,
@@ -33,6 +34,7 @@ export default function WritingSpacePage() {
   const router = useRouter();
   const timelineId = params.timelineId as string;
   const sectionId = params.sectionId as string;
+  const { data: session } = useSession();
 
   const timelines = useAtomValue(timelinesAtom);
   const updateSectionContent = useSetAtom(updateSectionContentAtom);
@@ -1249,9 +1251,9 @@ export default function WritingSpacePage() {
               timelineId={timelineId}
               sectionId={sectionId}
               currentUser={{
-                id: "student1", // This should come from auth context
-                name: "John Doe", // This should come from auth context
-                role: "student" as const,
+                id: session?.user?.id || "",
+                name: session?.user?.name || "Unknown User",
+                role: (session?.user as any)?.userType?.toLowerCase() || "student",
               }}
             />
         </div>

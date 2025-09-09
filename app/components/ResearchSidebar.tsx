@@ -12,9 +12,9 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { 
-  RESEARCH_TIMELINE_SECTIONS, 
-  DISSERTATION_SECTIONS 
+import {
+  RESEARCH_TIMELINE_SECTIONS,
+  DISSERTATION_SECTIONS,
 } from "../../lib/constants/timeline-sections";
 
 interface Section {
@@ -41,8 +41,14 @@ interface ResearchSidebarProps {
   currentSectionId: string;
   wordCount: number;
   onSectionClick: (sectionId: string) => void;
-  onToggleSectionStatus: (sectionId: string, currentStatus: "not-started" | "in-progress" | "completed") => void;
-  onToggleCompletion: (sectionId: string, isCompleted: boolean) => Promise<void>;
+  onToggleSectionStatus: (
+    sectionId: string,
+    currentStatus: "not-started" | "in-progress" | "completed"
+  ) => void;
+  onToggleCompletion: (
+    sectionId: string,
+    isCompleted: boolean
+  ) => Promise<void>;
   onExportSection: (section: Section) => void;
   onMarkComplete: () => void;
   showCompletionButton: boolean;
@@ -64,19 +70,20 @@ export default function ResearchSidebar({
   onToggleVisibility,
 }: ResearchSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set()
+  );
 
-  // Keyboard shortcut to toggle sidebar visibility (Ctrl/Cmd + B)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'b') {
+      if ((event.ctrlKey || event.metaKey) && event.key === "b") {
         event.preventDefault();
         onToggleVisibility();
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onToggleVisibility]);
 
   const toggleSectionExpansion = (sectionId: string) => {
@@ -89,75 +96,61 @@ export default function ResearchSidebar({
     setExpandedSections(newExpanded);
   };
 
-  const getStatusText = (status: "not-started" | "in-progress" | "completed") => {
-    switch (status) {
-      case "completed":
-        return "✓ Done";
-      case "in-progress":
-        return "⟳ In Progress";
-      default:
-        return "○ Not Started";
-    }
-  };
-
-  const getStatusColors = (status: "not-started" | "in-progress" | "completed") => {
-    switch (status) {
-      case "completed":
-        return "text-green-600";
-      case "in-progress":
-        return "text-blue-600";
-      default:
-        return "text-gray-500";
-    }
-  };
 
   // Get static section data based on document type and section title
   const getStaticSectionData = (section: Section) => {
     let sections;
-    if (timeline.documentType === 'RESEARCH_TIMELINE') {
+    if (timeline.documentType === "RESEARCH_TIMELINE") {
       sections = RESEARCH_TIMELINE_SECTIONS;
-    } else if (timeline.documentType === 'DISSERTATION') {
+    } else if (timeline.documentType === "DISSERTATION") {
       sections = DISSERTATION_SECTIONS;
     } else {
       // Fallback: try both
       sections = [...RESEARCH_TIMELINE_SECTIONS, ...DISSERTATION_SECTIONS];
     }
-    
+
     // Try exact match first
-    let found = sections.find(s => s.title === section.title);
-    
+    let found = sections.find((s) => s.title === section.title);
+
     // If no exact match, try partial match
     if (!found) {
-      found = sections.find(s => 
-        s.title.toLowerCase().includes(section.title.toLowerCase()) ||
-        section.title.toLowerCase().includes(s.title.toLowerCase())
+      found = sections.find(
+        (s) =>
+          s.title.toLowerCase().includes(section.title.toLowerCase()) ||
+          section.title.toLowerCase().includes(s.title.toLowerCase())
       );
     }
-    
+
     return found || null;
   };
 
   const getSectionContent = (section: Section) => {
     const staticData = getStaticSectionData(section);
-    
+
     return (
       <div className="space-y-3 text-xs text-gray-700">
         <div>
-          <h5 className="font-semibold text-gray-900 mb-2">Brief Description</h5>
+          <h5 className="font-semibold text-gray-900 mb-2">
+            Brief Description
+          </h5>
           <p className="text-gray-700 leading-relaxed">
-            {staticData?.description || section.description || 'No description available'}
+            {staticData?.description ||
+              section.description ||
+              "No description available"}
           </p>
         </div>
-        
+
         <div>
-          <h5 className="font-semibold text-gray-900 mb-2">What Must Be Included</h5>
+          <h5 className="font-semibold text-gray-900 mb-2">
+            What Must Be Included
+          </h5>
           <ul className="list-disc list-inside space-y-1 text-gray-700">
             {staticData?.whatToInclude?.map((item, index) => (
               <li key={index}>{item}</li>
             )) || <li className="text-gray-500">No items available</li>}
           </ul>
         </div>
-        
+
         <div>
           <h5 className="font-semibold text-gray-900 mb-2">Pro Tips</h5>
           <ul className="list-disc list-inside space-y-1 text-gray-700">
@@ -185,12 +178,13 @@ export default function ResearchSidebar({
           >
             <ChevronRight className="w-5 h-5" />
           </button>
-          
+
           {/* Quick Stats in Collapsed Mode */}
           <div className="mt-3 text-center">
             <div className="text-xs text-gray-500 mb-1">Progress</div>
             <div className="text-lg font-bold text-blue-600">
-              {timeline.sections.filter(s => s.status === "completed").length}/{timeline.sections.length}
+              {timeline.sections.filter((s) => s.status === "completed").length}
+              /{timeline.sections.length}
             </div>
             <div className="text-xs text-gray-400">sections</div>
           </div>
@@ -209,7 +203,6 @@ export default function ResearchSidebar({
             <span>Research Sections</span>
           </h3>
           <div className="flex items-center space-x-2">
-            
             <button
               onClick={onToggleVisibility}
               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -221,11 +214,11 @@ export default function ResearchSidebar({
         </div>
 
         {/* Sections List */}
-        <div 
+        <div
           className="space-y-3 flex-1 overflow-y-auto"
           style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#d1d5db #f3f4f6'
+            scrollbarWidth: "thin",
+            scrollbarColor: "#d1d5db #f3f4f6",
           }}
         >
           {timeline.sections.map((sectionItem) => {
@@ -269,7 +262,10 @@ export default function ResearchSidebar({
                         onClick={async (e) => {
                           e.stopPropagation();
                           try {
-                            await onToggleCompletion(sectionItem.id, isCompleted);
+                            await onToggleCompletion(
+                              sectionItem.id,
+                              isCompleted
+                            );
                           } catch (error) {
                             console.error("Error toggling completion:", error);
                           }
@@ -304,9 +300,13 @@ export default function ResearchSidebar({
                         </button>
                       )}
                       {/* Expand/Collapse Indicator */}
-                      <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 ${
-                        isExpanded ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
-                      }`}>
+                      <div
+                        className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 ${
+                          isExpanded
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-gray-100 text-gray-400"
+                        }`}
+                      >
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4" />
                         ) : (
@@ -317,23 +317,23 @@ export default function ResearchSidebar({
                   </div>
 
                   <div className="flex items-center justify-between">
-                                  <span
-                className={`text-sm ${getStatusColors(
-                  sectionItem.status
-                )}`}
-              >
-                {getStatusText(sectionItem.status)}
-              </span>
-              <div className="flex items-center space-x-1 text-gray-600">
-                <span className="text-sm">{sectionItem.duration}w</span>
-              </div>
+                    <span
+                      className={`text-sm ${isCompleted ? "text-green-600" : "text-gray-500"}`}
+                    >
+                      {isCompleted ? "Completed" : "Pending"}
+                    </span>
+                    <div className="flex items-center space-x-1 text-gray-600">
+                      <span className="text-sm">{sectionItem.duration}w</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Expandable Content */}
                 <div
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isExpanded ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"
+                    isExpanded
+                      ? "max-h-[800px] opacity-100"
+                      : "max-h-0 opacity-0"
                   }`}
                 >
                   <div className="px-3 pb-3">
@@ -342,13 +342,9 @@ export default function ResearchSidebar({
                       <div className="mb-4">
                         {getSectionContent(sectionItem)}
                       </div>
-                      
-
                     </div>
                   </div>
                 </div>
-
-
               </div>
             );
           })}
@@ -394,12 +390,13 @@ export default function ResearchSidebar({
               </button>
             )}
 
-            {timeline.sections.find(s => s.id === currentSectionId)?.status === "completed" && (
+            {timeline.sections.find((s) => s.id === currentSectionId)
+              ?.status === "completed" && (
               <div className="w-full px-4 py-3 bg-gradient-to-r from-green-100 to-green-200 text-green-800 rounded-lg border border-green-300 flex items-center justify-center space-x-2 font-medium">
                 <CheckCircle className="w-4 h-4" />
                 <span>Section Completed! 🎉</span>
               </div>
-              )}
+            )}
           </div>
         </div>
       </div>
