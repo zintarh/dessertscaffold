@@ -11,7 +11,7 @@ const credentialsSchema = z.object({
 });
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma), // Temporarily disabled - causing 404
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
