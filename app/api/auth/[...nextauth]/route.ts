@@ -1,6 +1,17 @@
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
 
-const handler = NextAuth(authOptions);
+// Minimal NextAuth configuration to test deployment
+const minimalAuthOptions = {
+  providers: [],
+  session: {
+    strategy: "jwt" as const,
+  },
+  pages: {
+    signIn: "/signin",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+const handler = NextAuth(minimalAuthOptions);
 
 export { handler as GET, handler as POST };
