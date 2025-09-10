@@ -26,16 +26,19 @@ export function useAuthSync() {
     }
 
     if (status === "authenticated" && session?.user) {
+      // Use session data directly to avoid database dependency issues
+      updateCurrentUser(session.user);
+      
+      // Optionally try to fetch additional profile data, but don't let it block authentication
       fetchUserProfile(session.user.id as string)
         .then((userData) => {
           if (userData) {
             updateCurrentUser(userData);
-          } else {
-            updateCurrentUser(session.user);
           }
         })
-        .catch(() => {
-          updateCurrentUser(session.user);
+        .catch((error) => {
+          console.warn("Could not fetch additional user profile data:", error);
+          // Don't update user state on error - keep using session data
         });
     }
   }, [session, status, updateCurrentUser, clearCurrentUser]);

@@ -79,7 +79,12 @@ export default function SigninPage() {
       });
 
       if (result?.error) {
-        toast.error("Invalid email or password. Please check your credentials and try again.");
+        // Check if it's a database connection error
+        if (result.error.includes('database') || result.error.includes('connection')) {
+          toast.error("Database connection issue. Please try again in a moment.");
+        } else {
+          toast.error("Invalid email or password. Please check your credentials and try again.");
+        }
         return;
       }
 
