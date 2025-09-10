@@ -21,11 +21,17 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    // Only match protected routes
     "/user/:path*",
     "/evaluation/:path*",
     "/result/:path*",
     "/research-evaluation/:path*",
     "/writing/:path*",
     "/writing-environment/:path*",
+
+    // 👇 Exclude /api/auth/*, Next.js internals, and static files
+    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
+
+
   ],
 };
