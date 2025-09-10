@@ -11,7 +11,7 @@ const credentialsSchema = z.object({
 });
 
 export const authOptions: NextAuthOptions = {
-  // adapter: PrismaAdapter(prisma), // Temporarily disabled to test
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
