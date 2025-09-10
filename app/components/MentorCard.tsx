@@ -8,6 +8,7 @@ import { createMentorBookingAtom, sendMentorNotificationAtom } from '../../lib/s
 import Modal, { ModalFooter, ModalSection } from './Modal';
 import Link from 'next/link';
 import { useSetAtom } from 'jotai/react';
+import toast from 'react-hot-toast';
 
 interface MentorCardProps {
   mentor: Mentor;
@@ -27,7 +28,7 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
 
   const handleBookMentor = async () => {
     if (!currentDocumentId) {
-      alert('Please select a document to book this mentor for.');
+      toast.error('Please select a document to book this mentor for.');
       return;
     }
 
@@ -46,10 +47,10 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
       await sendNotification(mentor.id, 'booking_request');
       setShowBookingModal(false);
       setMessage('');
-      alert('Booking request sent successfully! The mentor will be notified via email.');
+      toast.success('Booking request sent successfully! The mentor will be notified via email.');
     } catch (error) {
       console.error('Error creating booking:', error);
-      alert('Failed to create booking. Please try again.');
+      toast.error('Failed to create booking. Please try again.');
     } finally {
       setIsBooking(false);
     }

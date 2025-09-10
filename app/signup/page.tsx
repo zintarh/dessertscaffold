@@ -68,6 +68,10 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
+  // Password matching validation
+  const passwordsMatch = formData.password === formData.confirmPassword;
+  const showPasswordMismatch = formData.confirmPassword.length > 0 && !passwordsMatch;
+
   // Jotai atoms for authentication
   const registerUser = useSetAtom(registerUserAtom);
 
@@ -107,10 +111,8 @@ export default function SignupPage() {
     updateFormData({ [field]: value });
   };
 
-  // Use Jotai computed atom for step validation
   const isStepValid = useAtomValue(isStepValidAtom);
 
-  // Use constants from the constants file
   const userTypes = SIGNUP_CONSTANTS.USER_TYPES;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -144,55 +146,41 @@ export default function SignupPage() {
     setIsSubmitting(true);
 
     try {
-      // Prepare user data for registration
       const userData: any = {
-        email,
+        email: email.trim(),
         password,
-        firstName,
-        lastName,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         userType: userType as "STUDENT" | "MENTOR" | "INSTITUTION",
-        institutionName,
-        researchArea,
+        institutionName: institutionName.trim(),
+        researchArea: researchArea.trim(),
       };
 
-      // Only add academicLevel if it has a valid value
       if (formData.academicLevel && formData.academicLevel.trim() !== "") {
-        userData.academicLevel = formData.academicLevel;
+        userData.academicLevel = formData.academicLevel.trim();
       }
 
-      // Step 1: Register user with backend API (doesn't update local state yet)
       const registeredUser = await registerUser(userData);
 
-      console.log("✅ User registered successfully, attempting sign-in...");
-      toast.success("Account created successfully! Signing you in...");
+      if (registeredUser) {
+        const signInResult = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
 
-      // Step 2: Attempt to sign in with NextAuth.js
-      const signInResult = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (signInResult?.error) {
-        // Sign-in failed - don't update local state
-        console.error(
-          "❌ Sign-in failed after registration:",
-          signInResult.error
-        );
-        toast.error(
-          `Registration successful but sign-in failed: ${signInResult.error}`
-        );
-        return;
+        if (signInResult?.error) {
+          console.error(
+            "❌ Sign-in failed after registration:",
+            signInResult.error
+          );
+          toast.error(
+            `Registration successful but sign-in failed: ${signInResult.error}`
+          );
+          return;
+        }
       }
 
-      // Step 3: Sign-in successful - now update local state
-      console.log("✅ Sign-in successful, updating local state...");
-      // User state will be automatically updated by useAuthSync hook
-
-      // Step 4: Complete the flow
-      console.log(
-        "✅ Registration and sign-in complete, redirecting to dashboard..."
-      );
       toast.success("Welcome! Redirecting to your dashboard...");
       resetSignup();
       router.push("/user/dashboard");
@@ -218,7 +206,6 @@ export default function SignupPage() {
     }
   };
 
-  // Don't render theme-dependent content until hydration is complete
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -262,7 +249,6 @@ export default function SignupPage() {
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
         <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Side - School Image */}
           <motion.div
             className="relative"
             initial={{ opacity: 0, x: -50 }}
@@ -270,7 +256,6 @@ export default function SignupPage() {
             transition={{ duration: 0.8 }}
           >
             <div className="relative">
-              {/* School Image Container */}
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <div
                   className="w-full h-[600px] bg-cover bg-center bg-no-repeat"
@@ -278,7 +263,6 @@ export default function SignupPage() {
                     backgroundImage: `url('/images/signup-bg.jpg')`,
                   }}
                 >
-                  {/* Academic Icons Pattern */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="grid grid-cols-3 gap-8 opacity-20">
                       {[
@@ -722,7 +706,8 @@ export default function SignupPage() {
                           <p className="text-red-500 text-sm flex items-center space-x-1">
                             <span>⚠️</span>
                             <span>
-                              Institution accounts require an edu.ng email address
+                              Institution accounts require an edu.ng email
+                              address
                             </span>
                           </p>
                         )}
@@ -858,10 +843,14 @@ export default function SignupPage() {
                           onChange={(e) =>
                             handleInputChange("confirmPassword", e.target.value)
                           }
-                          className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
-                            isDarkMode
-                              ? "bg-gray-700 border-gray-600 text-white"
-                              : "text-gray-900"
+                          className={`w-full pl-10 pr-12 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all duration-200 placeholder-gray-400 ${
+                            showPasswordMismatch
+                              ? "border-red-500 focus:ring-red-500 bg-red-50 dark:bg-red-900/20"
+                              : passwordsMatch && formData.confirmPassword.length > 0
+                              ? "border-green-500 focus:ring-green-500 bg-green-50 dark:bg-green-900/20"
+                              : isDarkMode
+                              ? "bg-gray-700 border-gray-600 text-white focus:ring-blue-500"
+                              : "text-gray-900 border-gray-200 focus:ring-blue-500"
                           }`}
                           required
                         />
@@ -878,7 +867,46 @@ export default function SignupPage() {
                             <Eye className="w-5 h-5" />
                           )}
                         </button>
+                        
+                        {/* Password match indicator */}
+                        {formData.confirmPassword.length > 0 && (
+                          <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+                            {passwordsMatch ? (
+                              <div className="w-5 h-5 text-green-500">
+                                <svg fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 text-red-500">
+                                <svg fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
+                      
+                      {/* Password mismatch error message */}
+                      {showPasswordMismatch && (
+                        <p className="text-sm text-red-500 flex items-center space-x-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          <span>Passwords do not match</span>
+                        </p>
+                      )}
+                      
+                      {/* Password match success message */}
+                      {passwordsMatch && formData.confirmPassword.length > 0 && (
+                        <p className="text-sm text-green-500 flex items-center space-x-1">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <span>Passwords match</span>
+                        </p>
+                      )}
                     </div>
 
                     {/* Terms Checkbox */}

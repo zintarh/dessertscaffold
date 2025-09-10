@@ -128,14 +128,12 @@ export const updateFormDataAtom = atom(
     const normalized: Partial<SignupFormData> = {};
     Object.entries(updates).forEach(([key, value]) => {
       if (typeof value === 'string') {
-        // Don't trim password fields, only trim other string fields
-        if (key === 'password' || key === 'confirmPassword') {
-          normalized[key as keyof SignupFormData] = value as any;
+        // Don't trim any fields during real-time input - allow spaces
+        // Only normalize email to lowercase
+        if (key === 'email') {
+          normalized[key as keyof SignupFormData] = value.toLowerCase() as any;
         } else {
-          const trimmed = value.trim();
-          normalized[key as keyof SignupFormData] = (key === 'email'
-            ? trimmed.toLowerCase()
-            : trimmed) as any;
+          normalized[key as keyof SignupFormData] = value as any;
         }
       } else {
         normalized[key as keyof SignupFormData] = value as any;

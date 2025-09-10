@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { userAtom } from '../../lib/stores/authStore';
+import toast from 'react-hot-toast';
 import { 
   mentorBookingsByMentorAtom, 
   updateMentorBookingStatusAtom,
@@ -48,10 +49,10 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
       setSelectedBooking(null);
       setResponseMessage('');
       
-      alert(`Booking ${selectedBooking.status === 'accepted' ? 'accepted' : 'rejected'} successfully!`);
+      toast.success(`Booking ${selectedBooking.status === 'accepted' ? 'accepted' : 'rejected'} successfully!`);
     } catch (error) {
       console.error('Error updating booking:', error);
-      alert('Failed to update booking. Please try again.');
+      toast.error('Failed to update booking. Please try again.');
     } finally {
       setIsResponding(false);
     }

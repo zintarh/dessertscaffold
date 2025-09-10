@@ -43,27 +43,16 @@ export default function Navbar() {
         </motion.div>
 
         <div className="hidden md:flex items-center space-x-8">
-          {isAuthenticated ? (
-            <>
-              <NavLink href="/user/dashboard" label="Dashboard" delay={0.1} />
-              {isStudent ? (
-                <NavLink href="/user/mentors" label="Find Mentors" delay={0.2} />
-              ) : (
-                <NavLink href="/user/mentors" label="Mentor Dashboard" delay={0.2} />
-              )}
-              <NavLink href="/community" label="Community" delay={0.3} />
-            </>
-          ) : (
+          
             <>
               <NavLink href="/community" label="Community" delay={0.1} />
               <NavLink href="/pricing" label="Pricing" delay={0.2} />
-              <NavLink href="/result" label="Result" delay={0.3} />
             </>
-          )}
+        
         </div>
 
         <div className="flex items-center space-x-4">
-          <motion.button
+          {/* <motion.button
             onClick={toggleTheme}
             className={`p-3 rounded-xl transition-all duration-300 ${
               isDarkMode
@@ -79,7 +68,7 @@ export default function Navbar() {
             ) : (
               <Moon className="w-5 h-5" />
             )}
-          </motion.button>
+          </motion.button> */}
 
           {isAuthenticated ? (
             <div className="flex items-center space-x-3">
@@ -92,7 +81,7 @@ export default function Navbar() {
               >
                 <User className="w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {isStudent ? 'Student' : 'Mentor'}
+                  My Account
                 </span>
               </motion.div>
               

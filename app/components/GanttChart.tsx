@@ -6,6 +6,7 @@ import { Calendar, Download, FileText, Settings } from 'lucide-react';
 import { Timeline, TimelineSection } from '@/types';
 import { exportGanttChart, generateGanttData, ExportOptions } from '../../lib/utils/ganttExport';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 // Utility function to safely parse dates from API
 const parseDate = (dateValue: Date | string | null | undefined): Date | null => {
@@ -101,7 +102,7 @@ export default function GanttChart({ timeline, onExport }: GanttChartProps) {
       }
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Export failed. Please try again.');
+      toast.error('Export failed. Please try again.');
     } finally {
       setIsExporting(false);
       setShowExportOptions(false);

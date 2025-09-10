@@ -84,3 +84,59 @@ export interface MentorProfile {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+export interface EvaluationData {
+  topic: string;
+  overallScore: number;
+  metrics: Array<{
+    name: string;
+    score: number;
+    color: string;
+    description: string;
+    details: string;
+    recommendations: string[];
+  }>;
+  recommendations: string[];
+}
+
+// Define the API response type
+export interface EvaluationResponse {
+  metadata?: {
+    topic: string;
+  };
+  evaluation: {
+    novelty: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    trends: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    methodological_complexity: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    research_gaps: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    grant_potential: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    literature_availability: {
+      score: number;
+      justification: string;
+      recommendations?: string[];
+    };
+    overall_recommendations?: string[];
+    overall_summary: string;
+  };
+}

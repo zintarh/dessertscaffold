@@ -23,6 +23,7 @@ import Navbar from "./components/Navbar";
 export default function Home() {
   const { isDarkMode, isHydrated } = useTheme();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [topic, setTopic] = useState("");
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -34,7 +35,13 @@ export default function Home() {
   }, []);
 
   const handleEvaluate = () => {
-    window.location.href = "/evaluation";
+    if (topic.trim()) {
+      // Pass the topic as a URL parameter
+      window.location.href = `/evaluation?topic=${encodeURIComponent(topic.trim())}`;
+    } else {
+      // If no topic, go to evaluation page normally
+      window.location.href = "/evaluation";
+    }
   };
 
   const features = [
@@ -196,6 +203,8 @@ export default function Home() {
                 <div className="flex items-center space-x-4 max-w-4xl mx-auto">
                   <input
                     type="text"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
                     placeholder="Please Enter Topic eg: Machine learning applications in healthcare diagnostics"
                     className={`flex-1 px-10 py-6 rounded-xl text-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 ${
                       isDarkMode

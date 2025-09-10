@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import GradientButton from './ui/GradientButton';
+import toast from 'react-hot-toast';
 import { 
   documentAccessByDocumentAtom, 
   mentorCommentsByDocumentAtom,
@@ -58,7 +59,7 @@ export default function MentorCommentPanel({
       setNewComment('');
     } catch (error) {
       console.error('Error adding comment:', error);
-      alert('Failed to add comment. Please try again.');
+      toast.error('Failed to add comment. Please try again.');
     }
   };
 
@@ -71,7 +72,7 @@ export default function MentorCommentPanel({
       setEditContent('');
     } catch (error) {
       console.error('Error updating comment:', error);
-      alert('Failed to update comment. Please try again.');
+      toast.error('Failed to update comment. Please try again.');
     }
   };
 
@@ -82,7 +83,7 @@ export default function MentorCommentPanel({
       await deleteComment(commentId);
     } catch (error) {
       console.error('Error deleting comment:', error);
-      alert('Failed to delete comment. Please try again.');
+      toast.error('Failed to delete comment. Please try again.');
     }
   };
 

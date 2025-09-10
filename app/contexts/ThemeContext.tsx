@@ -1,6 +1,12 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -13,7 +19,7 @@ const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: true,
   setIsDarkMode: () => {},
   toggleTheme: () => {},
-  isHydrated: false
+  isHydrated: false,
 });
 
 function getInitialTheme(): boolean {
@@ -26,37 +32,40 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState(false); // Start with light mode for SSR
   const [isHydrated, setIsHydrated] = useState(false);
 
-  // Hydrate theme on mount
   useEffect(() => {
     // Only run on client side
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme) {
-        setIsDarkMode(savedTheme === 'dark');
-      } else {
-        // Default to system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setIsDarkMode(prefersDark);
-      }
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme");
+      // if (savedTheme) {
+      //   setIsDarkMode(savedTheme === 'light');
+      // } else {
+      //   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      //   setIsDarkMode(prefersDark);
+      // }
+
+      setIsDarkMode(false);
+
       setIsHydrated(true);
     }
   }, []);
 
-  // Save theme to localStorage whenever it changes
-  useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-      // Update document class for global styling
-      document.documentElement.classList.toggle('dark', isDarkMode);
-    }
-  }, [isDarkMode, isHydrated]);
+  // // Save theme to localStorage whenever it changes
+  // useEffect(() => {
+  //   if (isHydrated) {
+  //     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  //     // Update document class for global styling
+  //     document.documentElement.classList.toggle('dark', isDarkMode);
+  //   }
+  // }, [isDarkMode, isHydrated]);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, setIsDarkMode, toggleTheme, isHydrated }}>
+    <ThemeContext.Provider
+      value={{ isDarkMode, setIsDarkMode, toggleTheme, isHydrated }}
+    >
       {children}
     </ThemeContext.Provider>
   );

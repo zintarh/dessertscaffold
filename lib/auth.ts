@@ -1,6 +1,5 @@
 import type { NextAuthOptions, User as NextAuthUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import * as bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { z } from "zod";
@@ -54,10 +53,7 @@ export const authOptions: NextAuthOptions = {
           const valid = await bcrypt.compare(password, user.password);
           if (!valid) return null;
 
-          // Email verification check removed for now - will be added later
-          // if (!user.isActive) {
-          //   throw new Error('Please verify your email before signing in. Check your inbox for the verification link.');
-          // }
+         
 
           const fallbackName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
           const computedName = user.name ?? (fallbackName || user.email);
@@ -65,11 +61,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             name: computedName,
             email: user.email,
-            image: user.image ?? undefined,
             userType: (user as any).userType as string,
-            institutionName: (user as any).institutionName as string,
-            researchArea: (user as any).researchArea as string,
-            academicLevel: (user as any).academicLevel as string,
           };
           return resultUser;
         } catch (err) {

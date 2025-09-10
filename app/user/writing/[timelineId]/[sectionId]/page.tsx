@@ -548,7 +548,7 @@ export default function WritingSpacePage() {
       };
     } catch (error) {
       console.error("Error exporting section content:", error);
-      alert("Failed to export section. Please try again.");
+      toast.error("Failed to export section. Please try again.");
     }
   }, []);
 

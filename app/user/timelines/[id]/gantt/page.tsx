@@ -4,30 +4,17 @@ import { useParams, useRouter } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { timelinesAtom } from "../../../../../lib/stores/timelineStore";
 import { useState } from "react";
-import { 
-  ArrowLeft, 
-  Download, 
-  
-} from "lucide-react";
-import { exportGanttChart, generateGanttData, ExportOptions } from "../../../../../lib/utils/ganttExport";
+import toast from "react-hot-toast";
+import { ArrowLeft, Download } from "lucide-react";
+import {
+  exportGanttChart,
+  generateGanttData,
+  ExportOptions,
+} from "../../../../../lib/utils/ganttExport";
 
-// Utility function to safely parse dates from API
-const parseDate = (dateValue: Date | string | null | undefined): Date | null => {
-  if (!dateValue) return null;
-  if (dateValue instanceof Date) return dateValue;
-  if (typeof dateValue === 'string') {
-    const parsed = new Date(dateValue);
-    return isNaN(parsed.getTime()) ? null : parsed;
-  }
-  return null;
-};
 
-// Utility function to format dates safely
-const formatDate = (dateValue: Date | string | null | undefined): string => {
-  const date = parseDate(dateValue);
-  if (!date) return 'Not set';
-  return date.toLocaleDateString();
-};
+
+
 
 export default function GanttChartPage() {
   const params = useParams();
@@ -61,45 +48,24 @@ export default function GanttChartPage() {
     );
   }
 
-  const calculateProgress = () => {
-    const totalSections = timeline.sections.length;
-    const completedSections = timeline.sections.filter(
-      (s) => s.status === "completed"
-    ).length;
-    const inProgressSections = timeline.sections.filter(
-      (s) => s.status === "in-progress"
-    ).length;
-
-    return {
-      completed: completedSections,
-      inProgress: inProgressSections,
-      notStarted: totalSections - completedSections - inProgressSections,
-      percentage: Math.round((completedSections / totalSections) * 100),
-    };
-  };
-
-  const progress = calculateProgress();
-
   const exportToPDF = async () => {
     setIsExporting(true);
 
     try {
-      // Generate Gantt data using the utility function
       const ganttData = generateGanttData(timeline);
-      
-      // Configure export options
+
       const options: ExportOptions = {
-        format: 'pdf',
-        filename: `${timeline.documentType.toLowerCase().replace(/\s+/g, '-')}-gantt-${Date.now()}.pdf`,
+        format: "pdf",
+        filename: `${timeline.documentType
+          .toLowerCase()
+          .replace(/\s+/g, "-")}-gantt-${Date.now()}.pdf`,
         quality: 2,
       };
 
-      // Use the professional PDF export utility
       await exportGanttChart(null, ganttData, options);
-      
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      alert("Failed to export PDF. Please try again.");
+      toast.error("Failed to export PDF. Please try again.");
     } finally {
       setIsExporting(false);
     }
