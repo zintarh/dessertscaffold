@@ -1,11 +1,14 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = "postgresql://neondb_owner:npg_Jkrcad1RtT3K@ep-shiny-wildflower-adaz8eto-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
-  directUrl = "postgresql://neondb_owner:npg_Jkrcad1RtT3K@ep-shiny-wildflower-adaz8eto.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model Account {
@@ -21,7 +24,8 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -35,179 +39,203 @@ model Session {
 }
 
 model User {
-  id                       String               @id @default(cuid())
-  name                     String?
-  email                    String               @unique
-  emailVerified            DateTime?
-  image                    String?
-  password                 String?
-  firstName                String?
-  lastName                 String?
-  institutionName          String?
-  userType                 String?
-  researchArea             String?
-  academicLevel            String?
-  phoneNumber              String?
-  linkedinUrl              String?
-  twitterUrl               String?
-  websiteUrl               String?
-  isActive                 Boolean              @default(false)
-  verificationToken        String?
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  firstName     String?
+  lastName      String?
+  institutionName String?
+  userType      String?
+  researchArea  String?
+  academicLevel String?
+  phoneNumber   String?
+  linkedinUrl   String?
+  twitterUrl    String?
+  websiteUrl    String?
+  isActive      Boolean   @default(false)
+  verificationToken String?
   verificationTokenExpires DateTime?
-  createdAt                DateTime             @default(now())
-  updatedAt                DateTime             @updatedAt
-  accounts                 Account[]
-  comments                 Comment[]            @relation("CommentAuthor")
-  receivedInvites          Invite[]             @relation("ReceivedInvites")
-  sentInvites              Invite[]             @relation("SentInvites")
-  generatedInviteCodes     InviteCode[]         @relation("GeneratedInviteCodes")
-  usedInviteCodes          InviteCode[]         @relation("UsedInviteCodes")
-  mentorProfile            MentorProfile?
-  mentorProjects           MentorProject[]      @relation("MentorProjects")
-  studentProjects          MentorProject[]      @relation("StudentProjects")
-  receivedMessages         Message[]            @relation("ReceivedMessages")
-  sentMessages             Message[]            @relation("SentMessages")
-  sessions                 Session[]
-  timelines                Timeline[]
-  mentorAccess             WritingSpaceAccess[] @relation("MentorAccess")
-  studentAccess            WritingSpaceAccess[] @relation("StudentAccess")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  timelines     Timeline[]
+  mentorProfile MentorProfile? // Add relation to mentor profile
+  sentMessages  Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  generatedInviteCodes InviteCode[] @relation("GeneratedInviteCodes")
+  usedInviteCodes InviteCode[] @relation("UsedInviteCodes")
+  mentorAccess WritingSpaceAccess[] @relation("MentorAccess")
+  studentAccess WritingSpaceAccess[] @relation("StudentAccess")
+  mentorProjects MentorProject[] @relation("MentorProjects")
+  studentProjects MentorProject[] @relation("StudentProjects")
+  sentInvites Invite[] @relation("SentInvites")
+  receivedInvites Invite[] @relation("ReceivedInvites")
+  comments Comment[] @relation("CommentAuthor")
 }
 
+// Mentor Profile model for detailed mentor information
 model MentorProfile {
   id                String   @id @default(cuid())
-  userId            String   @unique
-  bio               String?
-  expertise         String?
-  hourlyRate        Float?
-  availability      String?
-  responseTime      String?
-  languages         String?
-  timezone          String?
-  education         String?
-  publications      String?
-  specializations   String?
-  socialLinks       String?
+  userId            String   @unique // One-to-one relationship with User
+  bio               String?  // Detailed bio/description
+  expertise         String?  // JSON string of expertise areas
+  hourlyRate        Float?   // Hourly rate for mentoring
+  availability      String?  // Availability status
+  responseTime      String?  // Typical response time
+  languages         String?  // JSON string of spoken languages
+  timezone          String?  // Timezone for scheduling
+  education         String?  // JSON string of education history
+  publications      String?  // JSON string of publications
+  specializations   String?  // JSON string of mentoring specializations
+  socialLinks       String?  // JSON string of social media links
   completedProjects Int      @default(0)
   rating            Float    @default(0.0)
   reviewCount       Int      @default(0)
   isVerified        Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  
+  // Relations
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Timeline model for research projects
 model Timeline {
-  id                 String               @id @default(cuid())
-  title              String
-  documentType       String
-  startDate          DateTime?
-  completionDate     DateTime?
-  academicLevel      String?
-  discipline         String?
-  researchTopic      String?
-  wordCount          Int                  @default(2000)
-  userId             String?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  comments           Comment[]
-  invites            Invite[]
-  mentorProjects     MentorProject[]
-  sections           Section[]
-  user               User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  title         String   // Simple title for testing
+  documentType  String   // "RESEARCH_TIMELINE" or "DISSERTATION"
+  startDate     DateTime?
+  completionDate DateTime?
+  academicLevel String?
+  discipline    String?
+  researchTopic String?
+  wordCount     Int      @default(2000) // Target word count for the project
+  userId        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sections      Section[]
   writingSpaceAccess WritingSpaceAccess[]
+  mentorProjects MentorProject[]
+  invites       Invite[]
+  comments      Comment[]
 }
 
+// Timeline sections with durations
 model Section {
   id          String   @id @default(cuid())
-  title       String
-  content     String?
-  duration    Int?
-  isCompleted Boolean  @default(false)
+  title       String   // "Executive Summary", "Introduction", etc.
+  content     String?  // Auto-saved editor content
+  duration    Int?     // Duration in weeks
+  isCompleted Boolean  @default(false) // Track completion status
   timelineId  String
-  order       Int?
+  order       Int?     // To maintain section order
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  // Relations
   timeline    Timeline @relation(fields: [timelineId], references: [id], onDelete: Cascade)
 }
 
+// Message model for student-mentor communication
 model Message {
   id         String   @id @default(cuid())
-  senderId   String
-  receiverId String
-  subject    String?
-  body       String
-  status     String   @default("unread")
+  senderId   String   // Student who sent the message
+  receiverId String   // Mentor who received the message (renamed from recipientId)
+  subject    String?  // Optional subject line
+  body       String   // Message content (renamed from content)
+  status     String   @default("unread") // Message status
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  
+  // Relations
   sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
 }
 
+// Invite Code model for mentor invitations
 model InviteCode {
-  id        String    @id @default(cuid())
-  code      String    @unique
-  mentorId  String
-  studentId String?
-  isUsed    Boolean   @default(false)
-  expiresAt DateTime?
-  createdAt DateTime  @default(now())
-  usedAt    DateTime?
-  invites   Invite[]
-  mentor    User      @relation("GeneratedInviteCodes", fields: [mentorId], references: [id], onDelete: Cascade)
-  student   User?     @relation("UsedInviteCodes", fields: [studentId], references: [id])
+  id          String   @id @default(cuid())
+  code        String   @unique // The unique invite code
+  mentorId    String   // Mentor who generated the code
+  studentId   String?  // Student who used the code (null if unused)
+  isUsed      Boolean  @default(false)
+  expiresAt   DateTime? // Optional expiration date
+  createdAt   DateTime @default(now())
+  usedAt      DateTime?
+  
+  // Relations
+  mentor      User     @relation("GeneratedInviteCodes", fields: [mentorId], references: [id], onDelete: Cascade)
+  student     User?    @relation("UsedInviteCodes", fields: [studentId], references: [id], onDelete: SetNull)
+  invites     Invite[] // Multiple invites can use the same code
 }
 
+// Writing Space Access model for mentor access to student writing spaces
 model WritingSpaceAccess {
-  id         String    @id @default(cuid())
-  timelineId String
-  mentorId   String
-  studentId  String
-  accessType String    @default("READ")
-  grantedAt  DateTime  @default(now())
-  expiresAt  DateTime?
-  mentor     User      @relation("MentorAccess", fields: [mentorId], references: [id], onDelete: Cascade)
-  student    User      @relation("StudentAccess", fields: [studentId], references: [id], onDelete: Cascade)
-  timeline   Timeline  @relation(fields: [timelineId], references: [id], onDelete: Cascade)
-
-  @@unique([timelineId, mentorId])
+  id          String   @id @default(cuid())
+  timelineId  String   // The writing space (timeline) being accessed
+  mentorId    String   // Mentor who has access
+  studentId   String   // Student who owns the writing space
+  accessType  String   @default("READ") // "READ", "COMMENT", "EDIT"
+  grantedAt   DateTime @default(now())
+  expiresAt   DateTime? // Optional expiration
+  
+  // Relations
+  timeline    Timeline @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  mentor      User     @relation("MentorAccess", fields: [mentorId], references: [id], onDelete: Cascade)
+  student     User     @relation("StudentAccess", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@unique([timelineId, mentorId]) // One mentor can only have one access record per timeline
 }
 
+// Mentor Project model for mentor invitations to specific projects
 model MentorProject {
-  id          String    @id @default(cuid())
-  projectId   String
-  mentorId    String
-  studentId   String
-  role        String    @default("pending")
-  invitedAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  projectId  String   // Timeline ID (project)
+  mentorId   String   // Mentor who was invited
+  studentId  String   // Student who sent the invitation
+  role       String   @default("pending") // pending, active, declined
+  invitedAt  DateTime @default(now())
   respondedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  mentor      User      @relation("MentorProjects", fields: [mentorId], references: [id], onDelete: Cascade)
-  project     Timeline  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  student     User      @relation("StudentProjects", fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@unique([projectId, mentorId])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  project    Timeline @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mentor     User     @relation("MentorProjects", fields: [mentorId], references: [id], onDelete: Cascade)
+  student    User     @relation("StudentProjects", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, mentorId]) // One mentor can only have one invitation per project
 }
 
+// Invite model for tracking individual mentor invitations
 model Invite {
-  id           String     @id @default(cuid())
-  inviteCodeId String
-  projectId    String
-  mentorId     String
-  studentId    String
-  status       String     @default("pending")
-  emailSent    Boolean    @default(false)
-  emailSentAt  DateTime?
-  respondedAt  DateTime?
-  expiresAt    DateTime
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  inviteCode   InviteCode @relation(fields: [inviteCodeId], references: [id], onDelete: Cascade)
-  mentor       User       @relation("ReceivedInvites", fields: [mentorId], references: [id], onDelete: Cascade)
-  project      Timeline   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  student      User       @relation("SentInvites", fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@unique([projectId, mentorId, inviteCodeId])
+  id          String   @id @default(cuid())
+  inviteCodeId String  // Reference to the invite code used
+  projectId   String   // Timeline ID (project)
+  mentorId    String   // Mentor who was invited
+  studentId   String   // Student who sent the invitation
+  status      String   @default("pending") // pending, accepted, declined, expired
+  emailSent   Boolean  @default(false) // Track if email was successfully sent
+  emailSentAt DateTime?
+  respondedAt DateTime?
+  expiresAt   DateTime // Invite expiration date (7 days from creation)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  inviteCode  InviteCode @relation(fields: [inviteCodeId], references: [id], onDelete: Cascade)
+  project     Timeline @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mentor      User     @relation("ReceivedInvites", fields: [mentorId], references: [id], onDelete: Cascade)
+  student     User     @relation("SentInvites", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, mentorId, inviteCodeId]) // Prevent duplicate invites with same code
 }
 
 model VerificationToken {
@@ -220,13 +248,15 @@ model VerificationToken {
 
 model Comment {
   id         String   @id @default(cuid())
-  content    String
-  timelineId String
-  sectionId  String?
-  authorId   String
-  isEdited   Boolean  @default(false)
+  content    String   // Comment content
+  timelineId String   // Timeline this comment belongs to
+  sectionId  String?  // Optional: specific section this comment is about
+  authorId   String   // User who wrote the comment
+  isEdited   Boolean  @default(false) // Track if comment was edited
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  author     User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  
+  // Relations
   timeline   Timeline @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  author     User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
 }
