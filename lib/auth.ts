@@ -75,6 +75,15 @@ export const authOptions: NextAuthOptions = {
           return resultUser;
         } catch (err) {
           console.error("Authentication error:", err);
+          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          const errorName = err instanceof Error ? err.name : 'Unknown';
+          const errorStack = err instanceof Error ? err.stack : 'No stack trace';
+          
+          console.error("Error details:", {
+            message: errorMessage,
+            stack: errorStack,
+            name: errorName
+          });
           return null;
         }
       },
@@ -108,4 +117,5 @@ export const authOptions: NextAuthOptions = {
     // Use secure cookies in production
   },
   debug: process.env.NODE_ENV === "development",
+  secret: process.env.NEXTAUTH_SECRET,
 };
