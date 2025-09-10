@@ -97,7 +97,6 @@ export default function EvaluationPage() {
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
   const syncEvaluationData = useSetAtom(evaluationSyncAtom);
 
-  // Use evaluation results if available, otherwise fall back to static data
   const displayData = evaluationResults
     ? {
     topic: evaluationResults.metadata?.topic || researchTopic,
@@ -302,6 +301,9 @@ export default function EvaluationPage() {
       setIsDownloading(false);
     }
   };
+
+
+  
 
   if (!isHydrated) {
     return (

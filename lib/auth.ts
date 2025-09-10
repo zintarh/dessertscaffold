@@ -11,14 +11,13 @@ const credentialsSchema = z.object({
 });
 
 export const authOptions: NextAuthOptions = {
-  // adapter: PrismaAdapter(prisma), // Temporarily disabled to test auth error
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
   pages: {
     signIn: "/signin",
-    error: "/signin", // redirect errors to sign-in page with ?error=
+    error: "/signin", 
   },
   providers: [
     CredentialsProvider({
@@ -92,30 +91,24 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        // Store only the absolute minimum required data
         token.id = (user as any).id;
         token.email = (user as any).email;
         token.userType = (user as any).userType;
-        token.institutionName = (user as any).institutionName;
-        token.researchArea = (user as any).researchArea;
-        token.academicLevel = (user as any).academicLevel;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token) {
+        // Store only essential data - fetch other data from database when needed
         (session.user as any).id = token.id as string;
         (session.user as any).userType = token.userType as string;
-        (session.user as any).institutionName = token.institutionName as string;
-        (session.user as any).researchArea = token.researchArea as string;
-        (session.user as any).academicLevel = token.academicLevel as string;
         (session.user as any).email = token.email as string;
       }
       return session;
     },
   },
-  cookies: {
-    // Use secure cookies in production
-  },
+  // Use default NextAuth cookie configuration to avoid header size issues
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
 };
