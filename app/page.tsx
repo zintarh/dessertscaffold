@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  Zap,
   Target,
   Users,
   BookOpen,
@@ -50,42 +49,54 @@ export default function Home() {
       title: "Research Evaluation",
       description:
         "Get instant feedback on your research topic across 6 key academic metrics with our advanced evaluation system.",
+      shortDesc: "AI-powered analysis",
+      color: "text-blue-500"
     },
     {
       icon: TrendingUp,
       title: "Progress Tracking",
       description:
         "Visualize your research journey with comprehensive progress tracking and milestone management.",
+      shortDesc: "Real-time insights",
+      color: "text-emerald-500"
     },
     {
       icon: Clock,
       title: "Timeline Planning",
       description:
         "Create structured timelines for your research proposals and dissertations with intelligent scheduling.",
+      shortDesc: "Smart scheduling",
+      color: "text-purple-500"
     },
     {
       icon: BookOpen,
       title: "Resource Library",
       description:
         "Access templates, guides, and academic resources curated specifically for your research field.",
+      shortDesc: "Curated content",
+      color: "text-amber-500"
     },
     {
       icon: Users,
       title: "Academic Community",
       description:
         "Connect with fellow researchers, mentors, and experts in your field for collaboration and support.",
+      shortDesc: "Expert network",
+      color: "text-orange-500"
     },
     {
       icon: Award,
       title: "Grant Writing Support",
       description:
         "Get assistance with grant applications and funding opportunities tailored to your research area.",
+      shortDesc: "Funding guidance",
+      color: "text-red-500"
     },
   ];
 
   const stats = [
-    { number: "10,000+", label: "Active Researchers" },
-    { number: "50,000+", label: "Topics Evaluated" },
+    { number: "10+", label: "Active Researchers" },
+    { number: "20+", label: "Topics Evaluated" },
     { number: "95%", label: "Success Rate" },
     { number: "24/7", label: "Expert Support" },
   ];
@@ -105,8 +116,8 @@ export default function Home() {
     <div
       className={`min-h-screen overflow-hidden relative transition-all duration-500 ${
         isDarkMode
-          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white"
-          : "bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900"
+          ? "bg-slate-900 text-white"
+          : "bg-gray-50 text-gray-600"
       }`}
     >
       {/* Animated Background */}
@@ -132,7 +143,6 @@ export default function Home() {
           }`}
         />
 
-        {/* Floating particles */}
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
@@ -176,11 +186,24 @@ export default function Home() {
               Transform Your Research
             </span>
             <br />
-            <span className={isDarkMode ? "text-white" : "text-gray-900"}>
+            <span className={`text-4xl md:text-5xl font-semibold ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
               Chaos Into Structured Success
             </span>
           </motion.h1>
 
+          {/* <motion.p
+            className={`text-xl md:text-2xl max-w-4xl mx-auto mb-12 leading-relaxed ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            Get instant AI-powered evaluation across 6 key academic metrics. 
+            Turn your research ideas into structured, fundable projects with expert guidance.
+          </motion.p> */}
         
           <motion.div
             className="max-w-6xl mx-auto mb-12"
@@ -189,93 +212,181 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
 
-            <div
-              className="py-6 mb-8"
-            >
-              <div className="absolute top-0 right-0 w-40 h-40 opacity-5">
-                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full blur-3xl"></div>
-              </div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 opacity-5">
-                <div className="w-full h-full bg-gradient-to-tr from-amber-500 to-orange-500 rounded-full blur-2xl"></div>
-              </div>
+            {/* Enhanced Input Form Container */}
+            <div className="relative mb-16">
+              {/* Background Glow Effect */}
+              <div className={`absolute inset-0 rounded-3xl blur-3xl opacity-20 ${
+                isDarkMode ? "bg-blue-500/30" : "bg-blue-500/20"
+              }`} />
+              
+              {/* Form Container with Enhanced Styling */}
+              <div className={`relative z-10 max-w-5xl mx-auto p-8 rounded-3xl border-2 backdrop-blur-sm ${
+                isDarkMode
+                  ? "bg-white/5 border-white/20 shadow-2xl"
+                  : "bg-white/90 border-gray-200/50 shadow-2xl"
+              }`}>
+                {/* Form Label */}
+                <motion.div
+                  className="text-center mb-6"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.9 }}
+                >
+                  <h3 className={`text-2xl font-bold mb-2 ${
+                    isDarkMode ? "text-white" : "text-gray-600"
+                  }`}>
+                    Start Your Research Evaluation
+                  </h3>
+                  <p className={`text-lg ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}>
+                    Enter your research topic below to get instant feedback
+                  </p>
+                </motion.div>
 
-              <div className="relative z-10 max-w-6xl mx-auto">
-                <div className="flex items-center space-x-4 max-w-4xl mx-auto">
-                  <input
-                    type="text"
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    placeholder="Please Enter Topic eg: Machine learning applications in healthcare diagnostics"
-                    className={`flex-1 px-10 py-6 rounded-xl text-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 ${
-                      isDarkMode
-                        ? "bg-transparent border-white/30 text-white placeholder-gray-300 focus:border-blue-400 focus:ring-blue-400/20"
-                        : "bg-transparent border-gray-300 text-gray-900  focus:border-blue-500 focus:ring-blue-500/20"
-                    }`}
-                  />
+                {/* Input and Button Container */}
+                <motion.div
+                  className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 1.0 }}
+                >
+                  {/* Enhanced Input Field */}
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                      placeholder="e.g., Machine learning applications in healthcare diagnostics"
+                      className={`w-full px-6 py-5 text-xl rounded-2xl border-2 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-opacity-30 ${
+                        isDarkMode
+                          ? "bg-white/10 border-white/40 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400/30 shadow-lg"
+                          : "bg-white border-gray-300 text-gray-600 placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/30 shadow-lg"
+                      }`}
+                      onFocus={(e) => {
+                        e.target.style.transform = 'scale(1.02)';
+                        e.target.style.boxShadow = isDarkMode 
+                          ? '0 0 0 4px rgba(59, 130, 246, 0.3), 0 20px 25px -5px rgba(0, 0, 0, 0.3)'
+                          : '0 0 0 4px rgba(59, 130, 246, 0.3), 0 20px 25px -5px rgba(0, 0, 0, 0.1)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.boxShadow = '';
+                      }}
+                    />
+                    
+                  </div>
+
+                  {/* Enhanced Button */}
                   <motion.button
                     onClick={handleEvaluate}
-                    className="bg-gradient-to-r from-blue-600 to-emerald-500 px-8 py-6 rounded-xl font-semibold text-xl hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 text-white whitespace-nowrap"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className={`px-10 py-5 rounded-2xl font-bold text-xl transition-all duration-300 flex items-center justify-center space-x-3 whitespace-nowrap shadow-xl hover:shadow-2xl ${
+                      topic.trim()
+                        ? "bg-gradient-to-r from-blue-600 to-emerald-500 hover:from-blue-700 hover:to-emerald-600 text-white"
+                        : isDarkMode
+                        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                    disabled={!topic.trim()}
+                    whileHover={topic.trim() ? { scale: 1.05 } : {}}
+                    whileTap={topic.trim() ? { scale: 0.95 } : {}}
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.3, delay: 1.1 }}
                   >
-                    <span>Evaluate</span>
+                    <span>Evaluate Research</span>
+                    <motion.div
+                      animate={topic.trim() ? { rotate: [0, 10, -10, 0] } : {}}
+                      transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      <Target className="w-6 h-6" />
+                    </motion.div>
                   </motion.button>
-                </div>
+                </motion.div>
+
+               
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
               {[
-                { icon: Target, label: "Novelty", color: "text-blue-500" },
-                {
-                  icon: TrendingUp,
+                { 
+                  icon: Target, 
+                  label: "Novelty",
+                  color: "text-blue-500"
+                },
+                { 
+                  icon: TrendingUp, 
                   label: "Trends",
-                  color: "text-emerald-500",
+                  color: "text-emerald-500"
                 },
-                {
-                  icon: BarChart3,
-                  label: "Methodological Complexity",
-                  color: "text-purple-500",
+                { 
+                  icon: BarChart3, 
+                  label: "Methodology",
+                  color: "text-purple-500"
                 },
-                {
-                  icon: Lightbulb,
+                { 
+                  icon: Lightbulb, 
                   label: "Research Gaps",
-                  color: "text-amber-500",
+                  color: "text-amber-500"
                 },
-                {
-                  icon: Award,
+                { 
+                  icon: Award, 
                   label: "Grant Potential",
-                  color: "text-orange-500",
+                  color: "text-orange-500"
                 },
-                {
-                  icon: BookOpen,
-                  label: "Literature Availability",
-                  color: "text-red-500",
+                { 
+                  icon: BookOpen, 
+                  label: "Literature",
+                  color: "text-red-500"
                 },
               ].map((metric, index) => {
                 const IconComponent = metric.icon;
                 return (
                   <motion.div
                     key={index}
-                    className={`text-center p-4 rounded-xl backdrop-blur-sm transition-all duration-300 ${
+                    className={`group relative text-center p-6 rounded-2xl backdrop-blur-sm transition-all duration-500 border ${
                       isDarkMode
-                        ? "bg-white/5 border border-white/10 hover:bg-white/10"
-                        : "bg-white/70 border border-gray-200 hover:bg-white shadow-lg"
+                        ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        : "bg-white/80 border-gray-200/50 hover:bg-white hover:border-gray-300/70 shadow-sm hover:shadow-lg"
                     }`}
-                    initial={{ y: 20, opacity: 0 }}
+                    initial={{ y: 30, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.9 + index * 0.1 }}
-                    whileHover={{ y: -5, scale: 1.05 }}
+                    transition={{ 
+                      delay: 0.9 + index * 0.1,
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 15
+                    }}
+                    whileHover={{ 
+                      y: -8, 
+                      scale: 1.02,
+                      transition: { duration: 0.3, ease: "easeOut" }
+                    }}
                   >
-                    <IconComponent
-                      className={`w-6 h-6 mx-auto mb-2 ${metric.color}`}
-                    />
-                    <span
-                      className={`text-sm font-medium ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
+                    {/* Subtle background on hover */}
+                    <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                      isDarkMode 
+                        ? "bg-white/5" 
+                        : "bg-gray-50/50"
+                    }`} />
+                    
+                    {/* Enhanced icon container */}
+                    <div className={`relative z-10 w-14 h-14 mx-auto mb-5 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
+                      isDarkMode
+                        ? "bg-white/10 group-hover:bg-white/20"
+                        : "bg-gray-100 group-hover:bg-gray-200"
+                    }`}>
+                      <IconComponent
+                        className={`w-7 h-7 transition-all duration-300 ${metric.color}`}
+                      />
+                    </div>
+                    
+                    {/* Enhanced typography */}
+                    <h3 className={`text-base font-bold transition-colors duration-300 relative z-10 ${
+                      isDarkMode ? "text-gray-100 group-hover:text-white" : "text-gray-600 group-hover:text-gray-600"
+                    }`}>
                       {metric.label}
-                    </span>
+                    </h3>
                   </motion.div>
                 );
               })}
@@ -303,7 +414,7 @@ export default function Home() {
                 whileInView={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
               >
-                <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent mb-2">
+                <div className={`text-4xl md:text-5xl font-bold mb-2 `}>
                   {stat.number}
                 </div>
                 <div
@@ -329,18 +440,18 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-6"
+              className={`text-4xl md:text-6xl font-bold mb-6 ${
+                isDarkMode ? "text-white" : "text-gray-700"
+              }`}
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-                Core Features
-              </span>
+             What We Do
             </motion.h2>
             <motion.p
               className={`text-xl max-w-3xl mx-auto ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -357,46 +468,80 @@ export default function Home() {
               return (
                 <motion.div
                   key={index}
-                  className={`backdrop-blur-sm rounded-2xl p-8 transition-all duration-300 group relative overflow-hidden ${
+                  className={`group relative backdrop-blur-sm rounded-3xl p-8 transition-all duration-500 border overflow-hidden ${
                     isDarkMode
-                      ? "bg-white/5 border border-white/10 hover:bg-white/10"
-                      : "bg-white/70 border border-gray-200 hover:bg-white shadow-lg hover:shadow-xl"
+                      ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+                      : "bg-white/80 border-gray-200/50 hover:bg-white hover:border-gray-300/70 shadow-sm hover:shadow-xl"
                   }`}
-                  initial={{ y: 50, opacity: 0 }}
+                  initial={{ y: 60, opacity: 0 }}
                   whileInView={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
+                  transition={{ 
+                    duration: 0.8, 
+                    delay: index * 0.1,
+                    type: "spring",
+                    stiffness: 80,
+                    damping: 20
+                  }}
+                  whileHover={{ 
+                    y: -12, 
+                    scale: 1.02,
+                    transition: { duration: 0.4, ease: "easeOut" }
+                  }}
                 >
-                  {/* Decorative Background Pattern */}
-                  <div className="absolute top-0 right-0 w-20 h-20 opacity-5">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-emerald-500 rounded-full blur-xl"></div>
-                  </div>
+                  {/* Subtle background pattern */}
+                  <div className={`absolute top-0 right-0 w-32 h-32 opacity-5 group-hover:opacity-10 transition-opacity duration-500 ${
+                    isDarkMode 
+                      ? "bg-white/10" 
+                      : "bg-gray-200/30"
+                  } rounded-full blur-2xl`} />
 
+                  {/* Enhanced icon container */}
                   <motion.div
-                    className="w-16 h-16 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative z-10"
-                    whileHover={{ rotate: [0, -10, 10, 0] }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <h3
-                    className={`text-xl font-bold mb-4 transition-colors duration-300 relative z-10 ${
+                    className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 relative z-10 transition-all duration-300 group-hover:scale-110 ${
                       isDarkMode
-                        ? "text-white group-hover:text-blue-600"
-                        : "text-gray-900 group-hover:text-blue-600"
+                        ? "bg-white/10 group-hover:bg-white/20"
+                        : "bg-gray-100 group-hover:bg-gray-200"
                     }`}
+                    whileHover={{ 
+                      scale: 1.15,
+                      rotate: [0, -8, 8, 0],
+                      transition: { duration: 0.6, ease: "easeInOut" }
+                    }}
                   >
+                    <IconComponent className={`w-9 h-9 transition-colors duration-300 ${feature.color}`} />
+                  </motion.div>
+
+                  {/* Enhanced typography hierarchy */}
+                  <h3 className={`text-2xl font-bold mb-3 transition-all duration-300 relative z-10 ${
+                    isDarkMode
+                      ? "text-white group-hover:text-white"
+                      : "text-gray-700 group-hover:text-gray-700"
+                  }`}>
                     {feature.title}
                   </h3>
-                  <p
-                    className={`leading-relaxed transition-colors duration-300 relative z-10 ${
-                      isDarkMode
-                        ? "text-gray-400 group-hover:text-gray-300"
-                        : "text-gray-600 group-hover:text-gray-700"
-                    }`}
-                  >
+                  
+                  <p className={`text-sm font-medium mb-3 transition-colors duration-300 relative z-10 ${
+                    isDarkMode
+                      ? "text-gray-300 group-hover:text-gray-200"
+                      : "text-gray-700 group-hover:text-gray-800"
+                  }`}>
+                    {feature.shortDesc}
+                  </p>
+                  
+                  <p className={`text-base leading-relaxed transition-all duration-300 relative z-10 ${
+                    isDarkMode
+                      ? "text-gray-400 group-hover:text-gray-300"
+                      : "text-gray-700 group-hover:text-gray-700"
+                  }`}>
                     {feature.description}
                   </p>
+
+                  {/* Subtle hover indicator */}
+                  <div className={`absolute bottom-0 left-0 w-full h-1 rounded-b-3xl transition-all duration-500 ${
+                    isDarkMode
+                      ? "bg-white/20 opacity-0 group-hover:opacity-100"
+                      : "bg-gray-300/50 opacity-0 group-hover:opacity-100"
+                  }`} />
                 </motion.div>
               );
             })}
@@ -415,13 +560,13 @@ export default function Home() {
           <div
             className={`backdrop-blur-sm rounded-3xl p-12 ${
               isDarkMode
-                ? "bg-gradient-to-r from-blue-600/20 to-emerald-500/20 border border-white/10"
-                : "bg-gradient-to-r from-blue-600/10 to-emerald-500/10 border border-gray-200 shadow-xl bg-white/50"
+                ? "bg-white/5 border border-white/10"
+                : "bg-white/80 border border-gray-200 shadow-xl"
             }`}
           >
             <motion.h2
               className={`text-4xl md:text-5xl font-bold mb-6 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                isDarkMode ? "text-white" : "text-gray-700"
               }`}
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -431,7 +576,7 @@ export default function Home() {
             </motion.h2>
             <motion.p
               className={`text-xl mb-8 ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -448,7 +593,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <motion.button
-                className="bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2"
+                className="bg-amber-500 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-amber-600 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2 text-white"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -472,7 +617,7 @@ export default function Home() {
 
             <div
               className={`flex items-center justify-center space-x-8 mt-8 text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
+                isDarkMode ? "text-gray-400" : "text-gray-700"
               }`}
             >
               <div className="flex items-center space-x-2">
@@ -493,7 +638,7 @@ export default function Home() {
         className={`py-16 px-6 relative z-10 transition-all duration-500 ${
           isDarkMode
             ? "bg-gray-900 text-white"
-            : "bg-white text-gray-900 border-t border-gray-200"
+            : "bg-white text-gray-700 border-t border-gray-200"
         }`}
       >
         <div className="max-w-7xl mx-auto">
@@ -514,7 +659,7 @@ export default function Home() {
               </div>
               <p
                 className={`leading-relaxed mb-6 max-w-md ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Empowering researchers worldwide with expert-curated tools and
@@ -542,18 +687,18 @@ export default function Home() {
             <div>
               <h4
                 className={`font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  isDarkMode ? "text-white" : "text-gray-700"
                 }`}
               >
                 Platform
               </h4>
               <ul className="space-y-3">
-                {["Features", "Pricing", "API", "Documentation", "Status"].map(
+                {["Features", "Pricing"].map(
                   (item) => (
                     <li key={item}>
                       <a
                         href="#"
-                        className="text-gray-400 hover:text-emerald-500 transition-colors duration-300 flex items-center group"
+                        className="text-gray-600 hover:text-emerald-500 transition-colors duration-300 flex items-center group"
                       >
                         <span className="group-hover:translate-x-1 transition-transform duration-300">
                           {item}
@@ -568,7 +713,7 @@ export default function Home() {
             <div>
               <h4
                 className={`font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  isDarkMode ? "text-white" : "text-gray-700"
                 }`}
               >
                 Support
@@ -578,13 +723,12 @@ export default function Home() {
                   "Help Center",
                   "Community",
                   "Contact",
-                  "Privacy",
-                  "Terms",
+                 
                 ].map((item) => (
                   <li key={item}>
                     <a
                       href="#"
-                      className="text-gray-400 hover:text-emerald-500 transition-colors duration-300 flex items-center group"
+                      className="text-gray-600 hover:text-emerald-500 transition-colors duration-300 flex items-center group"
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
                         {item}
@@ -606,7 +750,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p
                 className={`text-sm mb-4 md:mb-0 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  isDarkMode ? "text-gray-400" : "text-gray-700"
                 }`}
               >
                 © 2025 Dissertation Scaffold. All rights reserved.
@@ -614,17 +758,12 @@ export default function Home() {
               <div className="flex items-center space-x-6">
                 <p
                   className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                    isDarkMode ? "text-gray-400" : "text-gray-700"
                   }`}
                 >
                   Made with ❤️ for researchers worldwide
                 </p>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <span className="text-emerald-500 text-sm font-medium">
-                    All systems operational
-                  </span>
-                </div>
+                
               </div>
             </div>
           </div>
