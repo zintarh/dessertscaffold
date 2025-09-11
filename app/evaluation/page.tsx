@@ -29,8 +29,6 @@ import EvaluationSkeleton from "../components/EvaluationSkeleton";
 import { EvaluationResponse } from "@/lib/types";
 
 
-
-
 export const dynamic = "force-dynamic";
 
 export default function EvaluationPage() {
@@ -466,10 +464,9 @@ export default function EvaluationPage() {
           )}
         </motion.div>
 
-         {/* Results Section - Only show when we have evaluation data */}
          {showResults && displayData && (
           <>
-            {/* Overall Score Dashboard */}
+
             <motion.div
               className="mb-8 p-8 rounded-2xl shadow-lg bg-gradient-to-r from-blue-50/90 to-emerald-50/90 border border-blue-200 backdrop-blur-sm"
               initial={{ opacity: 0, y: 20 }}
@@ -675,7 +672,6 @@ export default function EvaluationPage() {
               </div>
             </div>
 
-            {/* Recommendations Section - Only show if there are recommendations */}
             {displayData.recommendations && displayData.recommendations.length > 0 && (
               <motion.div
                 className="relative mb-12 p-8 rounded-2xl bg-gradient-to-br from-white/90 to-gray-50/90 border border-gray-200/50 backdrop-blur-xl shadow-lg overflow-hidden"
@@ -683,7 +679,6 @@ export default function EvaluationPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-              {/* Background decoration */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-400/20 rounded-full blur-3xl"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-400/20 to-blue-400/20 rounded-full blur-2xl"></div>
 
