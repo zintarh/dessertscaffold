@@ -2,17 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { EvaluationRequestSchema } from '@/lib/types/evaluation';
 import { ComprehensiveEvaluator } from '@/lib/services/comprehensive-evaluator';
 
-/**
- * POST /api/evaluate-research
- * 
- * Comprehensive research topic evaluation endpoint that:
- * 1. Accepts research topic and additional keywords
- * 2. Orchestrates parallel API calls to literature and funding sources
- * 3. Processes and cleans the data (removes HTML, deduplicates, standardizes)
- * 4. Aggregates results for analysis
- * 5. Uses LLM to evaluate across six academic metrics
- * 6. Returns structured JSON evaluation report
- */
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -23,15 +12,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedRequest = EvaluationRequestSchema.parse(body);
 
-    // Log request
-    console.log('Research evaluation request:', {
-      requestId,
-      topic: validatedRequest.research_topic,
-      keywords: validatedRequest.additional_keywords,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Validate required environment variables
     const requiredEnvVars = ['OPENAI_API_KEY'];
     const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
     
@@ -46,10 +26,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize comprehensive evaluator
     const evaluator = new ComprehensiveEvaluator(process.env.OPENAI_API_KEY!);
 
-    // Execute comprehensive evaluation
+    console.log('evaluator request:', evaluator);
+
     const evaluation = await evaluator.evaluateResearchTopic(validatedRequest);
 
     // Log successful response

@@ -1,489 +1,653 @@
-import { EvaluationRequest, Evaluation, AggregatedData, Work, Funding } from '../types/evaluation';
-import { OpenAIEvaluator } from './openai-evaluator';
+import { EvaluationRequest, Evaluation, AggregatedData, Work, Funding } from "../types/evaluation";
+import { OpenAIEvaluator } from "./openai-evaluator";
 
 /**
  * Comprehensive Research Topic Evaluator
- * 
- * Implements the complete evaluation workflow:
- * 1. User Input (research topic + keywords)
- * 2. API Orchestration (literature + funding sources)
- * 3. Data Processing (cleaning, deduplication, aggregation)
- * 4. LLM Evaluation (six academic metrics)
- * 5. Structured Report Output
+ * Queries multiple APIs and evaluates 6 academic metrics
  */
-
-export interface EvaluationMetrics {
-  novelty: { score: number; justification: string };
-  trends: { score: number; justification: string };
-  methodological_complexity: { score: number; justification: string };
-  research_gaps: { score: number; justification: string };
-  grant_potential: { score: number; justification: string };
-  literature_availability: { score: number; justification: string };
-  overall_summary: string;
-}
-
-export interface APISource {
-  name: string;
-  baseUrl: string;
-  apiKey?: string;
-}
-
-export interface LiteratureSource extends APISource {
-  type: 'literature';
-}
-
-export interface FundingSource extends APISource {
-  type: 'funding';
-}
-
 export class ComprehensiveEvaluator {
   private openaiEvaluator: OpenAIEvaluator;
-  
-  // Literature sources
-  private literatureSources: LiteratureSource[] = [
-    { name: 'OpenAlex', type: 'literature', baseUrl: 'https://api.openalex.org' },
-    { name: 'Semantic Scholar', type: 'literature', baseUrl: 'https://api.semanticscholar.org' },
-    { name: 'CORE', type: 'literature', baseUrl: 'https://api.core.ac.uk' },
-    { name: 'CrossRef', type: 'literature', baseUrl: 'https://api.crossref.org' },
-  ];
-  
-  // Funding sources
-  private fundingSources: FundingSource[] = [
-    { name: 'NIH Reporter', type: 'funding', baseUrl: 'https://reporter.nih.gov/api' },
-    { name: 'Cordis', type: 'funding', baseUrl: 'https://cordis.europa.eu/api' },
-    { name: 'Grants.gov', type: 'funding', baseUrl: 'https://www.grants.gov/api' },
-  ];
 
   constructor(openaiApiKey: string) {
     this.openaiEvaluator = new OpenAIEvaluator(openaiApiKey);
   }
 
   /**
-   * Main evaluation method
+   * Main evaluation method - queries multiple APIs and evaluates 6 metrics
    */
   async evaluateResearchTopic(request: EvaluationRequest): Promise<Evaluation> {
-    console.log('Starting comprehensive evaluation for:', request.research_topic);
+    console.log(`🔍 Evaluating: ${request.research_topic}`);
     
     try {
-      // Step 1: API Orchestration - Query literature and funding sources
+      // Query all APIs in parallel
       const [literatureData, fundingData] = await Promise.all([
-        this.queryLiteratureSources(request.research_topic, request.additional_keywords),
-        this.queryFundingSources(request.research_topic, request.additional_keywords)
+        this.queryLiteratureAPIs(request.research_topic, request.additional_keywords),
+        this.queryFundingAPIs(request.research_topic, request.additional_keywords),
       ]);
 
-      console.log(`Retrieved ${literatureData.length} literature items and ${fundingData.length} funding opportunities`);
+      console.log(`📚 Retrieved: ${literatureData.length} literature papers, ${fundingData.length} funding opportunities`);
 
-      // Step 2: Data Processing
-      const processedData = this.processAndCleanData(literatureData, fundingData);
+      // Aggregate and process data
+      const aggregatedData = this.aggregateData(literatureData, fundingData);
       
-      // Step 3: Data Aggregation
-      const aggregatedData = this.aggregateData(processedData);
-      
-      // Step 4: LLM Evaluation
-      const evaluation = await this.performLLMEvaluation(request.research_topic, aggregatedData);
-      
-      console.log('Comprehensive evaluation completed successfully');
+      // Evaluate 6 metrics using OpenAI
+      const evaluation = await this.openaiEvaluator.evaluateTopic(
+        request.research_topic,
+        aggregatedData
+      );
+
+      this.logEvaluationResults(request.research_topic, aggregatedData, evaluation);
       return evaluation;
       
     } catch (error: any) {
-      console.error('Evaluation failed:', error);
-      throw new Error(`Research topic evaluation failed: ${error.message}`);
+      console.error("❌ Evaluation failed:", error);
+      throw new Error(`Research evaluation failed: ${error.message}`);
     }
   }
 
   /**
-   * Query literature sources in parallel
+   * Query all literature APIs in parallel
    */
-  private async queryLiteratureSources(topic: string, keywords?: string[]): Promise<any[]> {
-    const query = this.buildLiteratureQuery(topic, keywords);
-    const promises = this.literatureSources.map(source => 
-      this.queryLiteratureSource(source, query)
-    );
+  private async queryLiteratureAPIs(topic: string, keywords?: string[]): Promise<Work[]> {
+    const [openAlexData, semanticScholarData, coreData, crossrefData] = await Promise.allSettled([
+      this.queryOpenAlex(topic, keywords),
+      this.querySemanticScholar(topic, keywords),
+      this.queryCORE(topic, keywords),
+      this.queryCrossRef(topic, keywords),
+    ]);
+
+    const allLiterature = [
+      ...(openAlexData.status === 'fulfilled' ? openAlexData.value : []),
+      ...(semanticScholarData.status === 'fulfilled' ? semanticScholarData.value : []),
+      ...(coreData.status === 'fulfilled' ? coreData.value : []),
+      ...(crossrefData.status === 'fulfilled' ? crossrefData.value : []),
+    ];
+
+    console.log(`📊 Literature APIs: OpenAlex(${openAlexData.status === 'fulfilled' ? openAlexData.value.length : 0}), Semantic Scholar(${semanticScholarData.status === 'fulfilled' ? semanticScholarData.value.length : 0}), CORE(${coreData.status === 'fulfilled' ? coreData.value.length : 0}), CrossRef(${crossrefData.status === 'fulfilled' ? crossrefData.value.length : 0})`);
     
-    const results = await Promise.allSettled(promises);
-    const successfulResults = results
-      .filter((result): result is PromiseFulfilledResult<any[]> => result.status === 'fulfilled')
-      .map(result => result.value)
-      .flat();
-    
-    return successfulResults;
+    return allLiterature;
   }
 
   /**
-   * Query funding sources in parallel
+   * Query all funding APIs in parallel
    */
-  private async queryFundingSources(topic: string, keywords?: string[]): Promise<any[]> {
-    const query = this.buildFundingQuery(topic, keywords);
-    const promises = this.fundingSources.map(source => 
-      this.queryFundingSource(source, query)
-    );
+  private async queryFundingAPIs(topic: string, keywords?: string[]): Promise<Funding[]> {
+    const [nihData, cordisData, grantsGovData] = await Promise.allSettled([
+      this.queryNIH(topic, keywords),
+      this.queryCordis(topic, keywords),
+      this.queryGrantsGov(topic, keywords),
+    ]);
+
+    const allFunding = [
+      ...(nihData.status === 'fulfilled' ? nihData.value : []),
+      ...(cordisData.status === 'fulfilled' ? cordisData.value : []),
+      ...(grantsGovData.status === 'fulfilled' ? grantsGovData.value : []),
+    ];
+
+    console.log(`💰 Funding APIs: NIH(${nihData.status === 'fulfilled' ? nihData.value.length : 0}), Cordis(${cordisData.status === 'fulfilled' ? cordisData.value.length : 0}), Grants.gov(${grantsGovData.status === 'fulfilled' ? grantsGovData.value.length : 0})`);
     
-    const results = await Promise.allSettled(promises);
-    const successfulResults = results
-      .filter((result): result is PromiseFulfilledResult<any[]> => result.status === 'fulfilled')
-      .map(result => result.value)
-      .flat();
-    
-    return successfulResults;
+    return allFunding;
   }
 
   /**
-   * Build literature search query
+   * Query OpenAlex API for academic papers
    */
-  private buildLiteratureQuery(topic: string, keywords?: string[]): string {
-    const terms = [topic, ...(keywords || [])].filter(Boolean);
-    return terms.join(' AND ');
-  }
-
-  /**
-   * Build funding search query
-   */
-  private buildFundingQuery(topic: string, keywords?: string[]): string {
-    const terms = [topic, ...(keywords || [])].filter(Boolean);
-    return terms.join(' ');
-  }
-
-  /**
-   * Query individual literature source
-   */
-  private async queryLiteratureSource(source: LiteratureSource, query: string): Promise<any[]> {
+  private async queryOpenAlex(topic: string, keywords?: string[]): Promise<Work[]> {
     try {
-      // Mock implementation - in real app, this would make actual API calls
-      console.log(`Querying ${source.name} for: ${query}`);
-      
-      // Simulate API response with realistic data
-      return this.generateMockLiteratureData(query, source.name);
-      
-    } catch (error) {
-      console.warn(`Failed to query ${source.name}:`, error);
-      return [];
-    }
-  }
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=50&sort=cited_by_count:desc`;
 
-  /**
-   * Query individual funding source
-   */
-  private async queryFundingSource(source: FundingSource, query: string): Promise<any[]> {
-    try {
-      // Mock implementation - in real app, this would make actual API calls
-      console.log(`Querying ${source.name} for: ${query}`);
-      
-      // Simulate API response with realistic data
-      return this.generateMockFundingData(query, source.name);
-      
-    } catch (error) {
-      console.warn(`Failed to query ${source.name}:`, error);
-      return [];
-    }
-  }
-
-  /**
-   * Process and clean raw data
-   */
-  private processAndCleanData(literatureData: any[], fundingData: any[]): { works: Work[], funding: Funding[] } {
-    // Clean and standardize literature data
-    const works = literatureData
-      .map(item => this.standardizeWork(item))
-      .filter(Boolean) as Work[];
-
-    // Clean and standardize funding data
-    const funding = fundingData
-      .map(item => this.standardizeFunding(item))
-      .filter(Boolean) as Funding[];
-
-    // Remove duplicates by DOI/title similarity
-    const deduplicatedWorks = this.deduplicateWorks(works);
-    const deduplicatedFunding = this.deduplicateFunding(funding);
-
-    return {
-      works: deduplicatedWorks,
-      funding: deduplicatedFunding
-    };
-  }
-
-  /**
-   * Standardize work data from various sources
-   */
-  private standardizeWork(item: any): Work | null {
-    try {
-      return {
-        title: this.cleanText(item.title || ''),
-        abstract: this.cleanText(item.abstract || ''),
-        year: this.extractYear(item.year || item.publication_year || item.yearPublished),
-        doi: item.doi || item.DOI || item.ids?.doi,
-        concepts: this.extractConcepts(item.concepts || item.fieldsOfStudy || item.subject),
-        citations: item.citations || item.cited_by_count || item.citationCount || 0,
-        methods: this.extractMethods(item.methods || item.methodology),
-        fullTextUrl: item.fullTextUrl || item.downloadUrl || item.url,
-      };
-    } catch (error) {
-      console.warn('Failed to standardize work:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Standardize funding data from various sources
-   */
-  private standardizeFunding(item: any): Funding | null {
-    try {
-      return {
-        source: item.source || item.agency || 'Unknown',
-        title: this.cleanText(item.title || item.project_title || item.opportunityTitle),
-        abstractOrDesc: this.cleanText(item.abstractOrDesc || item.abstract_text || item.description),
-        amount: this.extractAmount(item.amount || item.award_amount),
-        fiscalYear: item.fiscalYear || item.fiscal_year,
-        deadline: item.deadline || item.closeDate,
-      };
-    } catch (error) {
-      console.warn('Failed to standardize funding:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Clean text by removing HTML tags and normalizing whitespace
-   */
-  private cleanText(text: string): string {
-    if (!text) return '';
-    return text
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/\s+/g, ' ') // Normalize whitespace
-      .trim();
-  }
-
-  /**
-   * Extract publication year from various formats
-   */
-  private extractYear(yearData: any): number {
-    if (typeof yearData === 'number') return yearData;
-    if (typeof yearData === 'string') {
-      const year = parseInt(yearData);
-      if (!isNaN(year) && year >= 1900 && year <= 2030) return year;
-    }
-    if (Array.isArray(yearData) && yearData.length > 0) {
-      const year = parseInt(yearData[0].toString());
-      if (!isNaN(year) && year >= 1900 && year <= 2030) return year;
-    }
-    return new Date().getFullYear(); // Default to current year
-  }
-
-  /**
-   * Extract concepts from various formats
-   */
-  private extractConcepts(concepts: any): string[] {
-    if (!concepts) return [];
-    if (Array.isArray(concepts)) {
-      return concepts
-        .map(concept => typeof concept === 'string' ? concept : concept.display_name || concept.name)
-        .filter(Boolean);
-    }
-    return [];
-  }
-
-  /**
-   * Extract methods from various formats
-   */
-  private extractMethods(methods: any): string[] | undefined {
-    if (!methods) return undefined;
-    if (Array.isArray(methods)) {
-      return methods.filter(method => typeof method === 'string');
-    }
-    return undefined;
-  }
-
-  /**
-   * Extract amount from various formats
-   */
-  private extractAmount(amount: any): number | undefined {
-    if (typeof amount === 'number') return amount;
-    if (typeof amount === 'string') {
-      const parsed = parseFloat(amount.replace(/[^\d.-]/g, ''));
-      return isNaN(parsed) ? undefined : parsed;
-    }
-    return undefined;
-  }
-
-  /**
-   * Deduplicate works by DOI or title similarity
-   */
-  private deduplicateWorks(works: Work[]): Work[] {
-    const seen = new Set<string>();
-    const unique: Work[] = [];
-    
-    for (const work of works) {
-      const key = work.doi || work.title.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        unique.push(work);
-      }
-    }
-    
-    return unique;
-  }
-
-  /**
-   * Deduplicate funding by title similarity
-   */
-  private deduplicateFunding(funding: Funding[]): Funding[] {
-    const seen = new Set<string>();
-    const unique: Funding[] = [];
-    
-    for (const item of funding) {
-      const key = item.title.toLowerCase();
-      if (!seen.has(key)) {
-        seen.add(key);
-        unique.push(item);
-      }
-    }
-    
-    return unique;
-  }
-
-  /**
-   * Aggregate processed data for analysis
-   */
-  private aggregateData(processedData: { works: Work[], funding: Funding[] }): AggregatedData {
-    const { works, funding } = processedData;
-    
-    // Calculate trends (publications per year)
-    const trends: Record<string, number> = {};
-    works.forEach(work => {
-      const year = work.year.toString();
-      trends[year] = (trends[year] || 0) + 1;
-    });
-
-    // Calculate methods distribution
-    const methods: Record<string, number> = {};
-    works.forEach(work => {
-      if (work.methods) {
-        work.methods.forEach(method => {
-          methods[method] = (methods[method] || 0) + 1;
-        });
-      }
-    });
-
-    // Calculate open access ratio
-    const openAccessCount = works.filter(work => work.fullTextUrl).length;
-    const openAccessRatio = works.length > 0 ? openAccessCount / works.length : 0;
-
-    // Calculate average citations
-    const totalCitations = works.reduce((sum, work) => sum + work.citations, 0);
-    const avgCitations = works.length > 0 ? totalCitations / works.length : 0;
-
-    // Extract top concepts
-    const conceptCounts: Record<string, number> = {};
-    works.forEach(work => {
-      work.concepts.forEach(concept => {
-        conceptCounts[concept] = (conceptCounts[concept] || 0) + 1;
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
       });
-    });
+
+      if (!response.ok) {
+        throw new Error(`OpenAlex API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processOpenAlexResults(data.results || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ OpenAlex query timed out");
+      } else {
+        console.warn("⚠️ OpenAlex query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query Semantic Scholar API for academic papers
+   */
+  private async querySemanticScholar(topic: string, keywords?: string[]): Promise<Work[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=50&sort=relevance`;
+
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Semantic Scholar API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processSemanticScholarResults(data.data || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ Semantic Scholar query timed out");
+      } else {
+        console.warn("⚠️ Semantic Scholar query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query CORE API for academic papers
+   */
+  private async queryCORE(topic: string, keywords?: string[]): Promise<Work[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://api.core.ac.uk/v3/search/works?q=${encodeURIComponent(query)}&limit=50&sort=relevance`;
+
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`CORE API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processCOREResults(data.results || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ CORE query timed out");
+      } else {
+        console.warn("⚠️ CORE query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query CrossRef API for academic papers (for methodological complexity)
+   */
+  private async queryCrossRef(topic: string, keywords?: string[]): Promise<Work[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://api.crossref.org/works?query=${encodeURIComponent(query)}&rows=50&sort=relevance`;
+
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`CrossRef API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processCrossRefResults(data.message?.items || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ CrossRef query timed out");
+      } else {
+        console.warn("⚠️ CrossRef query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query NIH Reporter API for funding opportunities
+   */
+  private async queryNIH(topic: string, keywords?: string[]): Promise<Funding[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://api.reporter.nih.gov/v2/projects/search`;
+
+      const response = await this.fetchWithTimeout(url, {
+        method: 'POST',
+        headers: { 
+          "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          criteria: {
+            advanced_text_search: {
+              operator: "and",
+              search_field: "all",
+              search_text: query
+            }
+          },
+          offset: 0,
+          limit: 50
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`NIH API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processNIHResults(data.results || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ NIH query timed out");
+      } else {
+        console.warn("⚠️ NIH query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query Cordis API for EU funding opportunities
+   */
+  private async queryCordis(topic: string, keywords?: string[]): Promise<Funding[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://data.europa.eu/api/hub/search/cordis?q=${encodeURIComponent(query)}&limit=50`;
+
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Cordis API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processCordisResults(data.results || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ Cordis query timed out");
+      } else {
+        console.warn("⚠️ Cordis query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Query Grants.gov API for funding opportunities
+   */
+  private async queryGrantsGov(topic: string, keywords?: string[]): Promise<Funding[]> {
+    try {
+      const query = this.buildSearchQuery(topic, keywords);
+      const url = `https://www.grants.gov/api/search?q=${encodeURIComponent(query)}&limit=50`;
+
+      const response = await this.fetchWithTimeout(url, {
+        headers: { "User-Agent": "DissertScaffold/1.0 (https://dissertscaffold.com)" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Grants.gov API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return this.processGrantsGovResults(data.results || []);
+    } catch (error: any) {
+      if (error.message?.includes('timed out')) {
+        console.warn("⚠️ Grants.gov query timed out");
+      } else {
+        console.warn("⚠️ Grants.gov query failed:", error);
+      }
+      return [];
+    }
+  }
+
+  /**
+   * Process OpenAlex API results
+   */
+  private processOpenAlexResults(results: any[]): Work[] {
+    return results
+      .map((item) => ({
+        title: item.title || "",
+        abstract: item.abstract || "",
+        year: this.extractYear(item.publication_year),
+        doi: item.ids?.doi,
+        concepts: item.concepts?.map((c: any) => c.display_name) || [],
+        citations: item.cited_by_count || 0,
+        methods: this.extractMethods(item.abstract),
+        fullTextUrl: item.open_access?.oa_url,
+      }))
+      .filter((work) => work.title && work.abstract);
+  }
+
+  /**
+   * Process Semantic Scholar API results
+   */
+  private processSemanticScholarResults(results: any[]): Work[] {
+    return results
+      .map((item) => ({
+        title: item.title || "",
+        abstract: item.abstract || "",
+        year: this.extractYear(item.year),
+        doi: item.externalIds?.DOI,
+        concepts: item.fieldsOfStudy || [],
+        citations: item.citationCount || 0,
+        methods: this.extractMethods(item.abstract),
+        fullTextUrl: item.openAccessPdf?.url,
+      }))
+      .filter((work) => work.title && work.abstract);
+  }
+
+  /**
+   * Process CORE API results
+   */
+  private processCOREResults(results: any[]): Work[] {
+    return results
+      .map((item) => ({
+        title: item.title || "",
+        abstract: item.abstract || "",
+        year: this.extractYear(item.publishedDate),
+        doi: item.doi,
+        concepts: item.subjects || [],
+        citations: item.citationCount || 0,
+        methods: this.extractMethods(item.abstract),
+        fullTextUrl: item.downloadUrl,
+      }))
+      .filter((work) => work.title && work.abstract);
+  }
+
+  /**
+   * Process CrossRef API results (for methodological complexity analysis)
+   */
+  private processCrossRefResults(results: any[]): Work[] {
+    return results
+      .map((item) => ({
+        title: item.title?.[0] || "",
+        abstract: item.abstract || "",
+        year: this.extractYear(item.published),
+        doi: item.DOI,
+        concepts: item.subject || [],
+        citations: item.citationCount || 0,
+        methods: this.extractMethods(item.abstract),
+        fullTextUrl: item.link?.[0]?.URL,
+      }))
+      .filter((work) => work.title && work.abstract);
+  }
+
+  /**
+   * Process NIH API results
+   */
+  private processNIHResults(results: any[]): Funding[] {
+    return results
+      .map((item) => ({
+        source: "NIH",
+        title: item.projectTitle || "",
+        abstractOrDesc: item.abstractText || "",
+        amount: item.awardAmount || 0,
+        fiscalYear: item.fiscalYear,
+        deadline: item.projectStartDate,
+      }))
+      .filter((funding) => funding.title);
+  }
+
+  /**
+   * Process Cordis API results
+   */
+  private processCordisResults(results: any[]): Funding[] {
+    return results
+      .map((item) => ({
+        source: "Cordis",
+        title: item.title || "",
+        abstractOrDesc: item.description || "",
+        amount: item.totalCost || 0,
+        fiscalYear: item.startDate ? new Date(item.startDate).getFullYear() : undefined,
+        deadline: item.deadline,
+      }))
+      .filter((funding) => funding.title);
+  }
+
+  /**
+   * Process Grants.gov API results
+   */
+  private processGrantsGovResults(results: any[]): Funding[] {
+    return results
+      .map((item) => ({
+        source: "Grants.gov",
+        title: item.opportunityTitle || "",
+        abstractOrDesc: item.description || "",
+        amount: item.estimatedTotalProgramFunding || 0,
+        fiscalYear: item.fiscalYear,
+        deadline: item.closeDate,
+      }))
+      .filter((funding) => funding.title);
+  }
+
+  /**
+   * Extract research methods from abstract text
+   */
+  private extractMethods(abstract: string): string[] {
+    if (!abstract) return [];
     
-    const topConcepts = Object.entries(conceptCounts)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 10)
-      .map(([name, count]) => ({ name, count }));
+    const methodKeywords = [
+      'machine learning', 'deep learning', 'neural networks', 'statistical analysis',
+      'qualitative research', 'quantitative research', 'case study', 'survey',
+      'experiment', 'simulation', 'modeling', 'data mining', 'text mining',
+      'meta-analysis', 'systematic review', 'randomized controlled trial',
+      'longitudinal study', 'cross-sectional study', 'ethnography', 'interview',
+      'focus group', 'content analysis', 'discourse analysis', 'regression analysis',
+      'clustering', 'classification', 'natural language processing', 'computer vision'
+    ];
+
+    const foundMethods = methodKeywords.filter(keyword => 
+      abstract.toLowerCase().includes(keyword.toLowerCase())
+    );
+
+    return foundMethods;
+  }
+
+  /**
+   * Extract year from various date formats
+   */
+  private extractYear(dateValue: any): number {
+    if (typeof dateValue === "number") return dateValue;
+    if (typeof dateValue === "string") {
+      const year = parseInt(dateValue.split("-")[0]);
+      if (!isNaN(year) && year >= 1900 && year <= 2030) return year;
+    }
+    return new Date().getFullYear();
+  }
+
+  /**
+   * Build search query from topic and keywords
+   */
+  private buildSearchQuery(topic: string, keywords?: string[]): string {
+    if (!topic || topic.trim().length === 0) {
+      throw new Error("Research topic cannot be empty");
+    }
+    
+    const validKeywords = keywords?.filter(k => k && k.trim().length > 0) || [];
+    return [topic.trim(), ...validKeywords].join(" ");
+  }
+
+  /**
+   * Helper method for API calls with timeout
+   */
+  private async fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs: number = 10000): Promise<Response> {
+    const controller = new AbortController();
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    try {
+      timeoutId = setTimeout(() => {
+        controller.abort();
+      }, timeoutMs);
+
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      
+      return response;
+    } catch (error: any) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      
+      if (error.name === 'AbortError') {
+        throw new Error(`Request timed out after ${timeoutMs}ms`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Aggregate processed data for LLM evaluation
+   */
+  private aggregateData(literatureData: Work[], fundingData: Funding[]): AggregatedData {
+    // Remove duplicates by DOI or title (O(n) complexity)
+    const seenDois = new Set<string>();
+    const seenTitles = new Set<string>();
+    const uniqueWorks = literatureData.filter((work) => {
+      const hasDoi = work.doi && !seenDois.has(work.doi);
+      const hasUniqueTitle = !seenTitles.has(work.title.toLowerCase());
+      
+      if (hasDoi) {
+        seenDois.add(work.doi!);
+        return true;
+      }
+      if (hasUniqueTitle) {
+        seenTitles.add(work.title.toLowerCase());
+        return true;
+      }
+      return false;
+    });
+
+    // Calculate metrics
+    const trends = this.calculateTrends(uniqueWorks);
+    const methods = this.calculateMethods(uniqueWorks);
+    const openAccessRatio = this.calculateOpenAccessRatio(uniqueWorks);
+    const avgCitations = this.calculateAverageCitations(uniqueWorks);
+    const topConcepts = this.calculateTopConcepts(uniqueWorks);
+    const totalFunding = this.calculateTotalFunding(fundingData);
+    const activeCalls = this.calculateActiveCalls(fundingData);
 
     return {
-      works,
-      funding,
+      works: uniqueWorks,
+      funding: fundingData,
       trends,
       methods,
       openAccessRatio,
-      totalWorks: works.length,
-      totalFunding: funding.length,
-      activeCalls: funding.filter(f => f.deadline && new Date(f.deadline) > new Date()).length,
+      totalWorks: uniqueWorks.length,
+      totalFunding,
+      activeCalls,
       avgCitations,
       topConcepts,
     };
   }
 
   /**
-   * Perform LLM evaluation using the aggregated data
+   * Calculate publication trends by year
    */
-  private async performLLMEvaluation(topic: string, aggregatedData: AggregatedData): Promise<Evaluation> {
-    try {
-      return await this.openaiEvaluator.evaluateTopic(topic, aggregatedData);
-    } catch (error) {
-      console.error('LLM evaluation failed:', error);
-      // Return a default evaluation if LLM fails
-      return this.generateDefaultEvaluation(topic, aggregatedData);
-    }
+  private calculateTrends(works: Work[]): Record<string, number> {
+    const trends: Record<string, number> = {};
+    works.forEach((work) => {
+      const year = work.year.toString();
+      trends[year] = (trends[year] || 0) + 1;
+    });
+    return trends;
   }
 
   /**
-   * Generate default evaluation when LLM fails
+   * Calculate research methods distribution
    */
-  private generateDefaultEvaluation(topic: string, data: AggregatedData): Evaluation {
-    return {
-      novelty: {
-        score: Math.min(10, Math.max(1, Math.floor(data.totalWorks / 10))),
-        justification: `Based on ${data.totalWorks} existing publications, this topic shows ${data.totalWorks > 50 ? 'moderate' : 'high'} novelty potential.`
-      },
-      trends: {
-        score: Math.min(10, Math.max(1, Math.floor(Object.keys(data.trends).length / 2))),
-        justification: `Publication trends span ${Object.keys(data.trends).length} years, indicating ${Object.keys(data.trends).length > 5 ? 'sustained' : 'emerging'} interest.`
-      },
-      methodological_complexity: {
-        score: Math.min(10, Math.max(1, Math.floor(Object.keys(data.methods).length / 2))),
-        justification: `Diverse methodologies (${Object.keys(data.methods).length} identified) suggest ${Object.keys(data.methods).length > 3 ? 'complex' : 'moderate'} research requirements.`
-      },
-      research_gaps: {
-        score: Math.min(10, Math.max(1, Math.floor(data.totalWorks / 20))),
-        justification: `With ${data.totalWorks} publications, there are likely unexplored areas and methodological gaps to investigate.`
-      },
-      grant_potential: {
-        score: Math.min(10, Math.max(1, Math.floor(data.totalFunding / 5))),
-        justification: `Found ${data.totalFunding} funding opportunities, indicating ${data.totalFunding > 10 ? 'strong' : 'moderate'} grant potential.`
-      },
-      literature_availability: {
-        score: Math.min(10, Math.max(1, Math.floor(data.openAccessRatio * 10))),
-        justification: `${Math.round(data.openAccessRatio * 100)}% of publications are open access, providing ${data.openAccessRatio > 0.5 ? 'good' : 'limited'} literature availability.`
-      },
-      overall_summary: `The research topic "${topic}" shows promise with ${data.totalWorks} publications and ${data.totalFunding} funding opportunities. The field demonstrates ${data.totalWorks > 50 ? 'maturity' : 'emerging potential'} with diverse methodologies and ${Math.round(data.openAccessRatio * 100)}% open access literature. This suggests a viable research area suitable for dissertation-level investigation.`
-    };
-  }
-
-  /**
-   * Generate mock literature data for demonstration
-   */
-  private generateMockLiteratureData(query: string, source: string): any[] {
-    const mockData = [];
-    const baseYear = new Date().getFullYear();
-    
-    for (let i = 0; i < Math.floor(Math.random() * 20) + 10; i++) {
-      mockData.push({
-        title: `Research on ${query} - Study ${i + 1}`,
-        abstract: `This study investigates ${query} using advanced methodologies and provides insights into current research trends.`,
-        year: baseYear - Math.floor(Math.random() * 10),
-        doi: `10.1000/mock.${source.toLowerCase()}.${i}`,
-        concepts: [`${query}`, 'Research Methodology', 'Data Analysis'],
-        citations: Math.floor(Math.random() * 100),
-        methods: ['Quantitative Analysis', 'Literature Review'],
-        fullTextUrl: Math.random() > 0.3 ? `https://example.com/paper${i}` : undefined,
+  private calculateMethods(works: Work[]): Record<string, number> {
+    const methodCounts: Record<string, number> = {};
+    works.forEach((work) => {
+      work.methods?.forEach((method) => {
+        methodCounts[method] = (methodCounts[method] || 0) + 1;
       });
-    }
-    
-    return mockData;
+    });
+    return methodCounts;
   }
 
   /**
-   * Generate mock funding data for demonstration
+   * Calculate open access ratio
    */
-  private generateMockFundingData(query: string, source: string): any[] {
-    const mockData = [];
+  private calculateOpenAccessRatio(works: Work[]): number {
+    if (works.length === 0) return 0;
+    const openAccessCount = works.filter((work) => work.fullTextUrl).length;
+    return openAccessCount / works.length;
+  }
+
+  /**
+   * Calculate average citations
+   */
+  private calculateAverageCitations(works: Work[]): number {
+    if (works.length === 0) return 0;
+    const totalCitations = works.reduce((sum, work) => sum + work.citations, 0);
+    return totalCitations / works.length;
+  }
+
+  /**
+   * Calculate top concepts from all works
+   */
+  private calculateTopConcepts(works: Work[]): Array<{ name: string; count: number }> {
+    const conceptCounts: Record<string, number> = {};
     
-    for (let i = 0; i < Math.floor(Math.random() * 8) + 3; i++) {
-      mockData.push({
-        source: source,
-        title: `${query} Research Grant - Opportunity ${i + 1}`,
-        abstractOrDesc: `Funding opportunity for research projects related to ${query}.`,
-        amount: Math.floor(Math.random() * 500000) + 50000,
-        fiscalYear: new Date().getFullYear() + Math.floor(Math.random() * 3),
-        deadline: new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+    works.forEach((work) => {
+      work.concepts?.forEach((concept) => {
+        conceptCounts[concept] = (conceptCounts[concept] || 0) + 1;
       });
-    }
-    
-    return mockData;
+    });
+
+    return Object.entries(conceptCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([name, count]) => ({ name, count }));
+  }
+
+  /**
+   * Calculate total funding amount
+   */
+  private calculateTotalFunding(funding: Funding[]): number {
+    return funding.reduce((total, fund) => total + (fund.amount || 0), 0);
+  }
+
+  /**
+   * Calculate active funding calls
+   */
+  private calculateActiveCalls(funding: Funding[]): number {
+    const now = new Date();
+    return funding.filter(fund => {
+      if (!fund.deadline) return false;
+      try {
+        const deadline = new Date(fund.deadline);
+        return deadline > now;
+      } catch {
+        return false;
+      }
+    }).length;
+  }
+
+  /**
+   * Log evaluation results for debugging
+   */
+  private logEvaluationResults(topic: string, data: AggregatedData, evaluation: Evaluation): void {
+    console.log("\n🎯 EVALUATION RESULTS");
+    console.log(`📝 Topic: ${topic}`);
+    console.log(`📊 Data: ${data.totalWorks} papers, $${data.totalFunding.toLocaleString()} funding, ${data.avgCitations.toFixed(1)} avg citations, ${(data.openAccessRatio * 100).toFixed(1)}% open access`);
+    console.log(`🔬 Methods: ${Object.keys(data.methods).length} unique methods`);
+    console.log(`💰 Funding: $${data.totalFunding.toLocaleString()} total, ${data.activeCalls} active calls`);
+    console.log("\n📈 6 METRICS SCORES (with API sources):");
+    console.log(`1️⃣  Novelty: ${evaluation.novelty.score}/10 (OpenAlex + Semantic Scholar)`);
+    console.log(`2️⃣  Trends: ${evaluation.trends.score}/10 (OpenAlex + CORE)`);
+    console.log(`3️⃣  Methodological Complexity: ${evaluation.methodological_complexity.score}/10 (Semantic Scholar + CrossRef)`);
+    console.log(`4️⃣  Research Gaps: ${evaluation.research_gaps.score}/10 (CORE + OpenAlex + GPT analysis)`);
+    console.log(`5️⃣  Grant Potential: ${evaluation.grant_potential.score}/10 (NIH + CORDIS + Grants.gov)`);
+    console.log(`6️⃣  Literature Availability: ${evaluation.literature_availability.score}/10 (All literature APIs)`);
+    console.log("\n✅ Evaluation completed successfully\n");
   }
 }

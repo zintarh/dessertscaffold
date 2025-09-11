@@ -6,19 +6,15 @@ import {
 } from "../types/evaluation";
 import { DataAggregator } from "../utils/aggregation";
 
-/**
- * OpenAI integration for research topic evaluation with strict JSON schema validation
- * Uses GPT-4 with temperature 0 for consistent, structured evaluation outputs
- */
-
 export class OpenAIEvaluator {
   private client: OpenAI;
   private model: string;
 
-  constructor(apiKey: string, model: string = "gpt-4-1106-preview") {
+  constructor(apiKey: string, model: string = "gpt-4o") {
     this.client = new OpenAI({ apiKey });
     this.model = model;
   }
+
 
   async evaluateTopic(
     researchTopic: string,
@@ -30,18 +26,14 @@ export class OpenAIEvaluator {
       maxTokens
     );
 
+
+
     try {
-      // First attempt
       const evaluation = await this.callOpenAI(researchTopic, preparedData);
       return this.validateAndParseEvaluation(evaluation);
     } catch (error) {
       if (error instanceof ValidationError) {
-        console.warn(
-          "First evaluation attempt failed validation, retrying...",
-          error.message
-        );
-
-        // Second attempt with validation error context
+        console.warn("🔄 Retrying evaluation after validation error...");
         try {
           const evaluation = await this.callOpenAI(
             researchTopic,
@@ -62,26 +54,24 @@ export class OpenAIEvaluator {
     }
   }
 
-  /**
-   * Call OpenAI API with structured prompt
-   */
+
   private async callOpenAI(
     researchTopic: string,
     aggregatedData: any,
     validationError?: string
   ): Promise<string> {
-    const systemMessage = this.buildSystemMessage();
-    const userMessage = this.buildUserMessage(
-      researchTopic,
-      aggregatedData,
-      validationError
-    );
-
     const response = await this.client.chat.completions.create({
       model: this.model,
       messages: [
-        { role: "system", content: systemMessage },
-        { role: "user", content: userMessage },
+        { role: "system", content: this.buildSystemMessage() },
+        {
+          role: "user",
+          content: this.buildUserMessage(
+            researchTopic,
+            aggregatedData,
+            validationError
+          ),
+        },
       ],
       temperature: 0,
       max_tokens: 2000,
@@ -97,7 +87,7 @@ export class OpenAIEvaluator {
   }
 
   /**
-   * Build system message for OpenAI
+   * Build system message for 6 metrics evaluation
    */
   private buildSystemMessage(): string {
     return `You are an expert academic evaluator specializing in research methodology and funding analysis. Your task is to evaluate research topics across six key academic metrics and provide a comprehensive analysis suitable for dissertation-level research (2000+ words expected).
@@ -106,7 +96,7 @@ IMPORTANT: Output ONLY valid JSON matching the exact schema provided. Do not inc
   }
 
   /**
-   * Build user message with exact prompt format for the six academic metrics
+   * Build user message with prompt for 6 academic metrics
    */
   private buildUserMessage(
     researchTopic: string,
@@ -143,7 +133,6 @@ Return ONLY valid JSON in this exact schema (no code fences, no additional text)
    */
   private validateAndParseEvaluation(response: string): Evaluation {
     try {
-      // Clean response (remove code fences if present)
       const cleanedResponse = response
         .replace(/```json\s*/g, "")
         .replace(/```\s*/g, "")
@@ -169,29 +158,9 @@ Return ONLY valid JSON in this exact schema (no code fences, no additional text)
   }
 
   /**
-   * Generate evaluation with empty data stub for cases with no results
+   * Generate evaluation with empty data for fallback
    */
   async evaluateWithEmptyData(researchTopic: string): Promise<Evaluation> {
-    const emptyData = {
-      summary: {
-        totalWorks: 0,
-        totalFunding: 0,
-        activeCalls: 0,
-        avgCitations: 0,
-        openAccessRatio: 0,
-        trends: {},
-        topMethods: {},
-        topConcepts: [],
-      },
-      sampleWorks: [],
-      sampleFunding: [],
-      metadata: {
-        totalWorksInSample: 0,
-        totalFundingInSample: 0,
-        estimatedTokens: 100,
-      },
-    };
-
     return this.evaluateTopic(researchTopic, {
       works: [],
       funding: [],
@@ -218,7 +187,7 @@ class ValidationError extends Error {
 }
 
 /**
- * Factory function to create OpenAI evaluator with environment configuration
+ * Factory function to create OpenAI evaluator
  */
 export function createOpenAIEvaluator(): OpenAIEvaluator {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -226,6 +195,6 @@ export function createOpenAIEvaluator(): OpenAIEvaluator {
     throw new Error("OPENAI_API_KEY environment variable is required");
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-4-1106-preview";
+  const model = process.env.OPENAI_MODEL || "gpt-4o";
   return new OpenAIEvaluator(apiKey, model);
 }
