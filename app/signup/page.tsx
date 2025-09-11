@@ -260,7 +260,7 @@ export default function SignupPage() {
                 <div
                   className="w-full h-[600px] bg-cover bg-center bg-no-repeat"
                   style={{
-                    backgroundImage: `url('/images/signup-bg.jpg')`,
+                    backgroundImage: `url('/images/auth.jpg')`,
                   }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">

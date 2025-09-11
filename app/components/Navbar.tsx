@@ -2,22 +2,19 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { GraduationCap, Sun, Moon, User } from "lucide-react";
-import { useTheme } from "../contexts/ThemeContext";
+import { GraduationCap, User } from "lucide-react";
 import { useAtomValue } from "jotai";
-import { userAtom, isAuthenticatedAtom,  } from "../../lib/stores/authStore";
+import { userAtom, isAuthenticatedAtom } from "../../lib/stores/authStore";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const { isDarkMode, toggleTheme } = useTheme();
   const currentUser = useAtomValue(userAtom);
   const isAuthenticated = useAtomValue(isAuthenticatedAtom);
 
-  const userRole = currentUser?.userType || 'student';
-  const isStudent = userRole === 'student';
+  const userRole = currentUser?.userType || "student";
+  const isStudent = userRole === "student";
 
   const router = useRouter();
-
 
   return (
     <motion.nav
@@ -42,17 +39,7 @@ export default function Navbar() {
           </Link>
         </motion.div>
 
-        <div className="hidden md:flex items-center space-x-8">
-          
-            <>
-              <NavLink href="/pricing" label="Pricing" delay={0.2} />
-            </>
-        
-        </div>
-
         <div className="flex items-center space-x-4">
-         
-
           {isAuthenticated ? (
             <div className="flex items-center space-x-3">
               <motion.div
@@ -60,16 +47,11 @@ export default function Navbar() {
                 initial={{ x: 100, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.8 }}
-                onClick={() => router.push('/user/dashboard')}
+                onClick={() => router.push("/user/dashboard")}
               >
                 <User className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  My Account
-                </span>
+                <span className="text-sm font-medium">My Account</span>
               </motion.div>
-              
-             
-
             </div>
           ) : (
             <motion.a
@@ -90,20 +72,3 @@ export default function Navbar() {
   );
 }
 
-function NavLink({ href, label, delay }: { href: string; label: string; delay: number }) {
-  const { isDarkMode } = useTheme();
-  return (
-    <motion.a
-      href={href}
-      className={`font-medium transition-colors duration-300 ${
-        isDarkMode ? "text-gray-300 hover:text-white" : "text-gray-600 hover:text-gray-900"
-      }`}
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay, duration: 0.5 }}
-      whileHover={{ y: -2 }}
-    >
-      {label}
-    </motion.a>
-  );
-}

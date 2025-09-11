@@ -101,16 +101,7 @@ export default function Home() {
     { number: "24/7", label: "Expert Support" },
   ];
 
-  if (!isHydrated) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // Remove loading state for static homepage - no need to wait for theme hydration
 
   return (
     <div
@@ -246,7 +237,7 @@ export default function Home() {
 
                 {/* Input and Button Container */}
                 <motion.div
-                  className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center"
+                  className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center py-2" 
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.6, delay: 1.0 }}
@@ -294,13 +285,8 @@ export default function Home() {
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.3, delay: 1.1 }}
                   >
-                    <span>Evaluate Research</span>
-                    <motion.div
-                      animate={topic.trim() ? { rotate: [0, 10, -10, 0] } : {}}
-                      transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                    >
-                      <Target className="w-6 h-6" />
-                    </motion.div>
+                    <span>Evaluate </span>
+                    
                   </motion.button>
                 </motion.div>
 

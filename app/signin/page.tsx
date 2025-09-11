@@ -159,7 +159,7 @@ export default function SigninPage() {
             <div
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{
-                backgroundImage: `url('/images/signin-bg.jpg')`,
+                backgroundImage: `url('/images/auth.jpg')`,
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
