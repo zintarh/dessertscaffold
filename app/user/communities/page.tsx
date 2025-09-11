@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAtomValue } from 'jotai';
-import { userAtom } from '../../../lib/stores/authStore';
-import { Search, MapPin, MessageCircle, Filter, X } from 'lucide-react';
+import { Search, MapPin,  X } from 'lucide-react';
 
 // Define the mentor type based on what the API actually returns
 interface MentorData {
@@ -36,7 +34,6 @@ interface MentorData {
 
 export default function CommunitiesPage() {
   const router = useRouter();
-  const currentUser = useAtomValue(userAtom);
   const [mentors, setMentors] = useState<MentorData[]>([]);
   const [filteredMentors, setFilteredMentors] = useState<MentorData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -131,11 +128,7 @@ export default function CommunitiesPage() {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600 bg-white/60 px-4 py-2 rounded-xl border border-gray-200/60">
-                  <span className="font-medium">{filteredMentors.length} mentors available</span>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -151,7 +144,7 @@ export default function CommunitiesPage() {
         )}
 
         {/* Search and Filters */}
-        {!isLoading && (
+        {!isLoading && mentors.length > 0 && (
           <div className="mb-8">
             <div className="bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200/60 p-6 shadow-lg">
               {/* Search Bar */}
@@ -168,18 +161,18 @@ export default function CommunitiesPage() {
 
               {/* Filter Toggle */}
               <div className="flex items-center justify-between mb-4">
-                <button
+                {/* <button
                   onClick={() => setShowFilters(!showFilters)}
                   className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all duration-200 font-medium"
                 >
                   <Filter className="w-4 h-4" />
                   <span>Filters</span>
                   <div className={`w-2 h-2 rounded-full transition-all duration-200 ${showFilters ? 'bg-blue-500' : 'bg-gray-400'}`} />
-                </button>
+                </button> */}
                 
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                {/* <div className="flex items-center space-x-2 text-sm text-gray-600">
                   <span>AI-powered matching coming soon</span>
-                </div>
+                </div> */}
               </div>
 
               {/* Filters */}

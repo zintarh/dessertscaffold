@@ -45,30 +45,13 @@ export default function Navbar() {
         <div className="hidden md:flex items-center space-x-8">
           
             <>
-              <NavLink href="/community" label="Community" delay={0.1} />
               <NavLink href="/pricing" label="Pricing" delay={0.2} />
             </>
         
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* <motion.button
-            onClick={toggleTheme}
-            className={`p-3 rounded-xl transition-all duration-300 ${
-              isDarkMode
-                ? "bg-white/10 hover:bg-white/20 text-white"
-                : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            aria-label="Toggle theme"
-          >
-            {isDarkMode ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
-          </motion.button> */}
+         
 
           {isAuthenticated ? (
             <div className="flex items-center space-x-3">

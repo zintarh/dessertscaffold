@@ -23,7 +23,6 @@ import {
   timelinesErrorAtom,
   deleteTimelineAtom,
 } from "../../../lib/stores/timelineStore";
-import { availableMentorsAtom } from "../../../lib/stores/mentorStore";
 import { userAtom, isStudentAtom, userNameAtom } from "@/lib/stores/authStore";
 import DeleteTimelineModal from "../../components/DeleteTimelineModal";
 import { MentorProfileUpdateCard } from "../../components/MentorProfileUpdateCard";
@@ -161,15 +160,7 @@ export default function UnifiedDashboard() {
               <Users className="w-4 h-4" />
               <span>Communities</span>
             </button>
-            <GradientButton
-              onClick={() => router.push("/user/new")}
-              variant="primary"
-              size="md"
-              className="flex items-center space-x-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Write</span>
-            </GradientButton>
+            
           </div>
         </div>
       </div>
