@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import toast from "react-hot-toast";
 import {
   GraduationCap,
   Brain,
@@ -29,7 +28,7 @@ export const dynamic = "force-dynamic";
 
 export default function EvaluationPage() {
   const [expandedMetrics, setExpandedMetrics] = useState<string[]>([]);
-  const [researchTopic, setResearchTopic] = useState("");
+  const [researchTopic,] = useState("");
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationResults, setEvaluationResults] =
     useState<EvaluationResponse | null>(null);
@@ -43,27 +42,26 @@ export default function EvaluationPage() {
   const searchParams = useSearchParams();
   const syncEvaluationData = useSetAtom(evaluationSyncAtom);
 
-  // Evaluation steps for progress indication
   const evaluationSteps = [
-    { id: 1, name: "Analyzing research topic...", icon: Brain, duration: 2000 },
+    { id: 1, name: "Analyzing research topic...", icon: Brain, duration: 500 },
     {
       id: 2,
       name: "Querying academic databases...",
       icon: Database,
-      duration: 3000,
+      duration: 800,
     },
     {
       id: 3,
       name: "Processing literature data...",
       icon: FileText,
-      duration: 2000,
+      duration: 400,
     },
-    { id: 4, name: "Evaluating metrics...", icon: TrendingUp, duration: 2500 },
+    { id: 4, name: "Evaluating metrics...", icon: TrendingUp, duration: 600 },
     {
       id: 5,
       name: "Generating recommendations...",
       icon: Award,
-      duration: 1500,
+      duration: 300,
     },
   ];
 
@@ -218,79 +216,7 @@ export default function EvaluationPage() {
     }
   };
 
-  const [isDownloading, setIsDownloading] = useState(false);
 
-  const downloadEvaluationPDF = async () => {
-    if (!evaluationResults || !displayData || isDownloading) return;
-
-    // Ensure we have real evaluation data, not fallback data
-    if (
-      !evaluationResults.evaluation ||
-      !displayData.metrics ||
-      displayData.metrics.length === 0
-    ) {
-      toast.error(
-        "No evaluation data available for download. Please run an evaluation first."
-      );
-      return;
-    }
-
-    setIsDownloading(true);
-
-    try {
-      const response = await fetch("/api/download-evaluation-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          research_topic: researchTopic,
-          evaluation_results: evaluationResults,
-          display_data: displayData,
-        }),
-      });
-
-      if (!response.ok) {
-        // Check if response is JSON or HTML
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const errorData = await response.json();
-          throw new Error(errorData.details || "Failed to generate PDF");
-        } else {
-          // Handle HTML error responses
-          const errorText = await response.text();
-          console.error("Non-JSON error response:", errorText);
-          throw new Error("Server error occurred while generating PDF");
-        }
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `evaluation-${researchTopic.replace(
-        /[^a-zA-Z0-9]/g,
-        "-"
-      )}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }, 100);
-    } catch (error) {
-      console.error("PDF download failed:", error);
-      toast.error(
-        `Failed to download PDF: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   useEffect(() => {
     const topicFromUrl = searchParams.get("topic");
@@ -299,88 +225,7 @@ export default function EvaluationPage() {
     }
   }, []);
 
-  // Show evaluation form if no topic provided
-  if (!researchTopic && !isEvaluating && !error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-        <nav className="relative z-10 p-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
-                    Dissertation Scaffold
-                  </span>
-                  <p className="text-gray-400 text-sm">
-                    Expert Research Guidance
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/"
-                className="px-6 py-3 rounded-xl font-medium transition-all duration-300 text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              >
-                Back to Home
-              </Link>
-            </div>
-          </div>
-        </nav>
-
-        <div className="relative z-10 max-w-4xl mx-auto px-6 py-20 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8">
-              <Brain className="w-10 h-10 text-white" />
-            </div>
-            
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Research Topic Evaluation
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-              Get instant feedback on your research topic across 6 key academic metrics. 
-              Enter your research topic below to begin your evaluation.
-            </p>
-
-            <div className="max-w-md mx-auto">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Enter your research topic..."
-                  value={researchTopic}
-                  onChange={(e) => setResearchTopic(e.target.value)}
-                  className="w-full px-6 py-4 text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && researchTopic.trim()) {
-                      handleEvaluate(researchTopic);
-                    }
-                  }}
-                />
-                <button
-                  onClick={() => researchTopic.trim() && handleEvaluate(researchTopic)}
-                  disabled={!researchTopic.trim()}
-                  className="absolute right-2 top-2 bg-gradient-to-r from-blue-600 to-emerald-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-emerald-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Evaluate
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show progress while evaluating
+ 
   if (isEvaluating && !showResults) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
@@ -629,12 +474,7 @@ export default function EvaluationPage() {
                 <h3 className="text-2xl font-bold text-gray-900">
                   Detailed Metrics
                 </h3>
-                <button
-                  onClick={() => setShowAllMetrics(!showAllMetrics)}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200"
-                >
-                  {showAllMetrics ? "Show Top 3 Only" : "Show All Metrics"}
-                </button>
+
               </div>
 
               <div className="grid lg:grid-cols-2 gap-8 mb-16">

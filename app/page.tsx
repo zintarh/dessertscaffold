@@ -20,7 +20,7 @@ import { useTheme } from "./contexts/ThemeContext";
 import Navbar from "./components/Navbar";
 
 export default function Home() {
-  const { isDarkMode, isHydrated } = useTheme();
+  const { isDarkMode, } = useTheme();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [topic, setTopic] = useState("");
 
@@ -38,7 +38,6 @@ export default function Home() {
       // Pass the topic as a URL parameter
       window.location.href = `/evaluation?topic=${encodeURIComponent(topic.trim())}`;
     } else {
-      // If no topic, go to evaluation page normally
       window.location.href = "/evaluation";
     }
   };
@@ -157,7 +156,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Navigation */}
       <Navbar />
 
       <motion.section
