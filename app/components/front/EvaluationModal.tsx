@@ -436,7 +436,7 @@ export default function EvaluationModal({
                 </>
               ) : (
                 <>
-                  <span>Complete Analysis</span>
+                  <span>Create Timeline</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

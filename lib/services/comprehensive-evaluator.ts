@@ -647,7 +647,7 @@ export class ComprehensiveEvaluator {
         conceptCounts[concept] = (conceptCounts[concept] || 0) + 1;
       });
     });
-
+    
     return Object.entries(conceptCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10)

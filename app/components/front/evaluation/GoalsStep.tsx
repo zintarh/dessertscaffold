@@ -61,11 +61,7 @@ export default function GoalsStep({
                   >
                     {goal.title}
                   </h3>
-                  {goal.id === "dissertation" && (
-                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                      Determines Project Type
-                    </span>
-                  )}
+                 
                 </div>
                 <p
                   className="text-sm"
