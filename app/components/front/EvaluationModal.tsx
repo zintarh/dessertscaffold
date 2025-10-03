@@ -171,7 +171,6 @@ export default function EvaluationModal({
             </h3>
             <nav className="space-y-1">
               <button
-                onClick={() => setCurrentStep("score")}
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "score"
                     ? "bg-purple-100 text-purple-800 font-medium"
@@ -209,7 +208,6 @@ export default function EvaluationModal({
                 <span className="text-sm">Goals</span>
               </button>
               <button
-                onClick={() => setCurrentStep("timeline-setup")}
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "timeline-setup"
                     ? "bg-purple-100 text-purple-800 font-medium"
@@ -228,7 +226,6 @@ export default function EvaluationModal({
                 <span className="text-sm">Setup</span>
               </button>
               <button
-                onClick={() => setCurrentStep("timeline")}
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "timeline"
                     ? "bg-purple-100 text-purple-800 font-medium"
