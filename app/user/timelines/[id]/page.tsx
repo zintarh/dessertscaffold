@@ -9,20 +9,17 @@ import {
   PlayCircle,
   TrendingUp,
   BarChart3,
-  Edit,
   Target,
-  BookOpen,
   FileText,
   Info,
   Calendar,
-  UserPlus,
-  CheckSquare,
-  Square,
+
   MessageCircle,
 } from "lucide-react";
 import {
   timelinesAtom,
   fetchTimelinesAtom,
+  timelinesLoadingAtom,
 } from "../../../../lib/stores/timelineStore";
 import { useState, useEffect } from "react";
 import { TimelineSection } from "@/types";
@@ -401,10 +398,18 @@ export default function TimelineDetailsPage() {
 
   const timelines = useAtomValue(timelinesAtom);
   const fetchTimelines = useSetAtom(fetchTimelinesAtom);
+  const isLoading = useAtomValue(timelinesLoadingAtom);
 
   const timeline = timelines.find((t) => t.id === timelineId);
 
   const isMentorAccess = timeline?.isMentorAccess || false;
+
+  // Fetch timelines when component mounts
+  useEffect(() => {
+    if (timelines.length === 0) {
+      fetchTimelines();
+    }
+  }, [timelines.length, fetchTimelines]);
 
   useEffect(() => {
     if (timeline) {
@@ -480,6 +485,26 @@ export default function TimelineDetailsPage() {
     }
   };
 
+  // Show loading state while data is being fetched
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Loading Timeline...
+            </h1>
+            <p className="text-gray-600">
+              Please wait while we fetch your timeline data.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not found only after loading is complete and timeline is not found
   if (!timeline) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
@@ -503,7 +528,6 @@ export default function TimelineDetailsPage() {
     );
   }
 
-  // Use the state-based progress instead of calculating each time
 
   const getCurrentSection = () => {
     const nextSection = timeline.sections.find((s) => !s.isCompleted);

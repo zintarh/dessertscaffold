@@ -23,11 +23,11 @@ import {
   Copy,
   CheckCircle,
 } from "lucide-react";
-import ResearchSidebar from "../../../../components/ResearchSidebar";
-import WritingChat from "../../../../components/WritingChat";
-import Modal, { ModalFooter } from "../../../../components/Modal";
+import ResearchSidebar from "../../../../components/dashboard/ResearchSidebar";
+import Modal, { ModalFooter } from "../../../../components/dashboard/Modal";
 import toast from "react-hot-toast";
-import NewTiptapEditor from "../../../../components/NewTiptapEditor";
+import NewTiptapEditor from "@/app/components/dashboard/NewTiptapEditor";
+import WritingChat from "@/app/components/dashboard/WritingChat";
 
 export default function WritingSpacePage() {
   const params = useParams();

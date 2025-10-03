@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import {  useSearchParams } from 'next/navigation';
-import { useSetAtom } from 'jotai';
-import { motion } from 'framer-motion';
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useSetAtom } from "jotai";
+import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle, XCircle, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import GradientButton from "../components/ui/GradientButton";
-import { useTheme } from '../contexts/ThemeContext';
+import { useTheme } from "../contexts/ThemeContext";
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const { isDarkMode, isHydrated } = useTheme();
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending');
-  const [errorMessage, setErrorMessage] = useState('');
-  
+  const [verificationStatus, setVerificationStatus] = useState<
+    "pending" | "success" | "error"
+  >("pending");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const router = useRouter();
   const searchParams = useSearchParams();
-  // const verifyEmail = useSetAtom(verifyEmailAtom);
-  // const signIn = useSetAtom(signInAtom);
 
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   useEffect(() => {
     if (token) {
@@ -30,21 +30,12 @@ export default function VerifyEmailPage() {
 
   const handleVerification = async () => {
     if (!token) return;
-    
+
     setIsVerifying(true);
     try {
-      // const user = await verifyEmail(token);
-      // setVerificationStatus('success');
-      
-      // // Auto-sign in the user after successful verification
-      // setTimeout(() => {
-      //   signIn(user);
-      //   router.push('/user/dashboard');
-      // }, 2000);
-      
     } catch (error: any) {
-      setVerificationStatus('error');
-      setErrorMessage(error.message || 'Verification failed');
+      setVerificationStatus("error");
+      setErrorMessage(error.message || "Verification failed");
     } finally {
       setIsVerifying(false);
     }
@@ -62,11 +53,13 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${
-      isDarkMode 
-        ? "bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white"
-        : "bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900"
-    }`}>
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        isDarkMode
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-gray-900 text-white"
+          : "bg-gradient-to-br from-gray-50 via-blue-50 to-emerald-50 text-gray-900"
+      }`}
+    >
       <div className="max-w-md w-full mx-4">
         <motion.div
           className={`p-8 rounded-2xl shadow-xl backdrop-blur-sm ${
@@ -78,7 +71,7 @@ export default function VerifyEmailPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {verificationStatus === 'pending' && (
+          {verificationStatus === "pending" && (
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-blue-600" />
@@ -93,14 +86,17 @@ export default function VerifyEmailPage() {
             </div>
           )}
 
-          {verificationStatus === 'success' && (
+          {verificationStatus === "success" && (
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h1 className="text-2xl font-bold mb-2 text-green-600">Email Verified!</h1>
+              <h1 className="text-2xl font-bold mb-2 text-green-600">
+                Email Verified!
+              </h1>
               <p className="text-gray-600 mb-6">
-                Your email has been successfully verified. You'll be redirected to the dashboard shortly.
+                Your email has been successfully verified. You'll be redirected
+                to the dashboard shortly.
               </p>
               <div className="flex items-center justify-center space-x-2 text-green-600">
                 <CheckCircle className="w-5 h-5" />
@@ -109,17 +105,20 @@ export default function VerifyEmailPage() {
             </div>
           )}
 
-          {verificationStatus === 'error' && (
+          {verificationStatus === "error" && (
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-red-600" />
               </div>
-              <h1 className="text-2xl font-bold mb-2 text-red-600">Verification Failed</h1>
+              <h1 className="text-2xl font-bold mb-2 text-red-600">
+                Verification Failed
+              </h1>
               <p className="text-gray-600 mb-6">
-                {errorMessage || 'We encountered an issue verifying your email address.'}
+                {errorMessage ||
+                  "We encountered an issue verifying your email address."}
               </p>
               <GradientButton
-                onClick={() => router.push('/signin')}
+                onClick={() => router.push("/signin")}
                 variant="primary"
                 size="lg"
                 className="flex items-center space-x-2 mx-auto"
@@ -132,5 +131,22 @@ export default function VerifyEmailPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
   );
 }

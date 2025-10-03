@@ -8,14 +8,13 @@ import {
   Users,
   FileText,
   Brain,
-  Plus,
   Search,
   MessageCircle,
   Edit,
   DollarSign,
   Award,
 } from "lucide-react";
-import { TimelineCard } from "../../components/TimelineTracker";
+import { TimelineCard } from "../../components/dashboard/TimelineTracker";
 import {
   timelinesAtom,
   fetchTimelinesAtom,
@@ -24,8 +23,8 @@ import {
   deleteTimelineAtom,
 } from "../../../lib/stores/timelineStore";
 import { userAtom, isStudentAtom, userNameAtom } from "@/lib/stores/authStore";
-import DeleteTimelineModal from "../../components/DeleteTimelineModal";
-import { MentorProfileUpdateCard } from "../../components/MentorProfileUpdateCard";
+import DeleteTimelineModal from "../../components/dashboard/DeleteTimelineModal";
+import { MentorProfileUpdateCard } from "../../components/dashboard/MentorProfileUpdateCard";
 import GradientButton from "../../components/ui/GradientButton";
 
 import { Timeline } from "@/types";
@@ -43,11 +42,9 @@ export default function UnifiedDashboard() {
   const isStudent = useAtomValue(isStudentAtom);
   const userName = useAtomValue(userNameAtom);
 
-  // Mentor profile state
   const [mentorProfile, setMentorProfile] = useState<Mentor | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  // Delete modal state
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     timeline: Timeline | null;
@@ -56,13 +53,11 @@ export default function UnifiedDashboard() {
     timeline: null,
   });
 
-  // Fetch timelines from API when component mounts
   useEffect(() => {
     console.log("🔄 Dashboard: Fetching timelines from API...");
     fetchTimelines();
   }, [fetchTimelines]);
 
-  // Fetch mentor profile for mentors
   useEffect(() => {
     const fetchMentorProfile = async () => {
       if (!currentUser || currentUser.userType !== "MENTOR") {
@@ -187,10 +182,10 @@ export default function UnifiedDashboard() {
             {isStudent && (
               <button
                 onClick={() => router.push("/user/new")}
-                className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-blue-50 to-emerald-50 hover:from-blue-100 hover:to-emerald-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+                className="p-4 border border-gray-200 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                     <FileText className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -208,10 +203,10 @@ export default function UnifiedDashboard() {
             {isStudent && (
               <button
                 onClick={() => router.push("/user/communities")}
-                className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+                className="p-4 border border-gray-200 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                     <Users className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -228,10 +223,10 @@ export default function UnifiedDashboard() {
               <>
                 <button
                   onClick={() => router.push("/user/mentors")}
-                  className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-cyan-50 to-blue-50 hover:from-cyan-100 hover:to-blue-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+                  className="p-4 border border-gray-200 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                       <MessageCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -267,10 +262,10 @@ export default function UnifiedDashboard() {
                 {!isProfileComplete && (
                   <button
                     onClick={() => router.push("/user/settings")}
-                    className="p-4 border border-gray-200 rounded-lg bg-gradient-to-br from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
+                    className="p-4 border border-gray-200 rounded-lg bg-purple-50 hover:bg-purple-100 transition-all duration-300 text-left shadow-sm hover:shadow-md"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center shadow-sm">
+                      <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                         <Award className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -298,7 +293,7 @@ export default function UnifiedDashboard() {
               </h2>
               <button
                 onClick={() => fetchTimelines()}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center space-x-1"
               >
                 <span>Refresh</span>
               </button>
@@ -320,7 +315,7 @@ export default function UnifiedDashboard() {
               </h2>
               <button
                 onClick={() => fetchTimelines()}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center space-x-1"
               >
                 <span>Refresh</span>
               </button>
@@ -342,7 +337,7 @@ export default function UnifiedDashboard() {
               </h2>
               <button
                 onClick={() => fetchTimelines()}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center space-x-1"
+                className="text-purple-600 hover:text-purple-700 text-sm font-medium flex items-center space-x-1"
               >
                 <span>Refresh</span>
               </button>
@@ -364,9 +359,9 @@ export default function UnifiedDashboard() {
             <h2 className="text-lg font-medium text-gray-900 mb-4">
               Get Started with Research Planning
             </h2>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <div className="text-center">
-                <Calendar className="w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <Calendar className="w-12 h-12 text-purple-600 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   No timelines yet
                 </h3>
@@ -397,14 +392,14 @@ export default function UnifiedDashboard() {
                 Your Mentor Profile
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="bg-purple-50 p-4 rounded-lg">
                   <div className="flex items-center">
-                    <MessageCircle className="w-8 h-8 text-blue-600 mr-3" />
+                    <MessageCircle className="w-8 h-8 text-purple-600 mr-3" />
                     <div>
-                      <p className="text-sm font-medium text-blue-800">
+                      <p className="text-sm font-medium text-purple-800">
                         Active Research
                       </p>
-                      <p className="text-2xl font-bold text-blue-900">0</p>
+                      <p className="text-2xl font-bold text-purple-900">0</p>
                     </div>
                   </div>
                 </div>

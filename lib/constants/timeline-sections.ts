@@ -1,3 +1,5 @@
+import { BookOpen, Brain, DollarSign, Target } from "lucide-react";
+
 export const RESEARCH_TIMELINE_SECTIONS = [
   { 
     title: 'Executive Summary', 
@@ -154,3 +156,156 @@ export const DISCIPLINES = [
   'Medicine',
   'Other'
 ];
+
+
+export const durationOptions = [
+  "1 week",
+  "2 weeks", 
+  "3 weeks",
+  "1 month",
+  "2 months",
+  "3 months",
+  "4 months",
+  "6 months"
+];
+
+export const academicLevels = [
+  "Undergraduate",
+  "Master's",
+  "PhD",
+  "Post-Doctoral",
+  "Faculty Research"
+];
+
+export const disciplines = [
+  "Computer Science",
+  "Engineering",
+  "Medicine",
+  "Psychology",
+  "Education",
+  "Business",
+  "Social Sciences",
+  "Natural Sciences",
+  "Humanities",
+  "Other"
+];
+
+export const evaluationScores = {
+  overall: 78,
+  metrics: [
+    {
+      name: "Grant Potential",
+      score: 85,
+      description: "High likelihood of securing funding",
+    },
+    {
+      name: "Research Impact",
+      score: 72,
+      description: "Moderate potential for significant impact",
+    },
+    {
+      name: "Methodology Feasibility",
+      score: 90,
+      description: "Well-defined and achievable approach",
+    },
+    {
+      name: "Innovation Level",
+      score: 65,
+      description: "Some novel aspects, room for improvement",
+    },
+    {
+      name: "Resource Requirements",
+      score: 80,
+      description: "Reasonable resource needs",
+    },
+    {
+      name: "Timeline Viability",
+      score: 75,
+      description: "Realistic timeline expectations",
+    },
+  ],
+};
+
+export const goals = [
+  {
+    id: "research",
+    title: "Research",
+    description:
+      "Conduct original research and contribute to knowledge in your field",
+    icon: Brain,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-200",
+  },
+  {
+    id: "dissertation",
+    title: "Dissertation",
+    description: "Complete your doctoral dissertation and defend your thesis",
+    icon: BookOpen,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50",
+    borderColor: "border-purple-200",
+  },
+  {
+    id: "grant-funding",
+    title: "Secure Grant Funding",
+    description:
+      "Find and apply for relevant research grants and funding opportunities",
+    icon: DollarSign,
+    color: "text-green-600",
+    bgColor: "bg-green-50",
+    borderColor: "border-green-200",
+  },
+  {
+    id: "research-impact",
+    title: "Maximize Research Impact",
+    description:
+      "Ensure your research has significant scientific and societal impact",
+    icon: Target,
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+    borderColor: "border-orange-200",
+  },
+];
+
+// Timeline helper functions
+export const getCurrentSections = (projectType: "dissertation" | "research-proposal") => {
+  return projectType === "dissertation" ? DISSERTATION_SECTIONS : RESEARCH_TIMELINE_SECTIONS;
+};
+
+export const parseDurationToWeeks = (duration: string): number => {
+  if (duration.includes("week")) {
+    return parseInt(duration.split(" ")[0]);
+  } else if (duration.includes("month")) {
+    return parseInt(duration.split(" ")[0]) * 4;
+  }
+  return 1;
+};
+
+export const formatTotalDuration = (weeks: number): string => {
+  if (weeks < 4) {
+    return `${weeks} week${weeks > 1 ? 's' : ''}`;
+  } else if (weeks < 52) {
+    const months = Math.round(weeks / 4);
+    return `${months} month${months > 1 ? 's' : ''}`;
+  } else {
+    const years = Math.round(weeks / 52);
+    return `${years} year${years > 1 ? 's' : ''}`;
+  }
+};
+
+export const calculateTotalDuration = (
+  projectType: "dissertation" | "research-proposal",
+  sectionDurations: Record<string, string>
+): number => {
+  const sections = getCurrentSections(projectType);
+  let totalWeeks = 0;
+  
+  sections.forEach(section => {
+    const duration = sectionDurations[section.title] || "1 week";
+    const weeks = parseDurationToWeeks(duration);
+    totalWeeks += weeks;
+  });
+  
+  return totalWeeks;
+};

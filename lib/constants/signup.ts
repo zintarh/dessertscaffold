@@ -1,37 +1,7 @@
 // Signup form constants and static data
-import {
-  GraduationCap,
-  Users,
-  Building,
-  CheckCircle,
-  Target,
-} from '../../app/components/Icons';
 
 export const SIGNUP_CONSTANTS = {
-  // User type options
-  USER_TYPES: [
-    {
-      id: "STUDENT",
-      title: "Student",
-      description: "MSc, PhD, or Research student",
-      icon: GraduationCap,
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      id: "MENTOR",
-      title: "Academic Mentor",
-      description: "Supervisor or advisor",
-      icon: Users,
-      color: "from-emerald-500 to-emerald-600",
-    },
-    {
-      id: "INSTITUTION",
-      title: "Institution",
-      description: "University or organization",
-      icon: Building,
-      color: "from-purple-500 to-purple-600",
-    },
-  ] as const,
+ 
 
   // Academic level options
   ACADEMIC_LEVELS: [
@@ -168,30 +138,9 @@ export const SIGNUP_CONSTANTS = {
     WELCOME_DESCRIPTION: "Continue your research journey with access to advanced research tools, expert guidance, and a community of scholars.",
   } as const,
 
-  // Feature highlights
-  FEATURES: [
-    {
-      icon: CheckCircle,
-      text: "Expert research evaluation",
-      color: "bg-blue-500/20",
-      iconColor: "text-blue-400",
-    },
-    {
-      icon: Users,
-      text: "Expert community access",
-      color: "bg-emerald-500/20",
-      iconColor: "text-emerald-400",
-    },
-    {
-      icon: Target,
-      text: "Personalized research roadmap",
-      color: "bg-orange-500/20",
-      iconColor: "text-orange-400",
-    },
-  ] as const,
+  
 } as const;
 
 // Type exports for use in components
-export type UserType = typeof SIGNUP_CONSTANTS.USER_TYPES[number]['id'];
 export type AcademicLevel = typeof SIGNUP_CONSTANTS.ACADEMIC_LEVELS[number]['value'];
 export type ErrorType = typeof SIGNUP_CONSTANTS.ERROR_TYPES[keyof typeof SIGNUP_CONSTANTS.ERROR_TYPES];

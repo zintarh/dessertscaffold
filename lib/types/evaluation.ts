@@ -140,6 +140,37 @@ export const AggregatedDataSchema = z.object({
     name: z.string(),
     count: z.number(),
   })),
+  // Enhanced data for detailed analysis
+  topCitedPapers: z.array(z.object({
+    title: z.string(),
+    citations: z.number(),
+    year: z.number(),
+    doi: z.string().optional(),
+    authors: z.array(z.string()).optional(),
+  })).optional(),
+  recentPapers: z.array(z.object({
+    title: z.string(),
+    year: z.number(),
+    citations: z.number(),
+    doi: z.string().optional(),
+  })).optional(),
+  topFundingOpportunities: z.array(z.object({
+    title: z.string(),
+    amount: z.number(),
+    source: z.string(),
+    fiscalYear: z.number().optional(),
+  })).optional(),
+  methodDistribution: z.array(z.object({
+    method: z.string(),
+    count: z.number(),
+    percentage: z.number(),
+  })).optional(),
+  conceptTrends: z.array(z.object({
+    concept: z.string(),
+    count: z.number(),
+    recentCount: z.number(),
+    trend: z.enum(['increasing', 'decreasing', 'stable']),
+  })).optional(),
 });
 
 export type AggregatedData = z.infer<typeof AggregatedDataSchema>;
@@ -147,7 +178,7 @@ export type AggregatedData = z.infer<typeof AggregatedDataSchema>;
 // LLM evaluation schema (strict contract) - matches the exact specification
 export const EvaluationMetricSchema = z.object({
   score: z.number().int().min(0).max(10),
-  justification: z.string().min(50).max(300),
+  justification: z.string().min(100).max(500), // Increased for more detailed justifications
 });
 
 export const EvaluationSchema = z.object({
@@ -157,7 +188,7 @@ export const EvaluationSchema = z.object({
   research_gaps: EvaluationMetricSchema,
   grant_potential: EvaluationMetricSchema,
   literature_availability: EvaluationMetricSchema,
-  overall_summary: z.string().min(200).max(1000),
+  overall_summary: z.string().min(300).max(1500), // Increased for more comprehensive summary
 });
 
 export type Evaluation = z.infer<typeof EvaluationSchema>;

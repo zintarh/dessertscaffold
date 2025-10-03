@@ -34,12 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Log successful response
     const duration = Date.now() - startTime;
-    console.log('Research evaluation completed:', {
-      requestId,
-      duration,
-      topic: validatedRequest.research_topic,
-      timestamp: new Date().toISOString(),
-    });
+ 
 
     // Return the evaluation in the exact format specified
     const response = NextResponse.json({
@@ -90,12 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Handle specific error types
     if (error.message.includes('OpenAI evaluation failed validation twice')) {
-      console.error('LLM evaluation failed:', {
-        requestId,
-        duration,
-        error: error.message,
-        timestamp: new Date().toISOString(),
-      });
+     
 
       return NextResponse.json(
         { 

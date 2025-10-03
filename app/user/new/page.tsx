@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TimelineCreationModal from '../../components/TimelineCreationModal';
+import TimelineCreationModal from '../../components/dashboard/TimelineCreationModal';
 
 export default function NewTimelinePage() {
   const router = useRouter();

@@ -14,7 +14,7 @@ import {
   Calendar,
   BookOpen,
 } from "lucide-react";
-import Modal, { ModalFooter } from "../../components/Modal";
+import Modal, { ModalFooter } from "../../components/dashboard/Modal";
 
 interface StudentProfile {
   id: string;

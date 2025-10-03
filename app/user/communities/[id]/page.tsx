@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAtomValue } from "jotai";
 import { userAtom } from "../../../../lib/stores/authStore";
-import Modal, { ModalFooter } from "../../../components/Modal";
+import Modal, { ModalFooter } from "../../../components/dashboard/Modal";
 import toast from "react-hot-toast";
 import {
   ArrowLeft,

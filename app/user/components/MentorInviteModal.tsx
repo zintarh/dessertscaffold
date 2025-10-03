@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal, { ModalFooter } from "../../components/Modal";
+import Modal, { ModalFooter } from "../../components/dashboard/Modal";
 import toast from "react-hot-toast";
 import { UserPlus, CheckCircle, AlertCircle } from "lucide-react";
 

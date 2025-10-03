@@ -91,7 +91,6 @@ export default function StudentSidebar({
               </div>
             </Link>
           </div>
-          ={" "}
           <nav className="flex-1 px-3">
             {navigationItems
               .filter((item) => {

@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/signin",
-    error: "/signin", 
+    error: "/signin",
   },
   providers: [
     CredentialsProvider({
@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
           if (!parsed.success) return null;
           const { email, password } = parsed.data;
 
-          const user = await prisma.user.findUnique({ 
+          const user = await prisma.user.findUnique({
             where: { email },
             select: {
               id: true,
@@ -45,17 +45,17 @@ export const authOptions: NextAuthOptions = {
               userType: true,
               institutionName: true,
               researchArea: true,
-              academicLevel: true
-            }
+              academicLevel: true,
+            },
           });
           if (!user || !user.password) return null;
 
           const valid = await bcrypt.compare(password, user.password);
           if (!valid) return null;
 
-         
-
-          const fallbackName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim();
+          const fallbackName = `${user.firstName ?? ""} ${
+            user.lastName ?? ""
+          }`.trim();
           const computedName = user.name ?? (fallbackName || user.email);
           const resultUser: NextAuthUser = {
             id: user.id,
@@ -66,14 +66,16 @@ export const authOptions: NextAuthOptions = {
           return resultUser;
         } catch (err) {
           console.error("Authentication error:", err);
-          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-          const errorName = err instanceof Error ? err.name : 'Unknown';
-          const errorStack = err instanceof Error ? err.stack : 'No stack trace';
-          
+          const errorMessage =
+            err instanceof Error ? err.message : "Unknown error";
+          const errorName = err instanceof Error ? err.name : "Unknown";
+          const errorStack =
+            err instanceof Error ? err.stack : "No stack trace";
+
           console.error("Error details:", {
             message: errorMessage,
             stack: errorStack,
-            name: errorName
+            name: errorName,
           });
           return null;
         }
