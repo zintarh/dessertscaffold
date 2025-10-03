@@ -76,13 +76,13 @@ export default function Navbar() {
                   <User className="w-4 h-4" />
                   <span>Account</span>
                 </Link>
-                <button
+                {/* <button
                   onClick={handleSignOut}
                   className="flex items-center space-x-2 text-gray-700 hover:text-red-600 px-2 sm:px-3 py-2 text-sm sm:text-base font-medium transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Sign Out</span>
-                </button>
+                </button> */}
               </>
             ) : (
               // Unauthenticated user

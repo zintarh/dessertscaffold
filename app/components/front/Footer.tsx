@@ -6,10 +6,8 @@ export default function Footer() {
   return (
     <footer className="bg-white border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-        {/* Main Footer Content */}
         <div className="py-8 sm:py-10 md:py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {/* Company Info */}
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center space-x-2">
                 {/* Logo */}
