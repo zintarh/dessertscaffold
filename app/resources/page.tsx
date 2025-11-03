@@ -148,7 +148,7 @@ export default function ResourcesPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-primary-bg">
       <PageAnimation>
         {/* Navbar */}
         <AnimatedSection animationType="fadeIn" delay={100} duration={600}>
@@ -162,14 +162,14 @@ export default function ResourcesPage() {
             {/* Header Section */}
             <AnimatedSection animationType="fadeInUp" delay={200} duration={800}>
               <div className="mb-8">
-                <p className="text-sm font-medium text-purple-600  tracking-wide mb-2">
+                <p className="text-sm font-medium text-accent tracking-wide mb-2">
                   EXPLORE TRAINING LESSONS AND RESOURCES
                 </p>
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                  <h1 className="text-xl sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 lg:mb-0">
+                  <h1 className="text-xl sm:text-xl md:text-2xl font-bold text-primary mb-4 lg:mb-0">
                     Discover training lessons and related resources to <br />  accelerate your learning.
                   </h1>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-secondary">
                     All resources ({filteredResources.length})
                   </div>
                 </div>
@@ -180,17 +180,17 @@ export default function ResourcesPage() {
             <AnimatedSection animationType="fadeInUp" delay={300} duration={800}>
               <div className="mb-8">
                 <div className="flex flex-wrap items-center gap-4 mb-6">
-                  <span className="text-sm font-medium text-gray-700">Refine by:</span>
+                  <span className="text-sm font-medium text-secondary">Refine by:</span>
                   
                   {/* Active Filters */}
                   {selectedContentType.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {selectedContentType.map((type) => (
-                        <span key={type} className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 text-sm font-medium rounded-full">
+                        <span key={type} className="inline-flex items-center gap-1 px-3 py-1 bg-accent-soft text-accent text-sm font-medium rounded-full">
                           {type}
                           <button
                             onClick={() => toggleContentType(type)}
-                            className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
+                            className="ml-1 hover:opacity-80 rounded-full p-0.5"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -202,7 +202,7 @@ export default function ResourcesPage() {
                   {(selectedContentType.length > 0 || selectedTrainingLevel.length > 0 || selectedDuration.length > 0) && (
                     <button
                       onClick={clearAllFilters}
-                      className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                      className="text-sm text-accent hover:opacity-80 font-medium"
                     >
                       Clear all
                     </button>
@@ -215,26 +215,26 @@ export default function ResourcesPage() {
                   <div className="relative">
                     <button
                       onClick={() => setShowContentType(!showContentType)}
-                      className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-2 px-4 py-2 border border-default rounded-lg bg-surface text-sm font-medium text-secondary hover:bg-surface-muted"
                     >
                       Content type
                       <ChevronDown className={`w-4 h-4 transition-transform ${showContentType ? 'rotate-180' : ''}`} />
                     </button>
                     {showContentType && (
-                      <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div className="absolute top-full left-0 mt-1 w-48 bg-surface border border-default rounded-lg shadow-lg z-10">
                         <div className="p-2">
                           {contentTypes.map((type) => (
-                            <label key={type.name} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <label key={type.name} className="flex items-center justify-between p-2 hover:bg-surface-muted rounded cursor-pointer">
                               <div className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
                                   checked={selectedContentType.includes(type.name)}
                                   onChange={() => toggleContentType(type.name)}
-                                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                  className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                                 />
-                                <span className="text-sm text-gray-700">{type.name}</span>
+                                <span className="text-sm text-secondary">{type.name}</span>
                               </div>
-                              <span className="text-xs text-gray-400">{type.count}</span>
+                              <span className="text-xs text-tertiary">{type.count}</span>
                             </label>
                           ))}
                         </div>
@@ -246,26 +246,26 @@ export default function ResourcesPage() {
                   <div className="relative">
                     <button
                       onClick={() => setShowTrainingLevel(!showTrainingLevel)}
-                      className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-2 px-4 py-2 border border-default rounded-lg bg-surface text-sm font-medium text-secondary hover:bg-surface-muted"
                     >
                       Training level
                       <ChevronDown className={`w-4 h-4 transition-transform ${showTrainingLevel ? 'rotate-180' : ''}`} />
                     </button>
                     {showTrainingLevel && (
-                      <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div className="absolute top-full left-0 mt-1 w-48 bg-surface border border-default rounded-lg shadow-lg z-10">
                         <div className="p-2">
                           {trainingLevels.map((level) => (
-                            <label key={level.name} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <label key={level.name} className="flex items-center justify-between p-2 hover:bg-surface-muted rounded cursor-pointer">
                               <div className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
                                   checked={selectedTrainingLevel.includes(level.name)}
                                   onChange={() => toggleTrainingLevel(level.name)}
-                                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                  className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                                 />
-                                <span className="text-sm text-gray-700">{level.name}</span>
+                                <span className="text-sm text-secondary">{level.name}</span>
                               </div>
-                              <span className="text-xs text-gray-400">{level.count}</span>
+                              <span className="text-xs text-tertiary">{level.count}</span>
                             </label>
                           ))}
                         </div>
@@ -277,26 +277,26 @@ export default function ResourcesPage() {
                   <div className="relative">
                     <button
                       onClick={() => setShowDuration(!showDuration)}
-                      className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                      className="flex items-center gap-2 px-4 py-2 border border-default rounded-lg bg-surface text-sm font-medium text-secondary hover:bg-surface-muted"
                     >
                       Duration
                       <ChevronDown className={`w-4 h-4 transition-transform ${showDuration ? 'rotate-180' : ''}`} />
                     </button>
                     {showDuration && (
-                      <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div className="absolute top-full left-0 mt-1 w-48 bg-surface border border-default rounded-lg shadow-lg z-10">
                         <div className="p-2">
                           {durations.map((duration) => (
-                            <label key={duration.name} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <label key={duration.name} className="flex items-center justify-between p-2 hover:bg-surface-muted rounded cursor-pointer">
                               <div className="flex items-center gap-2">
                                 <input
                                   type="checkbox"
                                   checked={selectedDuration.includes(duration.name)}
                                   onChange={() => toggleDuration(duration.name)}
-                                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                  className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                                 />
-                                <span className="text-sm text-gray-700">{duration.name}</span>
+                                <span className="text-sm text-secondary">{duration.name}</span>
                               </div>
-                              <span className="text-xs text-gray-400">{duration.count}</span>
+                              <span className="text-xs text-tertiary">{duration.count}</span>
                             </label>
                           ))}
                         </div>
@@ -317,36 +317,36 @@ export default function ResourcesPage() {
                     delay={500 + (index * 100)} 
                     duration={600}
                   >
-                    <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                    <div className="bg-surface border border-default rounded-lg p-6 hover:shadow-lg transition-all duration-300 group cursor-pointer">
                       {/* Icon */}
                       <div className="flex items-center justify-between mb-4">
-                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                          <FileText className="w-5 h-5 text-purple-600" />
+                        <div className="w-10 h-10 bg-accent-soft rounded-lg flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-accent" />
                         </div>
-                        <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                        <ExternalLink className="w-4 h-4 text-tertiary group-hover:text-accent transition-colors" />
                       </div>
 
                       {/* Type Badge */}
                       <div className="mb-3">
-                        <span className="text-xs font-medium text-purple-600 uppercase tracking-wide">
+                        <span className="text-xs font-medium text-accent uppercase tracking-wide">
                           {resource.type}
                         </span>
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                      <h3 className="text-lg font-semibold text-primary mb-2 group-hover:text-accent transition-colors">
                         {resource.title}
                       </h3>
 
                       {/* Meta Info */}
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                      <div className="flex items-center gap-4 text-sm text-tertiary mb-3">
                         <span>{resource.level}</span>
                         <span>•</span>
                         <span>{resource.duration}</span>
                       </div>
 
                       {/* Description */}
-                      <p className="text-sm text-gray-600 line-clamp-3">
+                      <p className="text-sm text-secondary line-clamp-3">
                         {resource.description}
                       </p>
                     </div>
@@ -357,14 +357,14 @@ export default function ResourcesPage() {
               {/* No Results */}
               {filteredResources.length === 0 && (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-gray-400" />
+                  <div className="w-16 h-16 bg-surface-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-8 h-8 text-tertiary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No resources found</h3>
-                  <p className="text-gray-600 mb-4">Try adjusting your search or filters</p>
+                  <h3 className="text-lg font-semibold text-primary mb-2">No resources found</h3>
+                  <p className="text-secondary mb-4">Try adjusting your search or filters</p>
                   <button
                     onClick={clearAllFilters}
-                    className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                    className="text-accent hover:opacity-80 font-medium transition-colors"
                   >
                     Clear all filters
                   </button>

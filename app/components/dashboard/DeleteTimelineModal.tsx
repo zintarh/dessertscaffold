@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Trash2,  } from "lucide-react";
-import GradientButton from "../ui/GradientButton";
 import { Timeline } from '@/types';
 import toast from 'react-hot-toast';
+import Button from '@/app/(user)/components/ui/Button';
 
 interface DeleteTimelineModalProps {
   isOpen: boolean;
@@ -97,7 +97,7 @@ export default function DeleteTimelineModal({
             >
               Cancel
             </button>
-            <GradientButton
+            <Button
               onClick={handleDelete}
               disabled={isDeleting}
               variant="danger"
@@ -115,7 +115,7 @@ export default function DeleteTimelineModal({
                   <span>Delete Timeline</span>
                 </>
               )}
-            </GradientButton>
+            </Button>
           </div>
         </motion.div>
       </motion.div>

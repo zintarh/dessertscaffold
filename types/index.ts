@@ -54,3 +54,32 @@ export interface TimelineCreationState {
   sections: TimelineSection[];
   isCreating: boolean;
 }
+
+
+
+export interface MentorData {
+  id: string;
+  name: string;
+  email: string;
+  userType: string;
+  institutionName?: string;
+  researchArea?: string;
+  academicLevel?: string;
+  image?: string;
+  expertise: string[];
+  hourlyRate: number;
+  rating: number;
+  reviewCount: number;
+  bio: string;
+  availability: string;
+  responseTime: string;
+  completedProjects: number;
+  specializations: string[];
+  languages: string[];
+  timezone: string;
+  education: string[];
+  publications: string[];
+  socialLinks: Record<string, string>;
+  isVerified: boolean;
+  hasCompleteProfile: boolean;
+}

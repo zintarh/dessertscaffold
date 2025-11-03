@@ -1,5 +1,5 @@
 "use client";
-import { Check,  } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface Goal {
   id: string;
@@ -35,22 +35,22 @@ export default function GoalsStep({
               onClick={() => onSelectGoal(goal.id)}
               className={`relative p-6 text-left border-2 rounded-xl transition-all duration-200 hover:shadow-md ${
                 isSelected
-                  ? `${goal.borderColor} ${goal.bgColor} ring-2 ring-purple-200`
-                  : "border-gray-200 hover:border-gray-300 bg-white"
+                  ? `border-default bg-accent-soft ring-2 ring-[var(--accent)]`
+                  : "border-default hover:bg-surface-muted bg-surface"
               }`}
             >
               {isSelected && (
                 <div className="absolute top-4 right-4">
-                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-accent rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" />
                   </div>
                 </div>
               )}
 
               <div
-                className={`w-12 h-12 ${goal.bgColor} rounded-lg flex items-center justify-center mb-4`}
+                className={`w-12 h-12 bg-accent-soft rounded-lg flex items-center justify-center mb-4`}
               >
-                <Icon className={`w-6 h-6 ${goal.color}`} />
+                <Icon className={`w-6 h-6 text-accent`} />
               </div>
 
               <div>
@@ -61,11 +61,9 @@ export default function GoalsStep({
                   >
                     {goal.title}
                   </h3>
-                 
                 </div>
                 <p
-                  className="text-sm"
-                  style={{ color: "var(--text-secondary)" }}
+                  className="text-sm text-secondary"
                 >
                   {goal.description}
                 </p>

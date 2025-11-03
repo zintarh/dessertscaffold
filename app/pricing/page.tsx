@@ -128,7 +128,7 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-primary-bg">
       <PageAnimation>
         {/* Navbar */}
         <AnimatedSection animationType="fadeIn" delay={100} duration={600}>
@@ -142,11 +142,11 @@ export default function PricingPage() {
             {/* Header Section */}
             <AnimatedSection animationType="fadeInUp" delay={200} duration={800}>
               <div className="text-center mb-12">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-primary mb-6">
                   Compare plans
                 </h1>
-                <p className="text-lg sm:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                  Use Dissert Scaffold for free with your entire team. Upgrade to unlock advanced features, 
+                <p className="text-lg sm:text-xl text-secondary max-w-4xl mx-auto leading-relaxed">
+                  Use Dissertation Scaffold for free with your entire team. Upgrade to unlock advanced features, 
                   expert mentorship, unlimited evaluations, and more.
                 </p>
               </div>
@@ -154,12 +154,12 @@ export default function PricingPage() {
 
             {/* Pricing Table */}
             <AnimatedSection animationType="fadeInUp" delay={300} duration={800}>
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-surface rounded-2xl shadow-sm border border-default overflow-hidden">
                 
                 {/* Table Header */}
-                <div className="grid grid-cols-4 gap-4 p-6 border-b border-gray-200 bg-gray-50">
+                <div className="grid grid-cols-4 gap-4 p-6 border-b border-default bg-surface-muted">
                   <div className="text-left">
-                    <h3 className="text-lg font-semibold text-gray-900">Features</h3>
+                    <h3 className="text-lg font-semibold text-primary">Features</h3>
                   </div>
                   {plans.map((plan, index) => (
                     <div key={plan.name} className="text-center">
@@ -170,11 +170,11 @@ export default function PricingPage() {
                         <span className={`text-3xl font-bold ${plan.color}`}>
                           {plan.price}
                         </span>
-                        <span className="text-sm text-gray-500 ml-1">
+                        <span className="text-sm text-tertiary ml-1">
                           {plan.period}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm text-secondary mt-2">
                         {plan.description}
                       </p>
                     </div>
@@ -182,14 +182,14 @@ export default function PricingPage() {
                 </div>
 
                 {/* Feature Rows */}
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-[var(--border)]">
                   {features.map((feature, featureIndex) => (
-                    <div key={feature.name} className="grid grid-cols-4 gap-4 p-6 hover:bg-gray-50 transition-colors">
+                    <div key={feature.name} className="grid grid-cols-4 gap-4 p-6 hover:bg-surface-muted transition-colors">
                       <div className="text-left">
-                        <h4 className="font-medium text-gray-900 mb-1">
+                        <h4 className="font-medium text-primary mb-1">
                           {feature.name}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-secondary">
                           {feature.description}
                         </p>
                       </div>
@@ -198,7 +198,7 @@ export default function PricingPage() {
                           {plan.features[featureIndex] ? (
                             <Check className={`w-5 h-5 ${plan.checkColor}`} />
                           ) : (
-                            <X className="w-5 h-5 text-gray-300" />
+                            <X className="w-5 h-5 text-tertiary" />
                           )}
                         </div>
                       ))}
@@ -207,14 +207,14 @@ export default function PricingPage() {
                 </div>
 
                 {/* CTA Buttons */}
-                <div className="grid grid-cols-4 gap-4 p-6 bg-gray-50 border-t border-gray-200">
+                <div className="grid grid-cols-4 gap-4 p-6 bg-surface-muted border-t border-default">
                   <div></div>
                   {plans.map((plan, index) => (
                     <div key={plan.name} className="text-center">
                       <button 
                         className={`w-full px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                           plan.name === 'Free' 
-                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                            ? 'bg-surface-muted text-secondary hover:opacity-90 border border-default'
                             : 'text-white hover:opacity-90'
                         }`}
                         style={plan.name !== 'Free' ? { 
@@ -232,22 +232,22 @@ export default function PricingPage() {
             {/* Additional Info */}
             <AnimatedSection animationType="fadeInUp" delay={400} duration={800}>
               <div className="mt-12 text-center">
-                <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <div className="bg-surface rounded-xl p-8 shadow-sm border border-default">
+                  <h3 className="text-2xl font-bold text-primary mb-4">
                     All plans include
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="flex items-center justify-center space-x-3">
-                      <Check className="w-5 h-5 text-purple-600" />
-                      <span className="text-gray-700">No setup fees</span>
+                      <Check className="w-5 h-5 text-accent" />
+                      <span className="text-secondary">No setup fees</span>
                     </div>
                     <div className="flex items-center justify-center space-x-3">
-                      <Check className="w-5 h-5 text-purple-600" />
-                      <span className="text-gray-700">Cancel anytime</span>
+                      <Check className="w-5 h-5 text-accent" />
+                      <span className="text-secondary">Cancel anytime</span>
                     </div>
                     <div className="flex items-center justify-center space-x-3">
-                      <Check className="w-5 h-5 text-purple-600" />
-                      <span className="text-gray-700">30-day money back guarantee</span>
+                      <Check className="w-5 h-5 text-accent" />
+                      <span className="text-secondary">30-day money back guarantee</span>
                     </div>
                   </div>
                 </div>
@@ -257,39 +257,39 @@ export default function PricingPage() {
             {/* FAQ Section */}
             <AnimatedSection animationType="fadeInUp" delay={500} duration={800}>
               <div className="mt-16">
-                <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
+                <h3 className="text-2xl font-bold text-primary text-center mb-8">
                   Frequently Asked Questions
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-semibold text-primary mb-2">
                       Can I change plans anytime?
                     </h4>
-                    <p className="text-gray-600">
+                    <p className="text-secondary">
                       Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-semibold text-primary mb-2">
                       What payment methods do you accept?
                     </h4>
-                    <p className="text-gray-600">
+                    <p className="text-secondary">
                       We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-semibold text-primary mb-2">
                       Is there a free trial?
                     </h4>
-                    <p className="text-gray-600">
+                    <p className="text-secondary">
                       Yes, our Free plan gives you access to core features. Professional plans include a 14-day free trial.
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-semibold text-primary mb-2">
                       Do you offer educational discounts?
                     </h4>
-                    <p className="text-gray-600">
+                    <p className="text-secondary">
                       Yes, we offer special pricing for educational institutions. Contact us for more information.
                     </p>
                   </div>

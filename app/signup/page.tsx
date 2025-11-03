@@ -163,22 +163,12 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFA]">
+    <div className="min-h-screen bg-primary-bg">
       <Toaster position="top-right" />
       <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-lg">
           <div className="mb-8">
-            <div className="text-center flex items-center justify-center space-x-2 mb-8">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm"></div>
-              </div>
-              <span
-                className="text-2xl font-bold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                Dissert Scaffold
-              </span>
-            </div>
+           
 
             <div className="mb-8">
               <h1
@@ -195,7 +185,7 @@ export default function SignupPage() {
               </p>
             </div>
 
-            <Card className="border border-gray-200 shadow-sm bg-white">
+            <Card className="border border-default shadow-sm bg-surface">
               <CardContent className="p-8 w-full">
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 grid-cols-1 gap-x-4">
@@ -262,7 +252,7 @@ export default function SignupPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-3 top-9 text-tertiary hover:text-primary transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -275,71 +265,39 @@ export default function SignupPage() {
                   {/* Password Strength Indicator */}
                   {formData.password && (
                     <div className="space-y-2">
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-secondary">
                         Password requirements:
                       </div>
                       <div className="space-y-1 text-xs">
                         <div
-                          className={`flex items-center space-x-2 ${
-                            formData.password.length >= 8
-                              ? "text-green-600"
-                              : "text-gray-400"
-                          }`}
+                          className={`flex items-center space-x-2 ${formData.password.length >= 8 ? "text-accent" : "text-tertiary"}`}
                         >
                           <div
-                            className={`w-2 h-2 rounded-full ${
-                              formData.password.length >= 8
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full ${formData.password.length >= 8 ? "bg-accent" : "bg-surface-muted"}`}
                           ></div>
                           <span>At least 8 characters</span>
                         </div>
                         <div
-                          className={`flex items-center space-x-2 ${
-                            /[a-z]/.test(formData.password)
-                              ? "text-green-600"
-                              : "text-gray-400"
-                          }`}
+                          className={`flex items-center space-x-2 ${/[a-z]/.test(formData.password) ? "text-accent" : "text-tertiary"}`}
                         >
                           <div
-                            className={`w-2 h-2 rounded-full ${
-                              /[a-z]/.test(formData.password)
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full ${/[a-z]/.test(formData.password) ? "bg-accent" : "bg-surface-muted"}`}
                           ></div>
                           <span>One lowercase letter</span>
                         </div>
                         <div
-                          className={`flex items-center space-x-2 ${
-                            /[A-Z]/.test(formData.password)
-                              ? "text-green-600"
-                              : "text-gray-400"
-                          }`}
+                          className={`flex items-center space-x-2 ${/[A-Z]/.test(formData.password) ? "text-accent" : "text-tertiary"}`}
                         >
                           <div
-                            className={`w-2 h-2 rounded-full ${
-                              /[A-Z]/.test(formData.password)
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full ${/[A-Z]/.test(formData.password) ? "bg-accent" : "bg-surface-muted"}`}
                           ></div>
                           <span>One uppercase letter</span>
                         </div>
                         <div
-                          className={`flex items-center space-x-2 ${
-                            /\d/.test(formData.password)
-                              ? "text-green-600"
-                              : "text-gray-400"
-                          }`}
+                          className={`flex items-center space-x-2 ${/\d/.test(formData.password) ? "text-accent" : "text-tertiary"}`}
                         >
                           <div
-                            className={`w-2 h-2 rounded-full ${
-                              /\d/.test(formData.password)
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
+                            className={`w-2 h-2 rounded-full ${/\d/.test(formData.password) ? "bg-accent" : "bg-surface-muted"}`}
                           ></div>
                           <span>One number</span>
                         </div>
@@ -365,7 +323,7 @@ export default function SignupPage() {
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-3 top-9 text-tertiary hover:text-primary transition-colors"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -377,7 +335,7 @@ export default function SignupPage() {
 
                   {/* Student Category Dropdown */}
                   <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <label className="text-sm font-medium text-primary mb-2 block">
                       Student Category
                     </label>
                     <div className="relative">
@@ -386,13 +344,13 @@ export default function SignupPage() {
                         onClick={() =>
                           setShowCategoryDropdown(!showCategoryDropdown)
                         }
-                        className="w-full flex items-center justify-between px-3 py-3 border border-gray-300 rounded-lg bg-white text-left text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                        className="w-full flex items-center justify-between px-3 py-3 border border-default rounded-lg bg-surface text-left text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all duration-200"
                       >
                         <span
                           className={
                             formData.studentCategory
-                              ? "text-gray-900"
-                              : "text-gray-500"
+                              ? "text-primary"
+                              : "text-tertiary"
                           }
                         >
                           {formData.studentCategory
@@ -402,14 +360,14 @@ export default function SignupPage() {
                             : "Select your student category"}
                         </span>
                         <ChevronDown
-                          className={`w-4 h-4 text-gray-400 transition-transform ${
+                          className={`w-4 h-4 text-tertiary transition-transform ${
                             showCategoryDropdown ? "rotate-180" : ""
                           }`}
                         />
                       </button>
 
                       {showCategoryDropdown && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-surface border border-default rounded-lg shadow-lg z-10">
                           {studentCategories.map((category) => (
                             <button
                               key={category.id}
@@ -418,14 +376,14 @@ export default function SignupPage() {
                                 updateFormData("studentCategory", category.id);
                                 setShowCategoryDropdown(false);
                               }}
-                              className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                              className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-surface-muted transition-colors"
                             >
                               <div className="text-lg">{category.icon}</div>
                               <div>
-                                <div className="font-medium text-gray-900">
+                                <div className="font-medium text-primary">
                                   {category.name}
                                 </div>
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-secondary">
                                   {category.description}
                                 </div>
                               </div>
@@ -446,20 +404,20 @@ export default function SignupPage() {
                     <input
                       type="checkbox"
                       required
-                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mt-1"
+                      className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] mt-1 bg-transparent"
                     />
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-secondary">
                       I agree to the{" "}
                       <Link
                         href="/terms"
-                        className="text-purple-600 hover:text-purple-800 font-medium"
+                        className="text-accent hover:opacity-80 font-medium"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
                         href="/privacy"
-                        className="text-purple-600 hover:text-purple-800 font-medium"
+                        className="text-accent hover:opacity-80 font-medium"
                       >
                         Privacy Policy
                       </Link>
@@ -470,7 +428,7 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 hover:opacity-90"
+                    className="w-full disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 hover:opacity-90"
                     style={{
                       backgroundColor: "var(--primary-button)",
                     }}
@@ -487,6 +445,12 @@ export default function SignupPage() {
                 </form>
               </CardContent>
             </Card>
+
+            <div className="mt-6 text-center">
+              <Link href="/" className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-default text-sm font-medium text-secondary hover:text-primary hover:bg-surface-muted transition-colors">
+                Back to Home
+              </Link>
+            </div>
 
             {/* Sign In Link */}
             <div className="mt-6 text-center">

@@ -28,11 +28,9 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse and validate request body
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email: validatedData.email },
     });
@@ -46,15 +44,12 @@ export async function POST(request: NextRequest) {
         { status: 409 }
       );
     }
-
-    // Hash password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(
       validatedData.password,
       saltRounds
     );
 
-    // Create user
     const userData: any = {
       email: validatedData.email,
       password: hashedPassword,
@@ -65,22 +60,14 @@ export async function POST(request: NextRequest) {
       institutionName: validatedData.institutionName,
       researchArea: validatedData.researchArea,
       academicLevel: validatedData.academicLevel,
-      isActive: true, // Set as active immediately (no email verification required)
+      isActive: true, 
     };
 
     const user = await (prisma as any).user.create({
       data: userData,
     });
 
-    // Email verification removed for now - will be added later
-    // try {
-    //   await sendVerificationEmail(validatedData.email, verificationToken, validatedData.firstName);
-    // } catch (emailError) {
-    //   console.error('Failed to send verification email:', emailError);
-    //   // Don't fail registration if email fails, but log it
-    // }
 
-    // Return success response
     return NextResponse.json(
       {
         success: true,

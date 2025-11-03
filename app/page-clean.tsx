@@ -1,27 +1,40 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { GraduationCap, Zap, Users, BookOpen, TrendingUp, ArrowRight, Play, Star, Rocket, Brain, Clock, Award } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import {
+  GraduationCap,
+  Zap,
+  Users,
+  BookOpen,
+  TrendingUp,
+  ArrowRight,
+  Play,
+  Star,
+  Rocket,
+  Brain,
+  Clock,
+  Award,
+} from "lucide-react";
 
 export default function Home() {
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [researchTopic, setResearchTopic] = useState('');
+  const [researchTopic, setResearchTopic] = useState("");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   const handleEvaluate = async () => {
     if (!researchTopic.trim()) return;
     setIsEvaluating(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsEvaluating(false);
   };
 
@@ -29,57 +42,62 @@ export default function Home() {
     {
       icon: Brain,
       title: "AI Research Evaluation",
-      description: "Get instant feedback on your research topic across 6 key academic metrics with our advanced AI system."
+      description:
+        "Get instant feedback on your research topic across 6 key academic metrics with our advanced AI system.",
     },
     {
       icon: TrendingUp,
       title: "Progress Tracking",
-      description: "Visualize your research journey with comprehensive progress tracking and milestone management."
+      description:
+        "Visualize your research journey with comprehensive progress tracking and milestone management.",
     },
     {
       icon: Clock,
       title: "Timeline Planning",
-      description: "Create structured timelines for your research proposals and dissertations with intelligent scheduling."
+      description:
+        "Create structured timelines for your research proposals and dissertations with intelligent scheduling.",
     },
     {
       icon: BookOpen,
       title: "Resource Library",
-      description: "Access templates, guides, and academic resources curated specifically for your research field."
+      description:
+        "Access templates, guides, and academic resources curated specifically for your research field.",
     },
     {
       icon: Users,
       title: "Academic Community",
-      description: "Connect with fellow researchers, mentors, and experts in your field for collaboration and support."
+      description:
+        "Connect with fellow researchers, mentors, and experts in your field for collaboration and support.",
     },
     {
       icon: Award,
       title: "Grant Writing Support",
-      description: "Get assistance with grant applications and funding opportunities tailored to your research area."
-    }
+      description:
+        "Get assistance with grant applications and funding opportunities tailored to your research area.",
+    },
   ];
 
   const stats = [
     { number: "10,000+", label: "Active Researchers" },
     { number: "50,000+", label: "Topics Evaluated" },
     { number: "95%", label: "Success Rate" },
-    { number: "24/7", label: "AI Support" }
+    { number: "24/7", label: "AI Support" },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden relative">
-      {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div 
+        <div
           className="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
           style={{
             left: mousePosition.x - 192,
             top: mousePosition.y - 192,
-            transition: 'all 0.3s ease-out'
+            transition: "all 0.3s ease-out",
           }}
         />
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-2xl animate-bounce" />
         <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-pink-500/10 rounded-full blur-xl animate-pulse" />
-        
+
         {/* Floating particles */}
         {[...Array(20)].map((_, i) => (
           <motion.div
@@ -103,14 +121,14 @@ export default function Home() {
       </div>
 
       {/* Navigation */}
-      <motion.nav 
+      <motion.nav
         className="relative z-50 px-6 py-6"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div 
+          <motion.div
             className="flex items-center space-x-3"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -122,9 +140,9 @@ export default function Home() {
               Dissertation Scaffold
             </span>
           </motion.div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
-            {['Features', 'Pricing', 'About', 'Contact'].map((item, index) => (
+            {["Features", "Pricing", "About", "Contact"].map((item, index) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
@@ -138,8 +156,8 @@ export default function Home() {
               </motion.a>
             ))}
           </div>
-          
-          <motion.button 
+
+          <motion.button
             className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             initial={{ x: 100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -153,7 +171,7 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         className="relative z-10 px-6 py-20 text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -166,23 +184,25 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-8"
           >
-            <motion.div 
+            <motion.div
               className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-8"
-              animate={{ 
+              animate={{
                 boxShadow: [
-                  '0 0 20px rgba(59, 130, 246, 0.3)',
-                  '0 0 40px rgba(147, 51, 234, 0.3)',
-                  '0 0 20px rgba(59, 130, 246, 0.3)'
-                ]
+                  "0 0 20px rgba(59, 130, 246, 0.3)",
+                  "0 0 40px rgba(147, 51, 234, 0.3)",
+                  "0 0 20px rgba(59, 130, 246, 0.3)",
+                ],
               }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <Zap className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm font-medium text-gray-200">AI-Powered Research Assistant</span>
+              <span className="text-sm font-medium text-gray-200">
+                AI-Powered Research Assistant
+              </span>
             </motion.div>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-5xl md:text-7xl font-bold mb-8 leading-tight"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -194,19 +214,20 @@ export default function Home() {
             <br />
             <span className="text-white">Research Journey</span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Navigate your academic journey with confidence. Get AI-powered research evaluation, 
-            structured progress tracking, and connect with a community of scholars.
+            Navigate your academic journey with confidence. Get AI-powered
+            research evaluation, structured progress tracking, and connect with
+            a community of scholars.
           </motion.p>
-          
+
           {/* Research Topic Input */}
-          <motion.div 
+          <motion.div
             className="max-w-2xl mx-auto mb-12"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -243,14 +264,14 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="flex flex-col sm:flex-row items-center justify-center gap-6"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.0 }}
           >
-            <motion.button 
+            <motion.button
               className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -258,8 +279,8 @@ export default function Home() {
               <span>Start Free Trial</span>
               <ArrowRight className="w-5 h-5" />
             </motion.button>
-            
-            <motion.button 
+
+            <motion.button
               className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-300 group"
               whileHover={{ x: 5 }}
             >
@@ -273,7 +294,7 @@ export default function Home() {
       </motion.section>
 
       {/* Stats Section */}
-      <motion.section 
+      <motion.section
         className="py-20 px-6 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -300,7 +321,7 @@ export default function Home() {
       </motion.section>
 
       {/* Features Section */}
-      <motion.section 
+      <motion.section
         className="py-20 px-6 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -308,7 +329,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <motion.h2 
+            <motion.h2
               className="text-4xl md:text-6xl font-bold mb-6"
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -318,13 +339,14 @@ export default function Home() {
                 Core Features
               </span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-xl text-gray-300 max-w-3xl mx-auto"
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Everything you need to navigate your research journey with confidence and precision
+              Everything you need to navigate your research journey with
+              confidence and precision
             </motion.p>
           </div>
 
@@ -357,7 +379,7 @@ export default function Home() {
       </motion.section>
 
       {/* CTA Section */}
-      <motion.section 
+      <motion.section
         className="py-20 px-6 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -365,7 +387,7 @@ export default function Home() {
       >
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-white/10 rounded-3xl p-12">
-            <motion.h2 
+            <motion.h2
               className="text-4xl md:text-5xl font-bold mb-6 text-white"
               initial={{ y: 30, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
@@ -373,22 +395,23 @@ export default function Home() {
             >
               Ready to Transform Your Research?
             </motion.h2>
-            <motion.p 
+            <motion.p
               className="text-xl text-gray-300 mb-8"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Join thousands of researchers who have already accelerated their academic success
+              Join thousands of researchers who have already accelerated their
+              academic success
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
               initial={{ y: 20, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <motion.button 
+              <motion.button
                 className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -396,8 +419,8 @@ export default function Home() {
                 <span>Start Free Trial</span>
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
-              
-              <motion.button 
+
+              <motion.button
                 className="border border-white/20 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white/10 transition-all duration-300 flex items-center space-x-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -406,7 +429,7 @@ export default function Home() {
                 <span>Watch Demo</span>
               </motion.button>
             </motion.div>
-            
+
             <div className="flex items-center justify-center space-x-8 text-gray-400 mt-8 text-sm">
               <div className="flex items-center space-x-2">
                 <Star className="w-4 h-4" />

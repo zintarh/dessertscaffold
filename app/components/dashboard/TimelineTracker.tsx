@@ -9,14 +9,11 @@ import {
   PlayCircle,
   Circle,
   TrendingUp,
-  BarChart3,
-  ArrowRight,
-  Trash2,
+  EllipsisVertical,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Timeline, TimelineSection } from "@/types";
 
-// Utility function to safely parse dates from API
 const parseDate = (
   dateValue: Date | string | null | undefined
 ): Date | null => {
@@ -29,11 +26,15 @@ const parseDate = (
   return null;
 };
 
-// Utility function to format dates safely
+// Utility function to format dates safely (Month DD, YYYY)
 const formatDate = (dateValue: Date | string | null | undefined): string => {
   const date = parseDate(dateValue);
   if (!date) return "Not set";
-  return date.toLocaleDateString();
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 };
 
 interface TimelineTrackerProps {
@@ -46,7 +47,6 @@ interface TimelineTrackerProps {
   onDeleteClick?: (timeline: Timeline) => void;
 }
 
-// Compact card component for dashboard
 export function TimelineCard({
   timeline,
   onDeleteClick,
@@ -55,14 +55,7 @@ export function TimelineCard({
   onDeleteClick?: (timeline: Timeline) => void;
 }) {
   const router = useRouter();
-
-  const calculateProgress = () => {
-    const totalSections = timeline.sections.length;
-    const completedSections = timeline.sections.filter(
-      (s) => s.status === "completed"
-    ).length;
-    return Math.round((completedSections / totalSections) * 100);
-  };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 
   const getCurrentSection = () => {
@@ -78,7 +71,6 @@ export function TimelineCard({
   };
 
   const currentSection = getCurrentSection();
-
   const handleCardClick = () => {
     if (!timeline.id) {
       console.error("Timeline ID is missing:", timeline);
@@ -86,14 +78,14 @@ export function TimelineCard({
     }
 
     try {
-      router.push(`/user/timelines/${timeline.id}`);
+      router.push(`/timelines/${timeline.id}`);
     } catch (error) {
       console.error("Navigation error:", error);
     }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation(); 
     if (onDeleteClick) {
       onDeleteClick(timeline);
     }
@@ -102,52 +94,79 @@ export function TimelineCard({
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 cursor-pointer group relative"
+      className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-200 cursor-pointer group relative"
       style={{ userSelect: "none" }}
     >
-      {/* Action buttons */}
-      <div className="absolute top-2 right-2 flex items-center space-x-2">
+      {/* Actions menu */}
+      <div className="absolute top-2 right-2">
         <button
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/user/timelines/${timeline.id}/gantt`);
+            setIsMenuOpen((v) => !v);
           }}
-          className="p-1 text-gray-400 hover:text-green-500 transition-colors rounded-full hover:bg-green-50"
-          title="View Gantt Chart"
+          className="p-1.5 text-gray-400 hover:text-gray-700 rounded-md hover:bg-gray-100"
+          aria-haspopup="menu"
+          aria-expanded={isMenuOpen}
         >
-          <BarChart3 className="w-4 h-4" />
+          <EllipsisVertical className="w-4 h-4" />
         </button>
-
-        <button
-          onClick={handleDeleteClick}
-          className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50"
-          title="Delete timeline"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-
-      
+        {isMenuOpen && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+            role="menu"
+          >
+            <button
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              onClick={() => {
+                setIsMenuOpen(false);
+                router.push(`/timelines/${timeline.id}`);
+              }}
+              role="menuitem"
+            >
+              Open Timeline
+            </button>
+            <button
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              onClick={() => {
+                setIsMenuOpen(false);
+                router.push(`/timelines/${timeline.id}/gantt`);
+              }}
+              role="menuitem"
+            >
+              View Gantt
+            </button>
+            <button
+              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+              onClick={(e) => {
+                setIsMenuOpen(false);
+                handleDeleteClick(e as unknown as React.MouseEvent);
+              }}
+              role="menuitem"
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate">
+          <h3 className="text-[17px] max-w-xl capitalize font-semibold text-gray-900 leading-6 line-clamp-1">
             {timeline.researchTopic}
           </h3>
           {timeline.documentType && (
-            <p className="text-sm text-gray-700 truncate mb-1">
-              {timeline.documentType}
+            <p className="text-[11px] font-semibold tracking-wide text-gray-500 uppercase mt-0.5 line-clamp-1">
+              {timeline.documentType.replaceAll("_", " ")}
             </p>
           )}
-          <p className="text-xs text-gray-500 truncate">
+          <p className="text-xs text-gray-500 mt-1 line-clamp-1">
             {timeline.academicLevel} • {timeline.discipline}
           </p>
         </div>
-        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
       </div>
 
-      {/* Current Section */}
       {currentSection && (
         <div className="flex items-center space-x-2 text-xs text-gray-600">
           <div
@@ -166,8 +185,7 @@ export function TimelineCard({
         </div>
       )}
 
-      {/* Timeline Dates */}
-      <div className="flex items-center space-x-1 text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+      <div className="flex items-center space-x-1 text-xs text-gray-500 mt-4 pt-3 border-t border-gray-100">
         <Calendar className="w-3 h-3" />
         <span>
           {formatDate(timeline.startDate)} -{" "}

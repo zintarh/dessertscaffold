@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Bold, Italic, Underline, Link, List, Quote, Type, AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 import ParagraphEditor from './ParagraphEditor';
 import { AnimatePresence, motion } from 'framer-motion';
 

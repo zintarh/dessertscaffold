@@ -227,9 +227,7 @@ export class DataDeduplicator {
     return Array.from(seen.values());
   }
 
-  /**
-   * Deduplicate funding opportunities by title similarity
-   */
+  
   static deduplicateFunding(funding: Funding[], similarityThreshold: number = 0.85): Funding[] {
     const seen = new Map<string, Funding>();
     
@@ -239,7 +237,6 @@ export class DataDeduplicator {
       for (const [key, existingFund] of seen.entries()) {
         const similarity = DataCleaner.calculateSimilarity(fund.title, existingFund.title);
         if (similarity >= similarityThreshold) {
-          // Keep the funding with more complete information
           if ((fund.amount && !existingFund.amount) || 
               (fund.deadline && !existingFund.deadline) ||
               (fund.abstractOrDesc && !existingFund.abstractOrDesc)) {

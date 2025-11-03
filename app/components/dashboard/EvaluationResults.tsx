@@ -5,7 +5,6 @@ import { useAtom } from 'jotai';
 import { resultAtom, statusAtom } from '@/lib/stores/evaluationStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
-import { Button } from '@/app/components/ui/button';
 import { Progress } from '@/app/components/ui/progress';
 import { 
   FileText, 
@@ -18,6 +17,7 @@ import {
   Lightbulb,
   ExternalLink,
 } from 'lucide-react';
+import Button from '@/app/(user)/components/ui/Button';
 
 /**
  * Research Topic Evaluation Results Component
@@ -169,7 +169,7 @@ export function EvaluationResults() {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <Button asChild variant="default">
+            <Button  variant="secondary">
               <a 
                 href={report.htmlUrl} 
                 target="_blank" 
@@ -181,7 +181,7 @@ export function EvaluationResults() {
               </a>
             </Button>
             
-            <Button asChild variant="outline">
+            <Button  variant="secondary">
               <a 
                 href={report.pdfUrl} 
                 download

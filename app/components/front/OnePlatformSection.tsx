@@ -42,14 +42,22 @@ function MetricCard({ feature }: MetricCardProps) {
 
   return (
     <div
-      className={`${feature.bgColor} ${feature.borderColor} w-full h-full border-2 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 relative hover:shadow-lg transition-shadow duration-300`}
+      className={`metric-card w-full h-full rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 relative hover:shadow-lg transition-shadow duration-300 ${feature.bgColor}`}
+      style={{
+        // Map existing feature props to CSS vars when present (fallback to theme classes)
+        // This keeps current light palette while enabling dark overrides
+        ['--metric-bg' as any]: undefined,
+        ['--metric-border' as any]: undefined,
+        ['--metric-text' as any]: undefined,
+        ['--metric-accent' as any]: undefined,
+      }}
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-4 sm:mb-6">
-        <h3 className={`text-xl sm:text-2xl md:text-3xl font-bold ${feature.textColor}`}>
+        <h3 className={`text-xl sm:text-2xl md:text-3xl font-bold metric-title`}>
           {feature.title}
         </h3>
-        <div className={`${feature.iconColor} w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white flex-shrink-0`}>
+        <div className={`metric-icon w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center text-white flex-shrink-0`}>
           <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
         </div>
       </div>
@@ -62,9 +70,7 @@ function MetricCard({ feature }: MetricCardProps) {
             className="w-full flex items-center space-x-3"
           >
             <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded flex items-center justify-center transition-all duration-500 ${
-              item.isActive 
-                ? `${feature.iconColor} text-white` 
-                : `${feature.bgColor} ${feature.textColor} opacity-30`
+              item.isActive ? 'metric-icon text-white' : 'opacity-50 border-2 border-default'
             }`}>
               {item.isActive ? (
                 <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -74,9 +80,7 @@ function MetricCard({ feature }: MetricCardProps) {
                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 border-2 border-current rounded opacity-50" />
               )}
             </div>
-            <span className={`text-sm sm:text-base font-medium ${
-              item.isActive ? 'text-gray-900' : 'text-gray-400'
-            }`}>
+            <span className={`text-sm sm:text-base font-medium metric-text`}>
               {item.name}
             </span>
           </div>
@@ -84,7 +88,7 @@ function MetricCard({ feature }: MetricCardProps) {
       </div>
 
       {/* Description */}
-      <p className={`text-sm sm:text-base ${feature.textColor} leading-relaxed`}>
+      <p className={`text-sm sm:text-base metric-text leading-relaxed`}>
         {feature.description}
       </p>
     </div>
@@ -95,10 +99,10 @@ export default function OnePlatformSection() {
   const features = [
     {
       title: "Novelty",
-      bgColor: "bg-green-50",
-      iconColor: "bg-[#6CB95E]",
-      textColor: "text-green-800",
-      borderColor: "border-green-200",
+      bgColor: "metric--novelty",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Innovation Score", active: true },
         { name: "Uniqueness Analysis", active: true },
@@ -112,10 +116,10 @@ export default function OnePlatformSection() {
     },
     {
       title: "Grant Potential",
-      bgColor: "bg-pink-50",
-      iconColor: "bg-[#E063C7]",
-      textColor: "text-[#E063C7]",
-      borderColor: "border-pink-200",
+      bgColor: "metric--grant",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Funding Alignment", active: true },
         { name: "NSF Priorities", active: true },
@@ -129,10 +133,10 @@ export default function OnePlatformSection() {
     },
     {
       title: "Research Gaps",
-      bgColor: "bg-purple-50",
-      iconColor: "bg-purple-800",
-      textColor: "text-purple-800",
-      borderColor: "border-purple-200",
+      bgColor: "metric--gaps",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Literature Review", active: true },
         { name: "Knowledge Gaps", active: true },
@@ -146,10 +150,10 @@ export default function OnePlatformSection() {
     },
     {
       title: "Trends",
-      bgColor: "bg-blue-50",
-      iconColor: "bg-blue-600",
-      textColor: "text-blue-800",
-      borderColor: "border-blue-200",
+      bgColor: "metric--trends",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Market Trends", active: true },
         { name: "Publication Growth", active: true },
@@ -163,10 +167,10 @@ export default function OnePlatformSection() {
     },
     {
       title: "Methodology",
-      bgColor: "bg-orange-50",
-      iconColor: "bg-orange-600",
-      textColor: "text-orange-800",
-      borderColor: "border-orange-200",
+      bgColor: "metric--methodology",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Complexity Score", active: true },
         { name: "Technical Feasibility", active: true },
@@ -180,10 +184,10 @@ export default function OnePlatformSection() {
     },
     {
       title: "Impact",
-      bgColor: "bg-teal-50",
-      iconColor: "bg-teal-600",
-      textColor: "text-teal-800",
-      borderColor: "border-teal-200",
+      bgColor: "metric--impact",
+      iconColor: "",
+      textColor: "",
+      borderColor: "",
       items: [
         { name: "Scientific Impact", active: true },
         { name: "Social Relevance", active: true },
@@ -199,18 +203,18 @@ export default function OnePlatformSection() {
 
 
   return (
-    <div className="bg-white py-12 sm:py-16 md:py-20">
+    <div className="bg-primary-bg py-12 sm:py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-2">
             Six Key Metrics.
           </h2>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6"> Complete Analysis.</h2>
-          <p className="text-gray-900 text-lg sm:text-xl md:text-2xl">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-4 sm:mb-6"> Complete Analysis.</h2>
+          <p className="text-primary text-lg sm:text-xl md:text-2xl">
             Evaluate your research topic across all critical dimensions 
           </p>
-          <p className="text-gray-900 text-lg sm:text-xl md:text-2xl">to maximize your chances of success and funding.</p>
+          <p className="text-primary text-lg sm:text-xl md:text-2xl">to maximize your chances of success and funding.</p>
         </div>
 
         {/* Feature Cards */}

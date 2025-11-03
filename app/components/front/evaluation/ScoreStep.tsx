@@ -45,9 +45,9 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
   );
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-emerald-600";
-    if (score >= 60) return "text-amber-600";
-    return "text-purple-600";
+    if (score >= 80) return "text-accent"; // use brand accent for top scores
+    if (score >= 60) return "text-secondary"; // medium contrast
+    return "text-tertiary"; // low contrast subtle
   };
 
   const getScoreIcon = (score: number) => {
@@ -56,16 +56,13 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
     return Target;
   };
 
-  const getScoreGradient = (score: number) => {
-    if (score >= 80) return "from-emerald-500 to-green-800";
-    if (score >= 60) return "from-amber-300 to-yellow-500";
-    return "from-purple-200 to-indigo-300";
+  const getScoreGradient = (_score: number) => {
+    // unify with accent for consistency
+    return "from-[var(--accent)] to-[var(--accent)]";
   };
 
-  const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-50 border-emerald-200";
-    if (score >= 60) return "bg-amber-50 border-amber-200";
-    return "bg-purple-50 border-purple-200";
+  const getScoreBgColor = (_score: number) => {
+    return "bg-surface border-default";
   };
 
   const truncateDescription = (
@@ -89,7 +86,7 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
         <div className="text-lg" style={{ color: "var(--text-secondary)" }}>
           Overall Score
         </div>
-        <div className="w-32 h-2 bg-gray-200 rounded-full mx-auto mt-4">
+        <div className="w-32 h-2 bg-surface-muted rounded-full mx-auto mt-4">
           <div
             className={`h-2 bg-gradient-to-r ${getScoreGradient(
               evaluationData.overall
@@ -107,13 +104,13 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
           return (
             <div
               key={`metric-${index}-${metric.name}`}
-              className={`border rounded-lg bg-white hover:shadow-md transition-all duration-200 ${getScoreBgColor(
+              className={`border rounded-lg hover:shadow-md transition-all duration-200 ${getScoreBgColor(
                 metric.score
               )}`}
             >
               <button
                 onClick={(e) => toggleMetric(index, e)}
-                className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="w-full p-4 text-left flex items-center justify-between hover:bg-surface-muted transition-colors"
               >
                 <div className="flex items-center space-x-3">
                   <div
@@ -150,15 +147,15 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
                     {metric.score * 10}%
                   </span>
                   {isExpanded ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                    <ChevronDown className="w-5 h-5 text-tertiary" />
                   ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-tertiary" />
                   )}
                 </div>
               </button>
 
               <div className="px-4 pb-2">
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-surface-muted rounded-full h-2">
                   <div
                     className={`h-2 bg-gradient-to-r ${getScoreGradient(
                       metric.score
@@ -169,7 +166,7 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
               </div>
 
               {isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-100">
+                <div className="px-4 pb-4 border-t border-default">
                   <div className="pt-4">
                     <h5
                       className="font-medium mb-3"
@@ -193,11 +190,7 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
                         </p>
                       </div>
 
-                      <div
-                        className={`p-3 rounded-lg ${getScoreBgColor(
-                          metric.score
-                        )}`}
-                      >
+                      <div className={`p-3 rounded-lg bg-surface-muted border border-default`}>
                         <div className="flex items-center space-x-2">
                           <Check
                             className={`w-4 h-4 ${getScoreColor(metric.score)}`}
@@ -214,7 +207,7 @@ export default function ScoreStep({ evaluationData }: ScoreStepProps) {
                               : "Needs Improvement"}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs text-secondary mt-1">
                           {metric.score >= 8
                             ? "This metric shows strong performance and aligns well with research objectives."
                             : metric.score >= 6

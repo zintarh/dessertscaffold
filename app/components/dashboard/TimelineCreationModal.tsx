@@ -29,8 +29,8 @@ import {
 import { DocumentType, AcademicLevel, Discipline, TimelineSection } from "@/types";
 import Modal, { ModalFooter, ModalSection } from "./Modal";
 import React, { useState, useEffect } from 'react';
-import GradientButton from '../../components/ui/GradientButton';
 import toast from "react-hot-toast";
+import Button from "@/app/(user)/components/ui/Button";
 
 interface TimelineCreationModalProps {
   isOpen: boolean;
@@ -440,14 +440,14 @@ function StepActions({
 
       <div className="flex items-center space-x-3">
         {currentStep === 3 ? (
-          <GradientButton
+          <Button
             onClick={onCreateTimeline}
             disabled={!canCreateTimeline}
             variant="primary"
             size="lg"
           >
             Create Timeline
-          </GradientButton>
+          </Button>
         ) : (
           <button
             onClick={onNext}

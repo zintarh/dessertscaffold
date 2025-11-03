@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "../components/front/Navbar";
-import { Search, ChevronDown, Star } from "lucide-react";
+import { Search, ChevronDown, } from "lucide-react";
 import { useState } from "react";
 import Footer from "../components/front/Footer";
 
@@ -195,24 +195,24 @@ export default function CommunityPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FDFCFA]">
+    <div className="min-h-screen bg-primary-bg">
       <Navbar />
 
         <div className="py-8 sm:py-12 md:py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <div className="lg:w-80 flex-shrink-0">
-                  <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-gray-100 p-4 sm:p-6 sticky top-8">
+                  <div className="bg-surface rounded-2xl sm:rounded-3xl shadow-sm border border-default p-4 sm:p-6 sticky top-8">
                     <div className="mb-6">
 
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-tertiary w-4 h-4" />
                         <input
                           type="text"
                           placeholder="Search mentors..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200"
+                          className="w-full pl-10 pr-4 py-3 border border-default rounded-lg focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent outline-none transition-all duration-200 bg-transparent text-primary placeholder:text-tertiary"
                         />
 
                       </div>
@@ -220,10 +220,10 @@ export default function CommunityPage() {
 
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-primary">
                           Topics
                         </h3>
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-tertiary" />
                       </div>
                       <div className="space-y-2 max-h-64 overflow-y-auto">
                         {topics.map((topic) => (
@@ -235,12 +235,12 @@ export default function CommunityPage() {
                               type="checkbox"
                               checked={selectedTopics.includes(topic.name)}
                               onChange={() => toggleTopic(topic.name)}
-                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                              className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                             />
-                            <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                            <span className="text-sm text-secondary group-hover:text-primary transition-colors">
                               {topic.name}
                             </span>
-                            <span className="text-xs text-gray-400 ml-auto">
+                            <span className="text-xs text-tertiary ml-auto">
                               {topic.count}
                             </span>
                           </label>
@@ -248,13 +248,12 @@ export default function CommunityPage() {
                       </div>
                     </div>
 
-                    {/* Audiences Filter */}
                     <div className="mb-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-primary">
                           Audiences
                         </h3>
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-tertiary" />
                       </div>
                       <div className="space-y-2">
                         {audiences.map((audience) => (
@@ -268,12 +267,12 @@ export default function CommunityPage() {
                                 audience.name
                               )}
                               onChange={() => toggleAudience(audience.name)}
-                              className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                              className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                             />
-                            <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
+                            <span className="text-sm text-secondary group-hover:text-primary transition-colors">
                               {audience.name}
                             </span>
-                            <span className="text-xs text-gray-400 ml-auto">
+                            <span className="text-xs text-tertiary ml-auto">
                               {audience.count}
                             </span>
                           </label>
@@ -281,9 +280,9 @@ export default function CommunityPage() {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-100">
+                    <div className="pt-4 border-t border-default">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-secondary">
                           {filteredMentors.length} out of {mentors.length}{" "}
                           mentors
                         </span>
@@ -292,7 +291,7 @@ export default function CommunityPage() {
                           searchQuery) && (
                           <button
                             onClick={clearAllFilters}
-                            className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                            className="text-sm text-accent hover:opacity-80 font-medium transition-colors"
                           >
                             Reset all filters
                           </button>
@@ -304,9 +303,8 @@ export default function CommunityPage() {
                 <div className="flex-1">
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {filteredMentors.map((mentor, index) => (
-                      <div key={mentor.id} className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
-                          {/* Image */}
-                          <div className="relative h-48 sm:h-56 bg-gray-100">
+                      <div key={mentor.id} className="bg-surface rounded-xl sm:rounded-2xl shadow-sm border border-default overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+                          <div className="relative h-48 sm:h-56 bg-surface-muted">
                             <div
                               className="w-full h-full bg-cover bg-center bg-no-repeat"
                               style={{
@@ -321,24 +319,24 @@ export default function CommunityPage() {
                           <div className="p-4 sm:p-6">
                             {/* Category */}
                             <div className="mb-3">
-                              <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                              <span className="bg-accent-soft text-accent text-xs font-medium px-2 py-1 rounded-full">
                                 {mentor.specialties[0]}
                               </span>
                             </div>
 
                             {/* Title */}
-                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                            <h3 className="text-lg sm:text-xl font-bold text-primary mb-2 group-hover:text-accent transition-colors">
                               {mentor.name}
                             </h3>
 
                             {/* Subtitle */}
-                            <p className="text-sm text-gray-600 mb-3">
+                            <p className="text-sm text-secondary mb-3">
                               {mentor.title}
                             </p>
 
                             {/* Institution */}
                             <div className="mb-4">
-                              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">
+                              <span className="bg-surface-muted text-secondary text-xs font-medium px-2 py-1 rounded-full">
                                 {mentor.institution}
                               </span>
                             </div>
@@ -350,18 +348,18 @@ export default function CommunityPage() {
                   {/* No Results */}
                   {filteredMentors.length === 0 && (
                     <div className="text-center py-12">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Search className="w-8 h-8 text-gray-400" />
+                      <div className="w-16 h-16 bg-surface-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Search className="w-8 h-8 text-tertiary" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-lg font-semibold text-primary mb-2">
                         No mentors found
                       </h3>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-secondary mb-4">
                         Try adjusting your search or filters
                       </p>
                       <button
                         onClick={clearAllFilters}
-                        className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                        className="text-accent hover:opacity-80 font-medium transition-colors"
                       >
                         Clear all filters
                       </button>

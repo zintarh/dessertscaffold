@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, MapPin, Clock, Users, MessageCircle, Heart, DollarSign, FileText, Edit, ArrowRight } from 'lucide-react';
+import { Clock, MessageCircle, DollarSign, FileText, Edit, ArrowRight } from 'lucide-react';
 
 import Modal, { ModalFooter, ModalSection } from './Modal';
 import Link from 'next/link';
 import { useSetAtom } from 'jotai/react';
 import toast from 'react-hot-toast';
 import { Mentor } from '@/lib/types';
-import GradientButton from '../ui/GradientButton';
 import { createMentorBookingAtom, sendMentorNotificationAtom } from '@/lib/stores/mentorStore';
+import Button from '@/app/(user)/components/ui/Button';
 
 interface MentorCardProps {
   mentor: Mentor;
@@ -73,7 +73,6 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
   return (
     <>
       <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden">
-        {/* Header with avatar and basic info */}
         <div className="p-6">
           <div className="flex items-start space-x-4 mb-4">
             <div className="relative">
@@ -94,7 +93,6 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
             </div>
           </div>
 
-          {/* Expertise tags */}
           <div className="mb-4">
             <div className="flex flex-wrap gap-2">
               {mentor.expertise.slice(0, 3).map((skill, index) => (
@@ -129,7 +127,7 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
           <div className="flex space-x-3">
             {showViewProfile && (
               <Link
-                href={`/user/mentors/${mentor.id}`}
+                href={`/mentors/${mentor.id}`}
                 className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center justify-center space-x-2"
               >
                 <span>View Profile</span>
@@ -234,14 +232,14 @@ export default function MentorCard({ mentor, currentUserId, currentDocumentId, s
           >
             Cancel
           </button>
-          <GradientButton
+          <Button
             onClick={handleBookMentor}
             disabled={isBooking}
             variant="primary"
             size="md"
           >
             {isBooking ? 'Sending...' : 'Send Request'}
-          </GradientButton>
+          </Button>
         </ModalFooter>
       </Modal>
     </>

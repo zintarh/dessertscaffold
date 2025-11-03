@@ -36,11 +36,11 @@ export default function FAQSection() {
   ];
 
   return (
-    <div className="bg-white py-12 sm:py-16 md:py-20">
+    <div className="bg-primary-bg py-12 sm:py-16 md:py-20">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4 sm:mb-6 md:mb-8">
             Frequently Asked Questions
           </h2>
         </div>
@@ -51,12 +51,12 @@ export default function FAQSection() {
             <AccordionItem 
               key={index} 
               value={`item-${index}`}
-              className="bg-gray-50 rounded-lg px-3 sm:px-4 md:px-6 border-0"
+              className="bg-surface-muted rounded-lg px-3 sm:px-4 md:px-6 border-0"
             >
-              <AccordionTrigger className="text-left text-base sm:text-lg md:text-xl font-medium text-gray-900 hover:no-underline py-4 sm:py-5 md:py-6">
+              <AccordionTrigger className="text-left text-base sm:text-lg md:text-xl font-medium text-primary hover:no-underline py-4 sm:py-5 md:py-6">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed pb-4 sm:pb-5 md:pb-6">
+              <AccordionContent className="text-secondary text-sm sm:text-base md:text-lg leading-relaxed pb-4 sm:pb-5 md:pb-6">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>

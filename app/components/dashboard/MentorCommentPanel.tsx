@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 
 import { MessageCircle, Edit, Trash2, Send, X } from "lucide-react";
 import { useAtomValue, useSetAtom } from "jotai/react";
-import GradientButton from "../ui/GradientButton";
 import {
   addMentorCommentAtom,
   deleteMentorCommentAtom,
@@ -14,6 +13,7 @@ import {
   updateMentorCommentAtom,
 } from "@/lib/stores/mentorStore";
 import { MentorComment } from "@/lib/types";
+import Button from "@/app/(user)/components/ui/Button";
 
 interface MentorCommentPanelProps {
   documentId: string;
@@ -160,7 +160,7 @@ export default function MentorCommentPanel({
               rows={3}
             />
             <div className="flex justify-end">
-              <GradientButton
+              <Button
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
                 variant="primary"
@@ -169,7 +169,7 @@ export default function MentorCommentPanel({
               >
                 <Send className="w-4 h-4" />
                 <span>Send</span>
-              </GradientButton>
+              </Button>
             </div>
           </div>
         </div>
@@ -232,20 +232,20 @@ export default function MentorCommentPanel({
                     rows={2}
                   />
                   <div className="flex space-x-2">
-                    <GradientButton
+                    <Button
                       onClick={() => handleUpdateComment(comment.id)}
                       variant="primary"
                       size="sm"
                     >
                       Save
-                    </GradientButton>
-                    <GradientButton
+                    </Button>
+                    <Button
                       onClick={cancelEditing}
                       variant="secondary"
                       size="sm"
                     >
                       Cancel
-                    </GradientButton>
+                    </Button>
                   </div>
                 </div>
               ) : (

@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
 
 export interface User {
   id: string;
@@ -28,22 +27,18 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-// Current authenticated user atom - will be populated from NextAuth.js
 export const currentUserAtom = atom<User | null>(null);
 
-// Auth state atom - now derived from NextAuth.js
 export const authStateAtom = atom<AuthState>({
   user: null,
   isAuthenticated: false,
   isLoading: false,
 });
 
-// Computed atoms
 export const userAtom = atom((get) => get(currentUserAtom));
 export const isAuthenticatedAtom = atom((get) => !!get(currentUserAtom));
 export const isLoadingAtom = atom((get) => get(authStateAtom).isLoading);
 
-// User role atoms - centralized role checking
 export const userRoleAtom = atom((get) => {
   const user = get(currentUserAtom);
   return user?.userType || 'STUDENT';
@@ -53,7 +48,6 @@ export const isStudentAtom = atom((get) => get(userRoleAtom) === 'STUDENT');
 export const isMentorAtom = atom((get) => get(userRoleAtom) === 'MENTOR');
 export const isInstitutionAtom = atom((get) => get(userRoleAtom) === 'INSTITUTION');
 
-// User info atoms
 export const userNameAtom = atom((get) => {
   const user = get(currentUserAtom);
   if (user?.firstName && user?.lastName) {
@@ -67,7 +61,6 @@ export const userDisplayNameAtom = atom((get) => {
   return user?.firstName || user?.name || user?.email || 'User';
 });
 
-// Action atoms
 export const setLoadingAtom = atom(
   null,
   (get, set, isLoading: boolean) => {
@@ -79,12 +72,10 @@ export const setLoadingAtom = atom(
   }
 );
 
-// Update current user from NextAuth.js session
 export const updateCurrentUserAtom = atom(
   null,
   (get, set, userData: any) => {
     try {
-      // Create local user object from NextAuth.js session data
       const newUser: User = {
         id: userData.id,
         email: userData.email,
@@ -138,12 +129,10 @@ export const clearCurrentUserAtom = atom(
   }
 );
 
-// Logout function that clears state and redirects
 export const logoutAtom = atom(
   null,
   async (get, set) => {
     try {
-      // Clear local state
       set(currentUserAtom, null);
       set(authStateAtom, {
         user: null,
@@ -151,14 +140,12 @@ export const logoutAtom = atom(
         isLoading: false,
       });
       
-      // Call NextAuth.js signOut
       const { signOut } = await import('next-auth/react');
       await signOut({ callbackUrl: '/signin' });
       
       console.log('✅ User logged out successfully');
     } catch (error) {
       console.error('❌ Error during logout:', error);
-      // Even if there's an error, clear local state
       set(currentUserAtom, null);
       set(authStateAtom, {
         user: null,
@@ -169,7 +156,6 @@ export const logoutAtom = atom(
   }
 );
 
-// Update current user profile data
 export const updateUserProfileAtom = atom(
   null,
   async (get, set, updates: Partial<Omit<User, 'id' | 'password' | 'isActive' | 'verificationToken' | 'verificationTokenExpires' | 'createdAt' | 'updatedAt'>>) => {
@@ -179,7 +165,6 @@ export const updateUserProfileAtom = atom(
         throw new Error('No user logged in');
       }
 
-      // Call backend API to update user profile
       const response = await fetch('/api/user/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -193,7 +178,6 @@ export const updateUserProfileAtom = atom(
 
       const result = await response.json();
       
-      // Update local user state with new data
       const updatedUser: User = {
         ...currentUser,
         ...updates,
@@ -206,10 +190,7 @@ export const updateUserProfileAtom = atom(
         isAuthenticated: true,
         isLoading: false,
       });
-
-      console.log('✅ User profile updated successfully');
       
-      // Dispatch custom event to notify other components of user profile update
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('userProfileUpdated'));
       }
@@ -223,7 +204,6 @@ export const updateUserProfileAtom = atom(
   }
 );
 
-// Update user image specifically
 export const updateUserImageAtom = atom(
   null,
   async (get, set, imageFile: File) => {

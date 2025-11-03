@@ -55,11 +55,11 @@ export default function TestimonialSection() {
   return (
     <div className=" hidden sm:block py-12 sm:py-16 md:py-20">
       <div className="text-center mb-12 sm:mb-16 md:mb-20">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
             Trusted by Researchers <br className="hidden sm:block" /> worldwide
           </h2>
         </div>
-      <div className="max-w-fit bg-white rounded-2xl sm:rounded-3xl md:rounded-4xl shadow-sm mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 lg:py-10">
+      <div className="max-w-fit bg-primary-bg border border-default rounded-2xl sm:rounded-3xl md:rounded-4xl shadow-sm mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 lg:py-10">
         {/* Header */}
         
 
@@ -80,7 +80,7 @@ export default function TestimonialSection() {
                     onClick={() => setActiveIndex(testimonial.id)}
                   >
                     <Card className={`w-36 h-48 sm:w-44 sm:h-56 md:w-48 md:h-64 overflow-hidden border-0 shadow-lg rounded-xl sm:rounded-2xl ${
-                      activeIndex === testimonial.id ? "ring-2 sm:ring-4 ring-blue-500" : ""
+                      activeIndex === testimonial.id ? "ring-2 sm:ring-4 ring-[var(--accent)]" : ""
                     }`}>
                       <div 
                         className="h-full relative bg-cover bg-center bg-no-repeat"
@@ -93,7 +93,7 @@ export default function TestimonialSection() {
                       
                         
                         {/* Logo */}
-                        <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 bg-white/20 w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center text-white backdrop-blur-sm">
+                        <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 bg-surface/20 w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center text-white backdrop-blur-sm">
                           <span className="text-xs sm:text-sm font-bold">{testimonial.logo}</span>
                         </div>
                       </div>

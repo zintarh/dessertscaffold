@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dissert Scaffold - Research Topic Evaluation Platform",
+  title: "Dissertation Scaffold - Research Topic Evaluation Platform",
   description: "Evaluate your research topics with expert-powered analysis across six key metrics to maximize funding success and research impact.",
 };
 

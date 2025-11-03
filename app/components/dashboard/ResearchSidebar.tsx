@@ -103,14 +103,11 @@ export default function ResearchSidebar({
     } else if (timeline.documentType === "DISSERTATION") {
       sections = DISSERTATION_SECTIONS;
     } else {
-      // Fallback: try both
       sections = [...RESEARCH_TIMELINE_SECTIONS, ...DISSERTATION_SECTIONS];
     }
 
-    // Try exact match first
     let found = sections.find((s) => s.title === section.title);
 
-    // If no exact match, try partial match
     if (!found) {
       found = sections.find(
         (s) =>
@@ -213,7 +210,7 @@ export default function ResearchSidebar({
 
         {/* Sections List */}
         <div
-          className="space-y-3 flex-1 overflow-y-auto"
+          className="space-y-2 flex-1 overflow-y-auto"
           style={{
             scrollbarWidth: "thin",
             scrollbarColor: "#d1d5db #f3f4f6",
@@ -235,12 +232,12 @@ export default function ResearchSidebar({
               >
                 {/* Section Header */}
                 <div
-                  className="cursor-pointer p-4 hover:bg-opacity-80 transition-all duration-200"
+                  className="cursor-pointer p-3 hover:bg-opacity-80 transition-all duration-200"
                   onClick={() => toggleSectionExpansion(sectionItem.id)}
                 >
-                  <div className="flex items-center justify-between mb-3 gap-2">
+                  <div className="flex items-center justify-between mb-2 gap-2">
                     <h4
-                      className={`font-bold text-base ${
+                      className={`font-semibold text-sm ${
                         isActive ? "text-blue-900" : "text-gray-900"
                       } flex-1 min-w-0`}
                     >
@@ -316,12 +313,12 @@ export default function ResearchSidebar({
 
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-sm ${isCompleted ? "text-green-600" : "text-gray-500"}`}
+                      className={`text-xs ${isCompleted ? "text-green-600" : "text-gray-500"}`}
                     >
                       {isCompleted ? "Completed" : "Pending"}
                     </span>
                     <div className="flex items-center space-x-1 text-gray-600">
-                      <span className="text-sm">{sectionItem.duration}w</span>
+                      <span className="text-xs">{sectionItem.duration}w</span>
                     </div>
                   </div>
                 </div>

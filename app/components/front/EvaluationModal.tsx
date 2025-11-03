@@ -123,7 +123,7 @@ export default function EvaluationModal({
         console.log("Timeline created:", result.timeline);
         onClose();
         // Redirect to the timeline page
-        window.location.href = `/user/timelines/${result.timeline.id}`;
+        window.location.href = `/timelines/${result.timeline.id}`;
       } else {
         console.error("Timeline creation failed:", result);
         toast.error(result.error || "Failed to create timeline");
@@ -161,7 +161,7 @@ export default function EvaluationModal({
       closeOnBackdropClick={false}
     >
       <div className="flex min-h-[600px]">
-        <div className="w-1/5 bg-gray-50 p-3 flex flex-col justify-between">
+        <div className="w-1/5 bg-surface-muted p-3 flex flex-col justify-between border-r border-default">
           <div>
             <h3
               className="text-sm font-semibold mb-3"
@@ -173,15 +173,15 @@ export default function EvaluationModal({
               <button
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "score"
-                    ? "bg-purple-100 text-purple-800 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-accent-soft text-accent font-medium"
+                    : "text-secondary hover:bg-surface"
                 }`}
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                     currentStep === "score"
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-300 text-gray-600"
+                      ? "bg-accent text-white"
+                      : "bg-surface text-tertiary border border-default"
                   }`}
                 >
                   1
@@ -192,15 +192,15 @@ export default function EvaluationModal({
                 // onClick={() => setCurrentStep("goals")}
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "goals"
-                    ? "bg-purple-100 text-purple-800 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-accent-soft text-accent font-medium"
+                    : "text-secondary hover:bg-surface"
                 }`}
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                     currentStep === "goals"
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-300 text-gray-600"
+                      ? "bg-accent text-white"
+                      : "bg-surface text-tertiary border border-default"
                   }`}
                 >
                   2
@@ -210,15 +210,15 @@ export default function EvaluationModal({
               <button
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "timeline-setup"
-                    ? "bg-purple-100 text-purple-800 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-accent-soft text-accent font-medium"
+                    : "text-secondary hover:bg-surface"
                 }`}
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                     currentStep === "timeline-setup"
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-300 text-gray-600"
+                      ? "bg-accent text-white"
+                      : "bg-surface text-tertiary border border-default"
                   }`}
                 >
                   3
@@ -228,15 +228,15 @@ export default function EvaluationModal({
               <button
                 className={`w-full flex items-center space-x-2 p-2 rounded-md text-left transition-colors ${
                   currentStep === "timeline"
-                    ? "bg-purple-100 text-purple-800 font-medium"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-accent-soft text-accent font-medium"
+                    : "text-secondary hover:bg-surface"
                 }`}
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
                     currentStep === "timeline"
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-300 text-gray-600"
+                      ? "bg-accent text-white"
+                      : "bg-surface text-tertiary border border-default"
                   }`}
                 >
                   4
@@ -348,12 +348,12 @@ export default function EvaluationModal({
         </div>
       </div>
 
-      <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+      <div className="flex justify-between items-center pt-6 border-t border-default">
         {currentStep === "score" ? (
           <>
             <button
               onClick={onClose}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="px-6 py-2 text-secondary hover:text-primary font-medium transition-colors"
             >
               Close
             </button>
@@ -372,14 +372,14 @@ export default function EvaluationModal({
           <>
             <button
               onClick={() => setCurrentStep("score")}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="px-6 py-2 text-secondary hover:text-primary font-medium transition-colors"
             >
               Back to Scores
             </button>
             <button
               onClick={() => setCurrentStep("timeline-setup")}
               disabled={!selectedGoal}
-              className="px-6 py-2 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors flex items-center space-x-2 hover:opacity-90"
+              className="px-6 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center space-x-2 hover:opacity-90"
               style={{
                 backgroundColor: "var(--primary-button)",
               }}
@@ -392,7 +392,7 @@ export default function EvaluationModal({
           <>
             <button
               onClick={() => setCurrentStep("goals")}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="px-6 py-2 text-secondary hover:text-primary font-medium transition-colors"
             >
               Back to Goals
             </button>
@@ -404,7 +404,7 @@ export default function EvaluationModal({
                 !academicLevel ||
                 !discipline
               }
-              className="px-6 py-2 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed font-medium transition-colors flex items-center space-x-2 hover:opacity-90"
+              className="px-6 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center space-x-2 hover:opacity-90"
               style={{
                 backgroundColor: "var(--primary-button)",
               }}
@@ -417,7 +417,7 @@ export default function EvaluationModal({
           <>
             <button
               onClick={() => setCurrentStep("timeline-setup")}
-              className="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              className="px-6 py-2 text-secondary hover:text-primary font-medium transition-colors"
             >
               Back to Setup
             </button>

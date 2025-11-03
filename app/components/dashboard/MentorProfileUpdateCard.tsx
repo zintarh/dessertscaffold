@@ -5,15 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useAtomValue } from 'jotai';
 import { currentUserAtom } from '@/lib/stores/authStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { Button } from '@/app/components/ui/button';
 import { AlertCircle, Settings, Users } from 'lucide-react';
 import { isProfileRecentlyUpdated } from '@/lib/utils/profile-utils';
+import Button from '@/app/(user)/components/ui/Button';
 
-/**
- * Mentor Profile Update Card Component
- * Displays a notification card for mentors who need to complete their profile
- * to appear in the student dashboard
- */
 
 export function MentorProfileUpdateCard() {
   const router = useRouter();
@@ -21,7 +16,6 @@ export function MentorProfileUpdateCard() {
   const [mentorProfile, setMentorProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch mentor profile data
   useEffect(() => {
     const fetchMentorProfile = async () => {
       if (!currentUser || currentUser.userType !== 'MENTOR') {
@@ -45,19 +39,17 @@ export function MentorProfileUpdateCard() {
     fetchMentorProfile();
   }, [currentUser]);
 
-  // Check if mentor profile is incomplete
   const isProfileIncomplete = () => {
     if (!currentUser || currentUser.userType !== 'MENTOR') return false;
     return !mentorProfile || !mentorProfile.bio || !mentorProfile.expertise || mentorProfile.expertise.length === 0;
   };
 
-  // Don't show card if loading, not a mentor, profile is complete, or recently updated
   if (isLoading || !currentUser || currentUser.userType !== 'MENTOR' || !isProfileIncomplete() || isProfileRecentlyUpdated(mentorProfile?.updatedAt)) {
     return null;
   }
 
   const handleUpdateProfile = () => {
-    router.push('/user/settings');
+    router.push('/settings');
   };
 
   return (

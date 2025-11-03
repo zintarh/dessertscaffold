@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { Bold, Italic,  Link, Image,  Plus, X, Code } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import GradientButton from '../ui/GradientButton';
+import Button from '@/app/(user)/components/ui/Button';
 
 
 interface EditorToolbarProps {
@@ -78,7 +78,6 @@ export default function EditorToolbar({
           <Plus className="w-4 h-4" />
         </motion.button>
 
-        {/* Dropdown Menu */}
         <AnimatePresence>
           {showMenu && (
             <motion.div
@@ -121,7 +120,6 @@ export default function EditorToolbar({
         </AnimatePresence>
       </div>
 
-      {/* Formatting Buttons */}
       <motion.button
         onClick={onBold}
         disabled={!hasSelection}
@@ -200,14 +198,14 @@ export default function EditorToolbar({
                 </div>
                 
                 <div className="flex space-x-3">
-                  <GradientButton
+                  <Button
                     onClick={handleAddLink}
                     variant="primary"
                     size="md"
                     className="flex-1"
                   >
                     Add Link
-                  </GradientButton>
+                  </Button>
                   <button
                     onClick={() => setShowLinkInput(false)}
                     className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
@@ -279,14 +277,14 @@ export default function EditorToolbar({
                 </div>
                 
                 <div className="flex space-x-3">
-                  <GradientButton
+                  <Button
                     onClick={handleAddImage}
                     variant="success"
                     size="md"
                     className="flex-1"
                   >
                     Add Image
-                  </GradientButton>
+                  </Button>
                   <button
                     onClick={() => setShowImageInput(false)}
                     className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"

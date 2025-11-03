@@ -41,7 +41,7 @@ export default function Modal({
         <Dialog.Content
           className={cn(
             "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-            "bg-white rounded-lg shadow-xl z-50",
+            "bg-surface rounded-lg shadow-xl z-50 border border-default",
             "w-full mx-4",
             sizeClasses[size],
             "max-h-[90vh] overflow-y-auto",
@@ -49,13 +49,13 @@ export default function Modal({
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-default bg-primary-bg">
             <div className="flex-1 min-w-0">
-              <Dialog.Title className="text-lg font-medium text-gray-900 truncate">
+              <Dialog.Title className="text-lg font-medium text-primary truncate">
                 {title}
               </Dialog.Title>
               {description && (
-                <Dialog.Description className="text-sm text-gray-500 mt-1">
+                <Dialog.Description className="text-sm text-secondary mt-1">
                   {description}
                 </Dialog.Description>
               )}
@@ -63,7 +63,7 @@ export default function Modal({
             
             {showCloseButton && (
               <Dialog.Close asChild>
-                <button className="ml-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <button className="ml-4 p-2 text-tertiary hover:text-primary hover:bg-surface-muted rounded-lg transition-colors">
                   <X className="w-5 h-5" />
                 </button>
               </Dialog.Close>
@@ -71,7 +71,7 @@ export default function Modal({
           </div>
 
           {/* Content */}
-          <div className="p-6 bg-white">
+          <div className="p-6 bg-surface">
             {children}
           </div>
         </Dialog.Content>
@@ -90,7 +90,7 @@ export function ModalFooter({
 }) {
   return (
     <div className={cn(
-      "flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-gray-200",
+      "flex items-center justify-end space-x-3 mt-6 pt-4 border-t border-default",
       className
     )}>
       {children}
@@ -114,9 +114,9 @@ export function ModalSection({
     <div className={cn("mb-6", className)}>
       {title && (
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-900 mb-1">{title}</h4>
+          <h4 className="text-sm font-semibold text-primary mb-1">{title}</h4>
           {description && (
-            <p className="text-sm text-gray-700">{description}</p>
+            <p className="text-sm text-secondary">{description}</p>
           )}
         </div>
       )}

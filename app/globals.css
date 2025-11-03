@@ -5,12 +5,26 @@
   --foreground: #171717;
   --primary-button: #7070ff;
   --primary-button-hover: #5a5aff;
+  --primary-bg: #ffffff; /* surface background for light mode */
+  --surface: #ffffff; /* main surface */
+  --surface-muted: #f7f8fb; /* muted cards */
+  --border: #e5e7eb; /* default borders */
+  --accent: #7070ff; /* brand accent */
+  --accent-soft: rgba(112, 112, 255, 0.12);
   
   /* Text Color Hierarchy */
   --text-primary: #1a1a1a;      /* Main text - darkest */
-  --text-secondary: #4a4a4a;    /* Secondary text - medium gray */
+  --text-secondary: #3f3f46;    /* Secondary text - slightly lighter */
   --text-tertiary: #6b7280;     /* Tertiary text - lighter gray */
   --text-muted: #9ca3af;        /* Muted text - lightest gray */
+
+  /* Metric card palette (light) */
+  --metric-green-bg: #eef9f0; --metric-green-border: #cfead6; --metric-green-text: #064e3b; --metric-green-accent: #10b981;
+  --metric-pink-bg: #fdebf6; --metric-pink-border: #f4cde6; --metric-pink-text: #8b2c68; --metric-pink-accent: #e063c7;
+  --metric-purple-bg: #f2edff; --metric-purple-border: #e0d6ff; --metric-purple-text: #5b21b6; --metric-purple-accent: #7c3aed;
+  --metric-blue-bg: #eef5ff; --metric-blue-border: #d5e6ff; --metric-blue-text: #1e3a8a; --metric-blue-accent: #3b82f6;
+  --metric-orange-bg: #fff1e6; --metric-orange-border: #ffd9b8; --metric-orange-text: #7c2d12; --metric-orange-accent: #fb923c;
+  --metric-teal-bg: #e6fbf7; --metric-teal-border: #c7eee7; --metric-teal-text: #115e59; --metric-teal-accent: #2dd4bf;
 }
 
 @theme inline {
@@ -22,15 +36,57 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Explicit dark theme variables toggled by html.dark class */
+html.dark {
+  --background: #0b0b0c;
+  --foreground: #ededed;
+  --text-primary: #e6e7eb;
+  --text-secondary: #cfd3da;
+  --text-tertiary: #a3aab6;
+  --text-muted: #7b818c;
+  --primary-bg: #111317; /* surface background for dark mode */
+  --surface: #111317; 
+  --surface-muted: #0e1014;
+  --border: #343a46; /* improved contrast border on dark */
+  --accent: #9ea0ff;
+  --accent-soft: rgba(158, 160, 255, 0.14);
+
+  /* Metric card palette (dark) */
+  --metric-green-bg: #0f2a1d; --metric-green-border: #1f3a2a; --metric-green-text: #d1fae5; --metric-green-accent: #34d399;
+  --metric-pink-bg: #2a1023; --metric-pink-border: #3a1a2f; --metric-pink-text: #f5d0e6; --metric-pink-accent: #f472b6;
+  --metric-purple-bg: #1f1533; --metric-purple-border: #2a1f3f; --metric-purple-text: #e9d5ff; --metric-purple-accent: #a78bfa;
+  --metric-blue-bg: #0f223a; --metric-blue-border: #1d3352; --metric-blue-text: #dbeafe; --metric-blue-accent: #60a5fa;
+  --metric-orange-bg: #2a1a0f; --metric-orange-border: #3a261a; --metric-orange-text: #ffedd5; --metric-orange-accent: #fb923c;
+  --metric-teal-bg: #0f2a2a; --metric-teal-border: #1f3a3a; --metric-teal-text: #ccfbf1; --metric-teal-accent: #2dd4bf;
 }
 
+.bg-primary-bg { background: var(--primary-bg); }
+.bg-surface { background: var(--surface); }
+.bg-surface-muted { background: var(--surface-muted); }
+.border-default { border-color: var(--border); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent); }
+.bg-accent-soft { background: var(--accent-soft); }
+.bg-accent { background: var(--accent); }
+
+.metric-card { background: var(--metric-bg); border: 2px solid var(--metric-border); }
+.metric-title { color: var(--metric-text); }
+.metric-icon { background: var(--metric-accent); }
+.metric-text { color: var(--metric-text); }
+
+.metric--novelty { --metric-bg: var(--metric-green-bg); --metric-border: var(--metric-green-border); --metric-text: var(--metric-green-text); --metric-accent: var(--metric-green-accent); }
+.metric--grant { --metric-bg: var(--metric-pink-bg); --metric-border: var(--metric-pink-border); --metric-text: var(--metric-pink-text); --metric-accent: var(--metric-pink-accent); }
+.metric--gaps { --metric-bg: var(--metric-purple-bg); --metric-border: var(--metric-purple-border); --metric-text: var(--metric-purple-text); --metric-accent: var(--metric-purple-accent); }
+.metric--trends { --metric-bg: var(--metric-blue-bg); --metric-border: var(--metric-blue-border); --metric-text: var(--metric-blue-text); --metric-accent: var(--metric-blue-accent); }
+.metric--methodology { --metric-bg: var(--metric-orange-bg); --metric-border: var(--metric-orange-border); --metric-text: var(--metric-orange-text); --metric-accent: var(--metric-orange-accent); }
+.metric--impact { --metric-bg: var(--metric-teal-bg); --metric-border: var(--metric-teal-border); --metric-text: var(--metric-teal-text); --metric-accent: var(--metric-teal-accent); }
+
 body {
-  background: #FDFCFA;
+  background: var(--background);
+  color: var(--text-primary);
   font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;

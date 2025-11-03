@@ -7,6 +7,8 @@ import { z } from "zod";
 import { Card, CardContent } from "../components/ui/card";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import PageAnimation from "../components/PageAnimation";
+import Navbar from "../components/front/Navbar";
+import Footer from "../components/front/Footer";
 import { Input } from "../components/ui/front/input";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -69,8 +71,11 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      if (result?.error) {
-        toast.error(result.error);
+
+      console.log(result)
+
+      if (result?.status === 401) {
+        toast.error("Invalid signin credentials");
         setIsLoading(false);
         return;
       }
@@ -79,7 +84,7 @@ export default function LoginPage() {
         toast.success("Login successful! Redirecting...");
         const session = await getSession();
         if (session?.user) {
-          const redirectTo = searchParams.get("callbackUrl") || "/user/dashboard";
+          const redirectTo = searchParams.get("callbackUrl") || "/dashboard";
           router.push(redirectTo);
         } else {
           toast.error("Session error. Please try again.");
@@ -94,7 +99,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFA]">
+    <div className="min-h-screen bg-primary-bg">
       <Toaster position="top-right" />
       <PageAnimation>
         <div className="flex min-h-screen">
@@ -109,7 +114,7 @@ export default function LoginPage() {
                     className="text-2xl font-bold"
                     style={{ color: 'var(--text-primary)' }}
                   >
-                    Dissert Scaffold
+                    Dissertation Scaffold
                   </span>
                 </div>
 
@@ -128,7 +133,7 @@ export default function LoginPage() {
                   </p>
                 </div>
 
-                <Card className="border border-gray-200 shadow-sm bg-white">
+                <Card className="border border-default shadow-sm bg-surface">
                   <CardContent className="p-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <Input
@@ -154,7 +159,7 @@ export default function LoginPage() {
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="absolute right-3 top-9 text-tertiary hover:text-primary transition-colors"
                         >
                           {showPassword ? (
                             <EyeOff className="w-5 h-5" />
@@ -168,15 +173,15 @@ export default function LoginPage() {
                         <label className="flex items-center">
                           <input
                             type="checkbox"
-                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            className="w-4 h-4 text-[var(--accent)] border-default rounded focus:ring-[var(--accent)] bg-transparent"
                           />
-                          <span className="ml-2 text-sm text-gray-600">
+                          <span className="ml-2 text-sm text-secondary">
                             Remember me
                           </span>
                         </label>
                         <Link
                           href="/forgot-password"
-                          className="text-sm text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                          className="text-sm text-accent hover:opacity-80 font-medium transition-colors"
                         >
                           Forgot password?
                         </Link>
@@ -185,7 +190,7 @@ export default function LoginPage() {
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 hover:opacity-90"
+                        className="w-full disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 hover:opacity-90"
                         style={{ 
                           backgroundColor: 'var(--primary-button)',
                         }}
@@ -206,15 +211,20 @@ export default function LoginPage() {
 
                 {/* Sign Up Link */}
                 <div className="mt-6 text-center">
-                  <p className="text-gray-600">
+                  <p className="text-secondary">
                     Don&apos;t have an account?{" "}
                     <Link
                       href="/signup"
-                      className="text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                      className="text-accent hover:opacity-80 font-medium transition-colors"
                     >
                       Sign up
                     </Link>
                   </p>
+                </div>
+                <div className="mt-4 text-center">
+                  <Link href="/" className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-default text-sm font-medium text-secondary hover:text-primary hover:bg-surface-muted transition-colors">
+                    Back to Home
+                  </Link>
                 </div>
               </div>
             </div>

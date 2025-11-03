@@ -6,8 +6,8 @@ import { useSetAtom } from "jotai";
 import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle, XCircle, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
-import GradientButton from "../components/ui/GradientButton";
 import { useTheme } from "../contexts/ThemeContext";
+import Button from "../(user)/components/ui/Button";
 
 function VerifyEmailContent() {
   const { isDarkMode, isHydrated } = useTheme();
@@ -117,7 +117,7 @@ function VerifyEmailContent() {
                 {errorMessage ||
                   "We encountered an issue verifying your email address."}
               </p>
-              <GradientButton
+              <Button
                 onClick={() => router.push("/signin")}
                 variant="primary"
                 size="lg"
@@ -125,7 +125,7 @@ function VerifyEmailContent() {
               >
                 <span>Go to Sign In</span>
                 <ArrowRight className="w-4 h-4" />
-              </GradientButton>
+              </Button>
             </div>
           )}
         </motion.div>

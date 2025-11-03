@@ -10,7 +10,6 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token }) => {
-        // Return true if the user is authenticated
         return !!token;
       },
     },
@@ -22,12 +21,18 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    // Only match protected routes
-    "/user/:path*",
+    "/dashboard/:path*",
+    "/communities/:path*",
+    "/timelines/:path*",
+    "/writing/:path*",
+    "/settings/:path*",
+    "/my-messages/:path*",
+    "/mentor/:path*",
+    "/mentor-invitations/:path*",
+    "/new/:path*",
     "/evaluation/:path*",
     "/result/:path*",
     "/research-evaluation/:path*",
-    "/writing/:path*",
     "/writing-environment/:path*",
 
   ],

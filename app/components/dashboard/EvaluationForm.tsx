@@ -14,17 +14,12 @@ import {
   resetAtom,
   initializeFromStorageAtom
 } from '@/lib/stores/evaluationStore';
-import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { Loader2, Plus, X, Search, RotateCcw } from 'lucide-react';
-
-/**
- * Research Topic Evaluation Form Component
- * Provides UI for submitting research topics and keywords for evaluation
- */
+import Button from '@/app/(user)/components/ui/Button';
 
 export function EvaluationForm() {
   const [topic, ] = useAtom(topicAtom);
@@ -148,7 +143,7 @@ export function EvaluationForm() {
               />
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={handleAddKeyword}
                 disabled={
@@ -220,7 +215,7 @@ export function EvaluationForm() {
             
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={handleReset}
               disabled={isLoading}
             >

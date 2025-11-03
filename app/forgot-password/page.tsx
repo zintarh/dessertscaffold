@@ -134,7 +134,7 @@ export default function ForgotPasswordPage() {
                     className="text-2xl font-bold"
                     style={{ color: 'var(--text-primary)' }}
                   >
-                    Dissert Scaffold
+                    Dissertation Scaffold
                   </span>
                 </div>
 

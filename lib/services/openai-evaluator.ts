@@ -30,7 +30,6 @@ export class OpenAIEvaluator {
       return this.validateAndParseEvaluation(evaluation);
     } catch (error) {
       if (error instanceof ValidationError) {
-        console.warn("🔄 Retrying evaluation after validation error...");
         try {
           const evaluation = await this.callOpenAI(
             researchTopic,
@@ -82,27 +81,24 @@ export class OpenAIEvaluator {
     return content;
   }
 
-  /**
-   * Build system message for 6 metrics evaluation
-   */
   private buildSystemMessage(): string {
-    return `You are an expert academic evaluator specializing in research methodology and funding analysis. Your task is to evaluate research topics across six key academic metrics and provide a comprehensive, data-driven analysis suitable for dissertation-level research.
-
-CRITICAL REQUIREMENTS:
-1. Use specific numbers, statistics, and citations from the provided data
-2. Reference specific papers by title and citation count when available
-3. Include exact funding amounts and sources
-4. Mention specific research methods and their frequency
-5. Reference concrete publication trends and years
-6. Provide detailed justifications with quantitative evidence
-7. Make the analysis suitable for academic reports and grant applications
-
-IMPORTANT: Output ONLY valid JSON matching the exact schema provided. Do not include explanations, markdown, or any text outside the JSON object.`;
+    return `You are an expert academic evaluator specializing 
+    in research methodology and funding analysis. 
+    Your task is to evaluate research topics across six key academic metrics and provide a 
+    comprehensive, data-driven analysis 
+    suitable for dissertation-level research.
+    
+            CRITICAL REQUIREMENTS:
+            1. Use specific numbers, statistics, and citations from the provided data
+            2. Reference specific papers by title and citation count when available
+            3. Include exact funding amounts and sources
+            4. Mention specific research methods and their frequency
+            5. Reference concrete publication trends and years
+            6. Provide detailed justifications with quantitative evidence
+            7. Make the analysis suitable for academic reports and grant applications
+          IMPORTANT: Output ONLY valid JSON matching the exact schema provided. Do not include explanations, markdown, or any text outside the JSON object.`;
   }
 
-  /**
-   * Build user message with prompt for 6 academic metrics
-   */
   private buildUserMessage(
     researchTopic: string,
     aggregatedData: any,
@@ -173,9 +169,6 @@ Return ONLY valid JSON in this exact schema (no code fences, no additional text)
     return message;
   }
 
-  /**
-   * Validate and parse evaluation response
-   */
   private validateAndParseEvaluation(response: string): Evaluation {
     try {
       const cleanedResponse = response
@@ -202,9 +195,6 @@ Return ONLY valid JSON in this exact schema (no code fences, no additional text)
     }
   }
 
-  /**
-   * Generate evaluation with empty data for fallback
-   */
   async evaluateWithEmptyData(researchTopic: string): Promise<Evaluation> {
     return this.evaluateTopic(researchTopic, {
       works: [],

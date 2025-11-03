@@ -18,7 +18,6 @@ interface TimelineSetupStepProps {
 
 export default function TimelineSetupStep({
   researchTopic,
-  projectType,
   researchStartDate,
   setResearchStartDate,
   researchCompletionDate,
@@ -48,7 +47,7 @@ export default function TimelineSetupStep({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-surface-muted rounded-lg">
         <div className="space-y-2">
           <label
             className="text-sm font-medium"
@@ -57,12 +56,12 @@ export default function TimelineSetupStep({
             Research Start Date
           </label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-tertiary" />
             <input
               type="date"
               value={researchStartDate}
               onChange={(e) => setResearchStartDate(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-3 py-2 border border-default rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-transparent text-primary"
             />
           </div>
         </div>
@@ -75,14 +74,14 @@ export default function TimelineSetupStep({
             Expected Completion Date
           </label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-tertiary" />
             <input
               type="date"
               value={researchCompletionDate}
               onChange={(e) =>
                 setResearchCompletionDate(e.target.value)
               }
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-3 py-2 border border-default rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-transparent text-primary"
             />
           </div>
         </div>
@@ -97,7 +96,7 @@ export default function TimelineSetupStep({
           <select
             value={academicLevel}
             onChange={(e) => setAcademicLevel(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-default rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-surface text-primary"
           >
             <option value="">Select academic level</option>
             {academicLevels.map((level) => (
@@ -118,7 +117,7 @@ export default function TimelineSetupStep({
           <select
             value={discipline}
             onChange={(e) => setDiscipline(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-default rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-surface text-primary"
           >
             <option value="">Select discipline</option>
             {disciplines.map((disc) => (

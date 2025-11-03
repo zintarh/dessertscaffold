@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import toast from 'react-hot-toast';
 
-import { Check, X, Clock, Calendar, User, MessageCircle, Edit, FileText } from 'lucide-react';
+import { Check, X, Clock, User, MessageCircle, Edit, FileText } from 'lucide-react';
 import { MentorBooking } from '@/lib/types';
 import {  mentorBookingsByMentorAtom, sendMentorNotificationAtom, updateMentorBookingStatusAtom } from '@/lib/stores/mentorStore';
-import GradientButton from '../ui/GradientButton';
+import Button from "@/app/(user)/components/ui/Button";
 
 
 interface MentorDashboardProps {
@@ -176,7 +176,7 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
                   </div>
                   
                   <div className="flex space-x-2 ml-4">
-                    <GradientButton
+                    <Button
                       onClick={() => handleRespondToBooking(booking, 'accepted')}
                       variant="success"
                       size="md"
@@ -184,8 +184,8 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
                     >
                       <Check className="w-4 h-4" />
                       <span>Accept</span>
-                    </GradientButton>
-                    <GradientButton
+                    </Button>
+                    <Button
                       onClick={() => handleRespondToBooking(booking, 'rejected')}
                       variant="danger"
                       size="md"
@@ -193,7 +193,7 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
                     >
                       <X className="w-4 h-4" />
                       <span>Reject</span>
-                    </GradientButton>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -236,13 +236,13 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
                   </div>
                   
                   <div className="ml-4">
-                    <GradientButton
+                    <Button
                       onClick={() => updateBookingStatus(booking.id, 'completed')}
                       variant="primary"
                       size="md"
                     >
                       Mark Complete
-                    </GradientButton>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -281,7 +281,7 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
               >
                 Cancel
               </button>
-              <GradientButton
+              <Button
                 type="submit"
                 disabled={isResponding}
                 variant={selectedBooking.status === 'accepted' ? 'success' : 'danger'}
@@ -289,7 +289,7 @@ export default function MentorDashboard({ mentorId }: MentorDashboardProps) {
                 className="flex-1"
               >
                 {isResponding ? 'Processing...' : (selectedBooking.status === 'accepted' ? 'Accept' : 'Reject')}
-              </GradientButton>
+              </Button>
             </div>
           </div>
         </div>

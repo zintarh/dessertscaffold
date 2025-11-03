@@ -19,18 +19,14 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
       setMounted(true)
     }, [])
 
-    // Prevent body scroll when modal is open
     React.useEffect(() => {
       if (isOpen) {
-        // Store the current scroll position
         const scrollY = window.scrollY
-        // Prevent scrolling
         document.body.style.position = 'fixed'
         document.body.style.top = `-${scrollY}px`
         document.body.style.width = '100%'
         
         return () => {
-          // Restore scrolling
           document.body.style.position = ''
           document.body.style.top = ''
           document.body.style.width = ''
@@ -70,27 +66,25 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
         {/* Modal Content */}
         <div
           ref={ref}
-          className="relative bg-white rounded-2xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col"
+          className="relative bg-surface border border-default rounded-2xl shadow-2xl max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col"
           style={{ zIndex: 9999 }}
           {...props}
         >
           {/* Header */}
           {(title || description) && (
-            <div className="px-8 py-6 border-b border-gray-200">
+            <div className="px-8 py-6 border-b border-default bg-primary-bg">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   {title && (
                     <h2 
-                      className="text-2xl font-bold mb-2"
-                      style={{ color: 'var(--text-primary)' }}
+                      className="text-2xl font-bold mb-2 text-primary"
                     >
                       {title}
                     </h2>
                   )}
                   {description && (
                     <p 
-                      className="text-lg"
-                      style={{ color: 'var(--text-secondary)' }}
+                      className="text-lg text-secondary"
                     >
                       {description}
                     </p>
@@ -98,16 +92,16 @@ const Modal = React.forwardRef<HTMLDivElement, ModalProps>(
                 </div>
                 <button
                   onClick={onClose}
-                  className="ml-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="ml-4 p-2 hover:bg-surface-muted rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-tertiary" />
                 </button>
               </div>
             </div>
           )}
           
           {/* Content */}
-          <div className="p-8 flex-1 overflow-y-auto">
+          <div className="p-8 flex-1 overflow-y-auto bg-surface text-primary">
             {children}
           </div>
         </div>
