@@ -5,7 +5,8 @@ import EvaluationModal from "./EvaluationModal";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import toast, { Toaster } from "react-hot-toast";
 import { useAtom } from "jotai";
-import { userAtom } from "@/lib/stores/authStore";
+import { isAuthenticatedAtom } from "@/lib/stores/authStore";
+import { useRouter } from "next/navigation";
 
 export default function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -14,8 +15,9 @@ export default function HeroSection() {
   const [showEvaluationModal, setShowEvaluationModal] = useState(false);
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [evaluationData, setEvaluationData] = useState(null);
-  const [user,] = useAtom(userAtom)
-  
+  const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+  const router = useRouter();
+
   const heroRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -72,6 +74,10 @@ export default function HeroSection() {
   };
 
   const handleEvaluate = async () => {
+    if (!isAuthenticated) {
+      router.push("/signin");
+      return;
+    }
     if (!inputValue.trim()) {
       toast.error("Please enter a research topic");
       return;
@@ -79,7 +85,6 @@ export default function HeroSection() {
 
     setIsEvaluating(true);
     try {
-      
       const response = await fetch("/api/evaluate-research", {
         method: "POST",
         headers: {
@@ -108,11 +113,6 @@ export default function HeroSection() {
     }
   };
 
-
-useEffect(() => {
-    console.log(user, "user in hero section");
-
-}, [user]);
   return (
     <div className="flex py-8 sm:py-12 md:py-16 lg:py-20 mt-16 sm:mt-18 md:mt-20">
       <Toaster position="top-right" />

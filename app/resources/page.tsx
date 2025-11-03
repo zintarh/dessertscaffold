@@ -182,7 +182,6 @@ export default function ResourcesPage() {
                 <div className="flex flex-wrap items-center gap-4 mb-6">
                   <span className="text-sm font-medium text-secondary">Refine by:</span>
                   
-                  {/* Active Filters */}
                   {selectedContentType.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                       {selectedContentType.map((type) => (

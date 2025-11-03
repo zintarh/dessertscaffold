@@ -88,14 +88,14 @@ export default function Navbar() {
             ) : (
               // Unauthenticated user
               <>
-                <Link
+                {/* <Link
                   href="/signin"
                   className={`px-2 sm:px-3 py-2 text-sm sm:text-base font-medium ${isDarkMode ? "text-secondary hover:text-primary" : "text-secondary hover:text-primary"}`}
                 >
                   Sign In
-                </Link>
+                </Link> */}
                 <Link
-                  href="/evaluate"
+                  href="/signin"
                   className="bg-purple-800 text-white px-3 py-2 sm:px-6 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-colors"
                 >
                   Get Started

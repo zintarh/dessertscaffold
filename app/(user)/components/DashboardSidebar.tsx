@@ -85,21 +85,23 @@ export default function DashboardSidebar({
 
   return (
     <>
-      <div className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 bg-white border-r border-gray-200 transition-all duration-300 ${
-        isCollapsed ? 'lg:w-16' : 'lg:w-64'
-      }`}>
+      <div
+        className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:z-50 bg-white border-r border-gray-200 transition-all duration-300 ${
+          isCollapsed ? "lg:w-16" : "lg:w-64"
+        }`}
+      >
         <div className="flex-1 flex flex-col min-h-0">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-                  <div className="w-4 h-4 bg-white rounded-sm"></div>
-                </div>
                 {!isCollapsed && (
-                  <span 
-                    className="text-xl font-bold"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+                    <div className="w-4 h-4 bg-white rounded-sm"></div>
+                  </div>
+                )}
+
+                {!isCollapsed && (
+                  <span className="text-xl font-bold text-black">
                     Dissertation Scaffold
                   </span>
                 )}
@@ -149,7 +151,7 @@ export default function DashboardSidebar({
                       isActive
                         ? "bg-purple-50 text-purple-700"
                         : "text-gray-700 hover:bg-gray-100"
-                    } ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+                    } ${isCollapsed ? "justify-center" : "space-x-3"}`}
                     title={isCollapsed ? item.name : undefined}
                   >
                     <IconComponent
@@ -168,7 +170,7 @@ export default function DashboardSidebar({
             <button
               onClick={handleLogout}
               className={`w-full flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium ${
-                isCollapsed ? 'justify-center' : 'justify-center space-x-2'
+                isCollapsed ? "justify-center" : "justify-center space-x-2"
               }`}
               title={isCollapsed ? "Sign Out" : undefined}
             >
@@ -195,9 +197,9 @@ export default function DashboardSidebar({
                   <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
                     <div className="w-4 h-4 bg-white rounded-sm"></div>
                   </div>
-                  <span 
+                  <span
                     className="text-xl font-bold"
-                    style={{ color: 'var(--text-primary)' }}
+                    style={{ color: "var(--text-primary)" }}
                   >
                     Dissertation Scaffold
                   </span>

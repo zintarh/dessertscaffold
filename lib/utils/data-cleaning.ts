@@ -183,31 +183,26 @@ export class DataCleaner {
 }
 
 export class DataDeduplicator {
-  /**
-   * Deduplicate works using DOI as primary key and title similarity as secondary
-   */
+ 
   static deduplicateWorks(works: Work[], similarityThreshold: number = 0.85): Work[] {
     const seen = new Map<string, Work>();
     const doiSeen = new Set<string>();
     
     for (const work of works) {
-      // Primary deduplication by DOI
       if (work.doi) {
         const normalizedDoi = work.doi.toLowerCase().trim();
         if (doiSeen.has(normalizedDoi)) {
-          continue; // Skip duplicate DOI
+          continue; 
         }
         doiSeen.add(normalizedDoi);
         seen.set(normalizedDoi, work);
         continue;
       }
       
-      // Secondary deduplication by title similarity
       let isDuplicate = false;
       for (const [key, existingWork] of seen.entries()) {
         const similarity = DataCleaner.calculateSimilarity(work.title, existingWork.title);
         if (similarity >= similarityThreshold) {
-          // Keep the work with more citations or more complete data
           if (work.citations > existingWork.citations || 
               (work.citations === existingWork.citations && work.abstract && !existingWork.abstract)) {
             seen.set(key, work);
@@ -218,7 +213,6 @@ export class DataDeduplicator {
       }
       
       if (!isDuplicate) {
-        // Use title hash as key for works without DOI
         const titleKey = `title_${work.title.toLowerCase().replace(/\s+/g, '_')}`;
         seen.set(titleKey, work);
       }

@@ -200,8 +200,14 @@ export default function CommunityPage() {
 
         <div className="py-8 sm:py-12 md:py-16 lg:py-20">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-            <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+               <div className="flex items-center justify-center h-[400px]">
+                    <p className="text-secondary text-lg font-medium">Coming soon...</p>
+                  </div>
+            {/* <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <div className="lg:w-80 flex-shrink-0">
+
+              
                   <div className="bg-surface rounded-2xl sm:rounded-3xl shadow-sm border border-default p-4 sm:p-6 sticky top-8">
                     <div className="mb-6">
 
@@ -301,6 +307,8 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 <div className="flex-1">
+
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {filteredMentors.map((mentor, index) => (
                       <div key={mentor.id} className="bg-surface rounded-xl sm:rounded-2xl shadow-sm border border-default overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
@@ -315,26 +323,21 @@ export default function CommunityPage() {
                             </div>
                           </div>
 
-                          {/* Content */}
                           <div className="p-4 sm:p-6">
-                            {/* Category */}
                             <div className="mb-3">
                               <span className="bg-accent-soft text-accent text-xs font-medium px-2 py-1 rounded-full">
                                 {mentor.specialties[0]}
                               </span>
                             </div>
 
-                            {/* Title */}
                             <h3 className="text-lg sm:text-xl font-bold text-primary mb-2 group-hover:text-accent transition-colors">
                               {mentor.name}
                             </h3>
 
-                            {/* Subtitle */}
                             <p className="text-sm text-secondary mb-3">
                               {mentor.title}
                             </p>
 
-                            {/* Institution */}
                             <div className="mb-4">
                               <span className="bg-surface-muted text-secondary text-xs font-medium px-2 py-1 rounded-full">
                                 {mentor.institution}
@@ -345,7 +348,8 @@ export default function CommunityPage() {
                     ))}
                   </div>
 
-                  {/* No Results */}
+                 
+
                   {filteredMentors.length === 0 && (
                     <div className="text-center py-12">
                       <div className="w-16 h-16 bg-surface-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -366,7 +370,7 @@ export default function CommunityPage() {
                     </div>
                   )}
                 </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
