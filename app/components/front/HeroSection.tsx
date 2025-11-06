@@ -129,25 +129,25 @@ export default function HeroSection() {
             }`}
             style={{ transitionDelay: "100ms" }}
           >
-            <span className="bg-accent-soft text-accent text-sm font-medium px-3 py-1 rounded-full">
+            <span className=" hidden md:block bg-accent-soft text-accent text-sm font-medium px-3 py-1 rounded-full">
               RESEARCH SUCCESS PLATFORM
             </span>
           </div>
 
           <h1
-            className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center font-bold text-primary mb-4 sm:mb-6 leading-tight transition-all duration-800 ease-out ${
+            className={` px-10 md:px-0 text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-center font-bold text-primary mb-4 sm:mb-6 leading-tight transition-all duration-800 ease-out ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-6"
             }`}
             style={{ transitionDelay: "200ms" }}
           >
-            From Research to
+            From Research to 
             <span className="text-purple-600"> $50M+ in Grants</span>
           </h1>
 
           <p
-            className={`text-base sm:text-lg text-secondary text-center mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed px-2 transition-all duration-800 ease-out ${
+            className={`text-sm sm:text-lg text-secondary text-center mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed px-2 transition-all duration-800 ease-out ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -222,15 +222,15 @@ export default function HeroSection() {
                 </p> */}
 
                 <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 py-3 sm:py-4">
-                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-sm sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
+                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-xs sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
                     <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>Grant Opportunities</span>
                   </button>
-                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-sm sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
+                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-xs sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>Research Trends</span>
                   </button>
-                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-sm sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
+                  <button className="bg-accent-soft text-accent px-3 py-2 sm:px-4 sm:py-3 rounded-lg text-xs sm:text-base font-medium flex items-center space-x-1 sm:space-x-2 transition-colors">
                     <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span>Methodology Score</span>
                   </button>

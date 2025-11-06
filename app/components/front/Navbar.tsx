@@ -42,7 +42,7 @@ export default function Navbar() {
               >
                 <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-sm"></div>
               </div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
+              <span className="text-sm sm:text-xl md:text-2xl font-bold text-primary">
                 Dissertation Scaffold
               </span>
             </Link>
@@ -90,11 +90,11 @@ export default function Navbar() {
           <div className="flex items-center space-x-2 sm:space-x-4">
 
 
-{/*             
+            
             <button
               onClick={toggleTheme}
-              aria-label="Toggle dark mode"
-              className={`p-2 rounded-lg transition-colors ${
+              aria-label="Toggle dark mode "
+              className={`p-2 rounded-lg transition-colors hidden md:block ${
                 isDarkMode
                   ? "text-secondary hover:bg-surface-muted"
                   : "text-secondary hover:bg-surface-muted"
@@ -105,7 +105,7 @@ export default function Navbar() {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
-            </button> */}
+            </button>
 
 
 
@@ -153,6 +153,7 @@ export default function Navbar() {
 
         {isMenuOpen && (
           <div className="md:hidden">
+
             <div
               className={`px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-surface border-t border-default`}
             >
