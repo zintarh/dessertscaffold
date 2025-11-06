@@ -7,8 +7,7 @@ import { z } from "zod";
 import { Card, CardContent } from "../components/ui/card";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import PageAnimation from "../components/PageAnimation";
-import Navbar from "../components/front/Navbar";
-import Footer from "../components/front/Footer";
+
 import { Input } from "../components/ui/front/input";
 import toast, { Toaster } from "react-hot-toast";
 
