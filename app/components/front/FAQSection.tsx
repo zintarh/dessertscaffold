@@ -6,32 +6,24 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 export default function FAQSection() {
   const faqData = [
     {
-      question: "What is research topic evaluation?",
-      answer: "Research topic evaluation is a comprehensive analysis that assesses your research idea across six key metrics: novelty, trends, methodological complexity, research gaps, grant potential, and impact. This helps you understand the viability and potential of your research before investing significant time and resources."
+      question: "Can I write my entire thesis or dissertation on DS?",
+      answer: "Yes. DS provides a complete writing environment where you can draft, edit, and manage your entire research project — from proposal to final submission. Your work is automatically saved in the cloud, and you can export individual chapters or the full document in word or PDF anytime."
     },
     {
-      question: "How does Dessert Scaffold help with grant applications?",
-      answer: "Dessert Scaffold analyzes your research topic against current funding priorities from major agencies like NSF, NIH, and others. It provides grant potential scores, identifies relevant funding opportunities, estimates budget requirements, and suggests strategies to improve your proposal's success rate."
+      question: "What happens after I choose my research topic?",
+      answer: "After topic evaluation and approval, you select your project type (Research Proposal, Thesis/Dissertation, or Grant). You then set your project's start and end dates, allocate durations for each section, and DS automatically generates a Gantt chart to guide your writing process."
     },
     {
-      question: "What metrics does Dessert Scaffold analyze?",
-      answer: "Dessert Scaffold evaluates six critical dimensions: Novelty (innovation and uniqueness), Grant Potential (funding alignment and success probability), Research Gaps (literature gaps and opportunities), Trends (market and publication trends), Methodology (complexity and feasibility), and Impact (scientific and social significance)."
+      question: "How does DS help me stay on schedule?",
+      answer: "DS monitors your writing progress and sends reminders when you're spending more time than planned on any section. Your dashboard displays both overall completion and chapter-by-chapter progress, keeping you motivated and organized."
     },
     {
-      question: "How accurate is the grant potential assessment?",
-      answer: "Our grant potential analysis is based on extensive databases of successful grants, current funding priorities, and historical success patterns. While we can't guarantee funding, our assessments have helped researchers improve their grant success rates by an average of 40%."
+      question: "Can I find research mentors on DS?",
+      answer: "Yes. The Academic Mentor Community connects you with verified academics worldwide. Mentors register using their institutional email, and you can search by area of expertise or institution. Mentorship sessions are offered at rates determined by each mentor."
     },
     {
-      question: "Can Dessert Scaffold help with interdisciplinary research?",
-      answer: "Yes, Dessert Scaffold excels at evaluating interdisciplinary research topics. Our system can analyze cross-disciplinary novelty, identify funding opportunities across multiple agencies, and assess the complexity of integrating different methodologies and approaches."
-    },
-    {
-      question: "How long does the evaluation process take?",
-      answer: "Most research topic evaluations are completed within 5-10 minutes. The system analyzes your topic against our comprehensive databases and provides detailed reports with actionable insights, funding recommendations, and strategic guidance."
-    },
-    {
-      question: "Is Dessert Scaffold suitable for all research fields?",
-      answer: "Yes, Dessert Scaffold supports evaluation across all academic disciplines including STEM, social sciences, humanities, and interdisciplinary fields. Our database includes funding opportunities, trends, and methodologies relevant to virtually every research area."
+      question: "Can DS be adapted to my institution's postgraduate guidelines?",
+      answer: "Absolutely. Institutions can partner with us to customize the DS framework according to their postgraduate thesis and dissertation requirements, ensuring alignment with their internal guidelines."
     }
   ];
 

@@ -132,20 +132,18 @@ export default function OnePlatformSection() {
       icon: <DollarSign className="w-4 h-4" />
     },
     {
-      title: "Research Gaps",
+      title: "Literature Availability",
       bgColor: "metric--gaps",
       iconColor: "",
       textColor: "",
       borderColor: "",
       items: [
-        { name: "Literature Review", active: true },
-        { name: "Knowledge Gaps", active: true },
-        { name: "Methodology Needs", active: true },
-        { name: "Data Requirements", active: true },
-        { name: "Validation Studies", active: true },
-        { name: "Future Directions", active: false },
+        { name: "Information Depth", active: true },
+        { name: "Open Access Ratio", active: true },
+        { name: "Database Coverage", active: true },
+        { name: "Scholarly Density", active: true },
       ],
-      description: "Identify critical research gaps and opportunities for meaningful contribution.",
+      description: "Evaluate whether sufficient, credible, and accessible research exists in your field of study — ensuring your topic is well-grounded and researchable.",
       icon: <BookOpen className="w-4 h-4" />
     },
     {
@@ -183,20 +181,20 @@ export default function OnePlatformSection() {
       icon: <Workflow className="w-4 h-4" />
     },
     {
-      title: "Impact",
+      title: "Research Gaps",
       bgColor: "metric--impact",
       iconColor: "",
       textColor: "",
       borderColor: "",
       items: [
-        { name: "Scientific Impact", active: true },
-        { name: "Social Relevance", active: true },
-        { name: "Economic Value", active: true },
-        { name: "Policy Implications", active: true },
-        { name: "Commercial Potential", active: true },
-        { name: "Long-term Benefits", active: false },
+        { name: "Literature Review", active: true },
+        { name: "Knowledge Gaps", active: true },
+        { name: "Methodology Needs", active: true },
+        { name: "Data Requirements", active: true },
+        { name: "Validation Studies", active: true },
+        { name: "Future Directions", active: false },
       ],
-      description: "Assess the potential impact and significance of your research outcomes.",
+      description: "Identify critical research gaps and opportunities for meaningful contribution.",
       icon: <Target className="w-4 h-4" />
     }
   ];

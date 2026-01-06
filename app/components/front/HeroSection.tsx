@@ -154,9 +154,7 @@ export default function HeroSection() {
             }`}
             style={{ transitionDelay: "300ms" }}
           >
-            Stop wasting time on unfundable research. Our platform analyzes your
-            topic across six dimensions to identify funding opportunities and
-            maximize your grant success.
+            Our AI-powered platform analyzes your research topic for novelty, trends, and funding potential, giving you a clear roadmap for a stronger thesis and better grant outcomes.
           </p>
 
           <div
